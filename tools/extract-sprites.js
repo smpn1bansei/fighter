@@ -83,6 +83,27 @@ const SHEETS = {
     matte: { dash: 20, punch: 30, guard: 30, salto: 40, flykick: 30, sweep: 40, stomp: 30 },
     anchorFix: {},
   },
+  pakjef: {
+    file: 'pak-jef.jpg',
+    colors: [[129, 129, 129], [186, 186, 186]],
+    tol: 12,
+    frames: ['stance', 'run', 'bigpunch', 'jab', 'crouch', 'kick', 'shoulder', 'guard', 'jump', 'smash', 'throw', 'flex'],
+    stand: 'stance',
+    portrait: 'flex',
+    matte: { run: 20, bigpunch: 30, jab: 20, kick: 30, shoulder: 20, guard: 30, smash: 30, throw: 30 },
+    anchorFix: { kick: -40 },
+  },
+  kingandri: {
+    file: 'king andri.jpg',
+    colors: [[120, 120, 120], [166, 166, 166]],
+    tol: 12,
+    frames: ['stance', 'fly', 'telekinesis', 'punch', 'charge', 'kick', 'rocks', 'shield', 'float', 'rain', 'aura', 'book'],
+    stand: 'book',
+    portrait: 'stance',
+    matte: { stance: 30, fly: 40, telekinesis: 40, punch: 40, charge: 30, kick: 50, rocks: 30, shield: 160, float: 40, rain: 50, aura: 110, book: 30 },
+    glass: { shield: [150, 225, 255], aura: [215, 245, 255] },
+    anchorFix: { telekinesis: -95, shield: -70, kick: -55 },
+  },
 };
 
 function findFrames(fg, w, h, count) {
@@ -128,7 +149,8 @@ function findFrames(fg, w, h, count) {
 
 // Efek cahaya semi-transparan yang "tercetak" di atas kotak-kotak: buang komponen abu-abunya
 // (color-to-alpha) untuk piksel terang yang tersambung ke latar tanpa melewati garis tepi gelap.
-function matteGlow(rgba, bw, bh, colors, maxDist) {
+// glass: warna seragam untuk efek tembus pandang (perisai kaca, aura) agar pola kotak-kotak hilang
+function matteGlow(rgba, bw, bh, colors, maxDist, glass) {
   const [dk, lt] = colors;
   const dist = new Int32Array(bw * bh).fill(-1);
   const queue = new Int32Array(bw * bh);
@@ -155,6 +177,14 @@ function matteGlow(rgba, bw, bh, colors, maxDist) {
     t = Math.max(-ext, Math.min(1 + ext, t));
     const B = [dk[0] + t * d0, dk[1] + t * d1, dk[2] + t * d2];
     const sd = Math.hypot(r - B[0], g - B[1], b - B[2]);
+    // (warna hangat seperti seragam & kulit tidak ikut diwarnai ulang)
+    if (glass && sd < 75 && r - b <= 6) {
+      const ga = Math.pow(Math.max(0, Math.min(1, (sd - 4) / 55)), 0.8) * 0.85;
+      if (ga < 0.04) { rgba[o + 3] = 0; continue; }
+      rgba[o] = glass[0]; rgba[o + 1] = glass[1]; rgba[o + 2] = glass[2];
+      rgba[o + 3] = Math.round(ga * 255);
+      continue;
+    }
     let a = Math.max(0, Math.min(1, (sd - 6) / 34));
     a = a * a * (3 - 2 * a);
     if (a >= 0.999) continue;
@@ -166,7 +196,7 @@ function matteGlow(rgba, bw, bh, colors, maxDist) {
   }
 }
 
-function cropFrame(img, fg, labels, blob, colors, matte) {
+function cropFrame(img, fg, labels, blob, colors, matte, glass) {
   const { w, data } = img;
   const ids = new Set(blob.ids);
   const bw = blob.maxX - blob.minX + 1, bh = blob.maxY - blob.minY + 1;
@@ -179,7 +209,7 @@ function cropFrame(img, fg, labels, blob, colors, matte) {
       rgba[o] = data[i * 3]; rgba[o + 1] = data[i * 3 + 1]; rgba[o + 2] = data[i * 3 + 2]; rgba[o + 3] = 255;
     }
   }
-  if (matte) matteGlow(rgba, bw, bh, colors, matte);
+  if (matte) matteGlow(rgba, bw, bh, colors, matte, glass);
   // Bersihkan "halo" di tepi: piksel tepi yang warnanya masih mirip latar.
   const [dk, lt] = colors;
   for (let pass = 0; pass < 2; pass++) {
@@ -267,7 +297,7 @@ async function processSheet(id) {
   const crops = {};
   frames.forEach((b, k) => {
     const name = cfg.frames[k];
-    crops[name] = cropFrame(img, fg, labels, b, cfg.colors, (cfg.matte || {})[name]);
+    crops[name] = cropFrame(img, fg, labels, b, cfg.colors, (cfg.matte || {})[name], (cfg.glass || {})[name]);
   });
 
   const standBox = tightBox(crops[cfg.stand].rgba, crops[cfg.stand].w, crops[cfg.stand].h);

@@ -131,6 +131,44 @@ window.UI = {
     return bg;
   },
 
+  // Tombol layar penuh (hanya muncul bila browser mendukung).
+  fullscreenToggle(scene, x, y) {
+    if (!scene.scale.fullscreen.available) return null;
+    const c = scene.add.container(x, y).setDepth(150);
+    const g = scene.add.graphics();
+    const t = UI.text(scene, 0, 0, '', 11, '#ffffff');
+    c.add([g, t]);
+    const draw = () => {
+      const on = scene.scale.isFullscreen;
+      g.clear();
+      g.fillStyle(0x000000, 0.5).fillRoundedRect(-72, -20, 144, 40, 10);
+      g.lineStyle(2, on ? 0x888888 : 0x4cd964, 1).strokeRoundedRect(-72, -20, 144, 40, 10);
+      t.setText(on ? 'KECILKAN' : 'LAYAR PENUH');
+      t.setColor(on ? '#999999' : '#4cd964');
+    };
+    c.setSize(144, 40).setInteractive({ useHandCursor: true });
+    c.on('pointerup', () => {
+      if (scene.scale.isFullscreen) scene.scale.stopFullscreen();
+      else UI.goFullscreen(scene);
+    });
+    scene.scale.on('enterfullscreen', draw);
+    scene.scale.on('leavefullscreen', draw);
+    scene.events.once('shutdown', () => {
+      scene.scale.off('enterfullscreen', draw);
+      scene.scale.off('leavefullscreen', draw);
+    });
+    draw();
+    return c;
+  },
+
+  // Masuk layar penuh + kunci posisi mendatar (harus dipanggil dari sentuhan/klik).
+  goFullscreen(scene) {
+    try {
+      if (!scene.scale.isFullscreen) scene.scale.startFullscreen();
+      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+    } catch (e) { /* tidak didukung browser */ }
+  },
+
   // Tombol suara kecil di pojok kanan atas.
   soundToggle(scene, x, y) {
     const c = scene.add.container(x, y).setDepth(150);

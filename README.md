@@ -13,11 +13,15 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 | **Marthadin**: Balerina Angin Puyuh | Tendangan Putar Udara: tendangan memutar di udara yang melepas bilah angin jarak jauh | Putaran Tornado: berputar menjadi angin puyuh yang menghisap lawan |
 | **Fatim**: Ninja Bayangan Bercadar | Shuriken Rahasia: tiga shuriken dari balik jubah | Tusukan Seribu Bayangan: menerjang lalu menusuk bertubi-tubi bersama bayangannya |
 | **Tio**: Pendekar Salto Kilat | Terjangan Kilat: menabrak lawan dengan kecepatan tinggi hingga terjatuh | Salto Badai: terjangan, tendangan salto ke udara, lalu hantaman ke tanah |
+| **Pak Jef**: Otot Baja Sekolah | Lemparan Batu Meriam: mencabut batu dari tanah lalu melemparnya | Batu Raksasa: mengangkat batu sangat besar dari tanah lalu melemparkannya |
+| **King Andri**: Raja Telekinesis *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Sinar Laser Merah: tubuh bercahaya lalu menembakkan laser sampai tepi layar |
 
 Ciri khas tambahan: Marthadin menyerang dengan lompatan split *Grand Jeté* (TENDANG) dan menukik dari udara,
 Fatim bergerak maju dengan lari merunduk yang cepat, Tio punya tendangan salto (PUKUL 3x).
+Pukulan & tendangan Pak Jef 35% lebih kuat dan mendorong lawan lebih jauh, tapi ia bergerak lebih lambat.
+Pukulan & tendangan King Andri berupa angin sabit yang menjangkau setengah layar, dan cakranya penuh dalam 2 detik.
 
-6 slot karakter lain sudah disiapkan (terkunci, "segera hadir").
+4 slot karakter lain sudah disiapkan (terkunci, "segera hadir").
 
 ## Cara main
 
@@ -55,12 +59,15 @@ Lalu buka <http://localhost:8080> di browser. Cara lain: ekstensi **Live Server*
 3. Di repository: **Settings → Pages → Source: Deploy from a branch**, pilih branch `main` dan folder `/ (root)`, lalu **Save**.
 4. Setelah 1–2 menit game bisa dibuka di `https://<nama-akun>.github.io/seikijang-fighter/`.
 
+Saat dibuka, game menampilkan layar "SENTUH LAYAR UNTUK MULAI". Sentuhan itu langsung membuat game layar penuh dan mendatar
+(browser HP hanya mengizinkan layar penuh setelah layar disentuh). Tombol **LAYAR PENUH** juga ada di layar judul, pilih karakter, dan menu jeda.
+
 Tips untuk HP: buka alamat game di Chrome, lalu pilih menu **⋮ → Tambahkan ke layar utama**.
 Game akan terbuka layar penuh dan mendatar seperti aplikasi.
 
 ## Memperbarui game yang sudah online
 
-Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.1` → `?v=1.2`)
+Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.2` → `?v=1.3`) dan `VERSION` di `js/config.js`
 agar HP pemain langsung memuat versi terbaru, bukan versi lama yang tersimpan di browser.
 GitHub Pages butuh sekitar 1–10 menit untuk menampilkan perubahan.
 
@@ -99,6 +106,7 @@ js/characters.js      data 12 slot karakter
 js/fighter.js         gerak, serangan, & status petarung
 js/jutsu.js           jurus-jurus ninja (Nur, Sit, Ranti) + dasar proyektil
 js/jutsu2.js          jurus Marthadin, Fatim, Tio
+js/jutsu3.js          jurus Pak Jef, King Andri
 js/ai.js              kecerdasan komputer
 js/input.js           keyboard & tombol layar sentuh
 js/fx.js              efek visual

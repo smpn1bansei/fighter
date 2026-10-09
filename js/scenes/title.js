@@ -67,6 +67,7 @@ class TitleScene extends Phaser.Scene {
     this.tweens.add({ targets: start, scale: 1.05, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     UI.soundToggle(this, W - 90, 40);
+    UI.fullscreenToggle(this, W - 246, 40);
     UI.text(this, W - 16, H - 16, 'v' + CFG.VERSION, 10, '#9aa3c0').setOrigin(1, 1).setDepth(6);
     const hint = this.sys.game.device.input.touch ? 'Tekan MULAI untuk bermain layar penuh' : 'Gunakan panah & Enter untuk memilih';
     UI.text(this, W / 2, H - 26, hint, 11, '#cfd5ea').setDepth(6);
@@ -85,12 +86,7 @@ class TitleScene extends Phaser.Scene {
     this.leaving = true;
     Sound.init();
     // Di HP: masuk layar penuh & kunci posisi mendatar bila didukung browser
-    if (this.sys.game.device.input.touch && !this.scale.isFullscreen) {
-      try {
-        this.scale.startFullscreen();
-        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
-      } catch (e) { /* tidak didukung */ }
-    }
+    if (this.sys.game.device.input.touch) UI.goFullscreen(this);
     this.cameras.main.fadeOut(250, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Select'));
   }

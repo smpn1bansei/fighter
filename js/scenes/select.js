@@ -62,7 +62,14 @@ class SelectScene extends Phaser.Scene {
     this.diffDesc = UI.text(this, 0, 530, '', 12, '#e8e8f0');
     this.diffBox.add(this.diffDesc);
 
-    this.confirmBtn = UI.button(this, W / 2, H - 62, 400, 66, 'PILIH', () => this.confirm(), { size: 22, color: 0xff6a2a, noHover: true });
+    // Tombol di bawah panel masing-masing (jauh dari tengah bawah layar, tempat
+    // munculnya pesan "layar penuh" di HP).
+    this.pickBtn = UI.button(this, 168, H - 56, 280, 64, 'PILIH', () => this.confirm(), { size: 22, color: 0xff6a2a, noHover: true });
+    this.startBtn = UI.button(this, W - 168, H - 56, 280, 64, 'MULAI TANDING!', () => this.confirm(), { size: 17, color: 0x4cd964, noHover: true });
+    [this.pickBtn, this.startBtn].forEach((b) => {
+      b.setFocus(true);
+      this.tweens.add({ targets: b, scale: 1.05, duration: 520, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    });
     this.backBtn = UI.button(this, 104, 46, 170, 50, '◀ KEMBALI', () => this.back(), { size: 12, color: 0x8a8fa8, sound: 'back' });
 
     // Keyboard
@@ -78,6 +85,7 @@ class SelectScene extends Phaser.Scene {
     });
 
     UI.soundToggle(this, W - 90, 46);
+    UI.fullscreenToggle(this, W - 246, 46);
     if (this.p1) this.step = 2;
     this.refresh();
   }
@@ -88,13 +96,13 @@ class SelectScene extends Phaser.Scene {
     const c = this.add.container(x, 0);
     const g = this.add.graphics();
     const color = side === 0 ? 0x4aa8ff : 0xff4d4d;
-    g.fillStyle(color, 0.12).fillRoundedRect(-148, 128, 296, 520, 16);
-    g.lineStyle(3, color, 0.7).strokeRoundedRect(-148, 128, 296, 520, 16);
-    const label = UI.text(this, 0, 150, side === 0 ? 'KAMU' : 'KOMPUTER', 14, UI.hex(color));
-    const img = this.add.image(0, 572, 'bg').setOrigin(0.5, 1).setVisible(false);
-    const q = UI.title(this, 0, 380, '?', 120, '#3a3760');
-    const name = UI.title(this, 0, 598, '', 34, '#ffffff');
-    const title = UI.text(this, 0, 628, '', 10, '#cfd5ea');
+    g.fillStyle(color, 0.12).fillRoundedRect(-148, 120, 296, 496, 16);
+    g.lineStyle(3, color, 0.7).strokeRoundedRect(-148, 120, 296, 496, 16);
+    const label = UI.text(this, 0, 142, side === 0 ? 'KAMU' : 'KOMPUTER', 14, UI.hex(color));
+    const img = this.add.image(0, 548, 'bg').setOrigin(0.5, 1).setVisible(false);
+    const q = UI.title(this, 0, 360, '?', 120, '#3a3760');
+    const name = UI.title(this, 0, 572, '', 34, '#ffffff');
+    const title = UI.text(this, 0, 600, '', 10, '#cfd5ea');
     const stamp = UI.title(this, 0, 300, 'SIAP!', 64, '#ffd75a').setAngle(-12).setVisible(false);
     c.add([g, q, img, label, name, title, stamp]);
     return { c, img, q, name, title, stamp, id: null, side };
@@ -287,7 +295,9 @@ class SelectScene extends Phaser.Scene {
       this.diffBtns.forEach((b, i) => b.setFocus(i === this.diff));
       this.diffDesc.setText(CFG.DIFFICULTY[this.diff].desc);
     }
-    this.confirmBtn.setLabel(this.step === 3 ? 'MULAI TANDING!' : 'PILIH');
-    this.confirmBtn.setFocus(true);
+    // tombol PILIH berada di bawah panel pemain yang sedang dipilih
+    this.pickBtn.setVisible(this.step < 3);
+    this.pickBtn.x = this.step === 1 ? 168 : CFG.W - 168;
+    this.startBtn.setVisible(this.step === 3);
   }
 }

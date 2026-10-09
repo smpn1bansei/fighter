@@ -113,6 +113,12 @@ class AIController extends Controller {
       return;
     }
 
+    // Karakter dengan serangan jarak jauh (angin sabit) menyerang dari jauh
+    if (me.def.ranged && dist > 180 && dist < CFG.W * 0.47 && r < lv.aggression * 0.75) {
+      this.press(Math.random() < 0.6 ? 'punch' : 'kick');
+      return;
+    }
+
     if (dist > 380) {
       if (canJ && dist <= (j.range || 400) && r < lv.jutsu) this.press('jurus');
       else if (me.chakra < CFG.MAX_CHAKRA && r < 0.25) this.plan = { hold: { charge: true }, frames: 25 + Phaser.Math.Between(0, 25) };

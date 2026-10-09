@@ -245,9 +245,15 @@ class FightScene extends Phaser.Scene {
     att.hasHit = true;
     const ix = (Math.max(ab.x, hb.x) + Math.min(ab.x + ab.w, hb.x + hb.w)) / 2;
     const iy = (Math.max(ab.y, hb.y) + Math.min(ab.y + ab.h, hb.y + hb.h)) / 2;
+    // power: karakter bertenaga besar (mis. Pak Jef) memukul lebih keras & lebih jauh
+    const pw = att.def.power || 1;
     this.applyHit(att, att.opp, {
-      dmg: m.dmg, hitstun: m.hitstun, blockstun: m.blockstun, push: m.push,
-      kd: m.kd, launch: m.launch, heavy: m.heavy, x: ix, y: iy,
+      dmg: Math.round(m.dmg * pw),
+      hitstun: (m.hitstun || 18) + (pw > 1 ? 5 : 0),
+      blockstun: (m.blockstun || 12) + (pw > 1 ? 3 : 0),
+      push: (m.push || 5) * pw,
+      kd: m.kd, launch: m.launch && [m.launch[0] * pw, m.launch[1]],
+      heavy: m.heavy || pw > 1.2, x: ix, y: iy,
     });
   }
 
@@ -500,8 +506,10 @@ class FightScene extends Phaser.Scene {
       UI.button(this, W / 2, 530, 340, 64, 'MENU UTAMA', () => this.leave('Title'), { size: 16 }),
     ];
     btns.forEach((b) => c.add(b));
-    const snd = UI.soundToggle(this, W / 2, 615);
+    const snd = UI.soundToggle(this, W / 2 - 80, 615);
     c.add(snd);
+    const fs = UI.fullscreenToggle(this, W / 2 + 80, 615);
+    if (fs) c.add(fs);
     this.pausePanel = c;
     this.pauseMenu = UI.menu(this, btns);
   }

@@ -47,6 +47,7 @@ class Fighter {
     this.airUsed = false;
     this.comboTaken = 0;
     this.grabbing = false; // sedang "memegang" lawan dalam jurus (dorongan antar-petarung dimatikan)
+    this.tintOverride = null;
     this.ko = false;
     this.flashAt = -1e9;
     this.walkPhase = 0;
@@ -165,7 +166,10 @@ class Fighter {
           // pose khusus saat maju (mis. lari merunduk Fatim)
           this.setPose(fwd && d.frames.walkF ? d.frames.walkF : d.frames.walk);
           this.walkPhase += 0.22;
-          if (fwd && d.frames.walkF && this.t % 4 === 0) this.afterimage(d.color, 0.3, 160);
+          if (fwd && d.frames.walkF && this.t % 4 === 0) {
+            if (d.walkFx === 'dust') this.fx.dust(this.x - this.facing * 30, this.ground, 1);
+            else this.afterimage(d.color, 0.3, 160);
+          }
         } else {
           this.vx = 0;
           if (this.state !== 'idle') this.setState('idle');
@@ -253,7 +257,8 @@ class Fighter {
   }
 
   chargeChakra() {
-    this.gainChakra(0.55);
+    // chargeRate: kecepatan isi cakra per langkah (0.55 = penuh dalam ~3 detik)
+    this.gainChakra(this.def.chargeRate || 0.55);
     if (this.t % 27 === 1) Sound.play('charge');
     if (this.t % 20 === 1) this.fx.shock(this.x, this.ground, this.def.color, 1.6);
   }
@@ -279,6 +284,11 @@ class Fighter {
     const a0 = m.startup, a1 = m.startup + m.active, total = a1 + m.recovery;
     if (t === a0) {
       this.setPose(m.frame);
+      // serangan jarak jauh (mis. angin sabit King Andri)
+      if (m.proj) {
+        new WindCrescent(this, m);
+        this.hasHit = true;
+      }
       if (m.slash) {
         const p = this.at(m.box[0] * 0.8, m.box[1]);
         this.fx.slash(p.x, p.y, this.facing, m.slash);
@@ -504,6 +514,7 @@ class Fighter {
     const fl = time - this.flashAt;
     if (this.flashHard && fl < 60) sp.setTintFill(0xffffff);
     else if (fl < 170) sp.setTint(0xff8a8a);
+    else if (this.tintOverride) sp.setTint(this.tintOverride);
     else if (this.baseTint) sp.setTint(this.baseTint);
     else sp.clearTint();
 

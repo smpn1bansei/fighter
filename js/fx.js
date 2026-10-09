@@ -203,6 +203,43 @@ window.FX = {
       g.fillStyle = fade;
       g.fillRect(0, 0, 96, 256);
     });
+    // Sinar horizontal (Kamehameha, laser)
+    make('fx_hbeam', 256, 64, (g) => {
+      const gr = g.createLinearGradient(0, 0, 0, 64);
+      gr.addColorStop(0, 'rgba(255,255,255,0)');
+      gr.addColorStop(0.3, 'rgba(255,255,255,0.75)');
+      gr.addColorStop(0.5, 'rgba(255,255,255,1)');
+      gr.addColorStop(0.7, 'rgba(255,255,255,0.75)');
+      gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr;
+      g.fillRect(0, 0, 256, 64);
+    });
+    // Batu bulat (dilempar Pak Jef)
+    make('fx_boulder', 96, 96, (g) => {
+      g.beginPath();
+      const pts = 14;
+      for (let i = 0; i < pts; i++) {
+        const a = (i / pts) * Math.PI * 2;
+        const r = 40 + Math.sin(i * 2.7) * 4 + Math.cos(i * 1.3) * 3;
+        g.lineTo(48 + Math.cos(a) * r, 48 + Math.sin(a) * r);
+      }
+      g.closePath();
+      const gr = g.createRadialGradient(36, 34, 4, 48, 48, 46);
+      gr.addColorStop(0, '#a99a86');
+      gr.addColorStop(0.55, '#7a6650');
+      gr.addColorStop(1, '#3e3226');
+      g.fillStyle = gr;
+      g.fill();
+      g.lineWidth = 4;
+      g.strokeStyle = '#211a12';
+      g.stroke();
+      g.strokeStyle = 'rgba(33,26,18,0.7)';
+      g.lineWidth = 2.5;
+      g.beginPath(); g.moveTo(30, 52); g.lineTo(44, 60); g.lineTo(50, 74); g.stroke();
+      g.beginPath(); g.moveTo(58, 28); g.lineTo(66, 40); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,0.18)';
+      g.beginPath(); g.ellipse(36, 32, 12, 7, -0.5, 0, Math.PI * 2); g.fill();
+    });
     // Shuriken baja (tidak diwarnai ulang)
     make('fx_shuriken', 48, 48, (g) => {
       g.translate(24, 24);

@@ -186,13 +186,80 @@ window.ROSTER = [
       win: 'Kecepatan adalah kekuatan!',
     },
   },
+  {
+    id: 'pakjef',
+    name: 'PAK JEF',
+    title: 'Otot Baja Sekolah',
+    element: 'KEKUATAN FISIK',
+    desc: 'Guru bertenaga raksasa. Pukulan & tendangannya jauh lebih keras dari petarung lain, tapi geraknya lebih lambat.',
+    color: 0x4cd964,
+    color2: 0xffd75a,
+    walk: 3.5, backWalk: 3.0, jumpV: 17.5, jumpX: 4.6,
+    power: 1.35, // pukulan & tendangan 35% lebih kuat, dorongan lebih jauh
+    walkFx: 'dust',
+    hurtbox: { w: 124, h: 280 },
+    frames: {
+      idle: 'stance', walk: 'stance', walkF: 'run', jump: 'jump', fall: 'jump', hurt: 'crouch', fly: 'jump', lie: 'stance',
+      getup: 'crouch', guard: 'guard', charge: 'flex', intro: 'flex', win: 'flex', seal: 'crouch',
+    },
+    moves: {
+      p1: { frame: 'jab', startup: 5, active: 3, recovery: 10, dmg: 45, hitstun: 18, blockstun: 11, push: 6, box: [130, 205, 104, 74], lunge: 2, next: 'p2' },
+      p2: { frame: 'bigpunch', startup: 6, active: 4, recovery: 12, dmg: 50, hitstun: 20, blockstun: 12, push: 7, box: [135, 200, 124, 104], lunge: 2, next: 'p3', slash: 0xffffff },
+      // terjangan bahu
+      p3: { frame: 'shoulder', pre: 'crouch', startup: 8, active: 6, recovery: 18, dmg: 70, blockstun: 15, push: 9, box: [95, 170, 140, 200], lunge: 7, kd: true, launch: [10, -9], heavy: true },
+      kick: { frame: 'kick', pre: 'stance', startup: 9, active: 4, recovery: 17, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 200, 124, 134], lunge: 2, heavy: true, slash: 0xdff4ff },
+      air: { frame: 'smash', startup: 4, active: 40, recovery: 9, dmg: 80, hitstun: 22, blockstun: 12, push: 7, box: [40, 45, 160, 120], dive: [2, 16], heavy: true },
+    },
+    jurus: { type: 'cannonrock', name: 'LEMPARAN BATU MERIAM', cost: 30, range: 1500, desc: 'Mencabut batu dari tanah lalu melemparnya ke lawan' },
+    ulti: { type: 'megaboulder', name: 'BATU RAKSASA', cost: 100, range: 1500, desc: 'Mengangkat batu raksasa dari tanah lalu melemparkannya' },
+    quotes: {
+      intro: 'Otot ini bukan pajangan!',
+      win: 'Olahraga itu penting, anak-anak!',
+    },
+  },
+  {
+    id: 'kingandri',
+    name: 'KING ANDRI',
+    title: 'Raja Telekinesis',
+    element: 'TELEKINESIS (OVER POWER)',
+    desc: 'Karakter terkuat! Pukulan & tendangannya berupa angin sabit yang melesat setengah layar. Cakra penuh hanya 2 detik.',
+    color: 0x5fe0ff,
+    color2: 0xbff4ff,
+    walk: 4.6, backWalk: 4.0, jumpV: 19, jumpX: 5.6,
+    chargeRate: 0.84, // cakra penuh dalam 2 detik
+    ranged: true,      // pukulan & tendangan menyerang dari jauh (dipakai AI)
+    hurtbox: { w: 106, h: 272 },
+    frames: {
+      idle: 'stance', walk: 'stance', walkF: 'fly', jump: 'float', fall: 'float', hurt: 'charge', fly: 'float', lie: 'book',
+      getup: 'charge', guard: 'shield', charge: 'aura', intro: 'float', win: 'book', seal: 'charge',
+    },
+    // proj: angin sabit ("pisang angin") yang terbang setengah layar
+    moves: {
+      p1: { frame: 'punch', startup: 4, active: 3, recovery: 10, dmg: 40, hitstun: 18, blockstun: 11, push: 6, box: [130, 205, 90, 70], next: 'p2', proj: { h: 205, speed: 18 } },
+      p2: { frame: 'telekinesis', startup: 5, active: 3, recovery: 12, dmg: 45, hitstun: 20, blockstun: 12, push: 7, box: [130, 200, 90, 70], next: 'p3', proj: { h: 195, speed: 18 } },
+      p3: { frame: 'rocks', startup: 7, active: 3, recovery: 18, dmg: 70, blockstun: 15, push: 9, box: [130, 190, 120, 120], kd: true, launch: [9, -12], heavy: true, proj: { h: 185, speed: 17, scale: 1.4 } },
+      kick: { frame: 'kick', pre: 'stance', startup: 8, active: 3, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [130, 175, 120, 120], heavy: true, proj: { h: 175, speed: 17, scale: 1.3 } },
+      air: { frame: 'rain', startup: 4, active: 3, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [100, 120, 90, 90], air: true, proj: { h: 140, speed: 15, vy: 6 } },
+    },
+    jurus: { type: 'kamehameha', name: 'KAMEHAMEHA', cost: 30, range: 1500, desc: 'Gelombang energi yang menjangkau tepi layar' },
+    ulti: { type: 'redlaser', name: 'SINAR LASER MERAH', cost: 100, range: 1500, desc: 'Tubuh bercahaya lalu menembakkan laser merah sampai tepi layar' },
+    quotes: {
+      intro: 'Raja tidak perlu mendekat.',
+      win: 'Itulah kekuatan seorang raja!',
+    },
+  },
 ];
 
 // Slot karakter yang akan dikembangkan nanti.
-for (let i = 1; i <= 6; i++) {
+for (let i = 1; i <= 4; i++) {
   window.ROSTER.push({ id: 'locked' + i, name: '???', locked: true });
 }
 
 window.getChar = function (id) {
   return window.ROSTER.find((c) => c.id === id);
 };
+
+// Serangan udara (tombol serang saat melompat) selalu ditandai sebagai serangan udara.
+for (const c of window.ROSTER) {
+  if (c.moves && c.moves.air) c.moves.air.air = true;
+}
