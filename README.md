@@ -7,21 +7,22 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 
 | Karakter | Jurus (butuh cakra) | Jurus Pamungkas (cakra penuh) |
 |---|---|---|
-| **Nur Hokage**: Hokage Cahaya Emas | Rasengan Cahaya: melesat membawa bola cakra berputar | Rasen-Shuriken Hokage: shuriken angin raksasa yang mengurung lawan |
-| **Sit Hokage**: Hokage Api Konoha | Katon: Bola Api, segel tangan lalu menyemburkan bola api | Kuchiyose: Pilar Api, segel pemanggil memunculkan pilar api di bawah lawan |
+| **Nur Hokage**: Hokage Cahaya Emas | Rasengan Cahaya: melesat maju membawa bola cakra berputar | Rasen-Shuriken Hokage: shuriken angin raksasa yang mengurung lawan |
+| **Siti Hokage**: Hokage Api Konoha | Katon: Bola Api, segel tangan lalu menyemburkan bola api | Kuchiyose: Pilar Api, segel pemanggil memunculkan pilar api di bawah lawan |
 | **Ranti**: Sannin Tinju Seratus | Retakan Bumi: tinju ke tanah, batu menjalar ke lawan | Byakugo: Tinju Seratus, memulihkan darah lalu menghantam dengan tinju raksasa |
-| **Marthadin**: Balerina Angin Puyuh | Tendangan Putar Udara: tendangan memutar di udara yang melepas bilah angin jarak jauh | Putaran Tornado: berputar menjadi angin puyuh yang menghisap lawan |
+| **Mrs. Dina**: Balerina Kilat | Tendangan Putar Udara: tendangan memutar di udara yang melepas bilah angin jarak jauh | Tendangan Badai: tendangan jarak jauh berupa badai angin yang melempar lawan |
 | **Fatim**: Ninja Bayangan Bercadar | Shuriken Rahasia: tiga shuriken dari balik jubah | Tusukan Seribu Bayangan: menerjang lalu menusuk bertubi-tubi bersama bayangannya |
-| **Tio**: Pendekar Salto Kilat | Terjangan Kilat: menabrak lawan dengan kecepatan tinggi hingga terjatuh | Salto Badai: terjangan, tendangan salto ke udara, lalu hantaman ke tanah |
+| **Mas Tio**: Pendekar Salto Kilat | Terjangan Kilat: menabrak lawan dengan kecepatan tinggi hingga terjatuh | Salto Badai: terjangan, tendangan salto ke udara, lalu hantaman ke tanah |
 | **Pak Jef**: Otot Baja Sekolah | Lemparan Batu Meriam: mencabut batu dari tanah lalu melemparnya | Batu Raksasa: mengangkat batu sangat besar dari tanah lalu melemparkannya |
-| **King Andri**: Raja Telekinesis *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Sinar Laser Merah: tubuh bercahaya lalu menembakkan laser sampai tepi layar |
+| **King Andri**: Raja Petir *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Laser Merah Langit: melompat tinggi lalu menembakkan laser merah ke bawah, lawan terlempar |
+| **Mbak Nita**: Pemanah Petir | Panah Cahaya: mengeluarkan busur lalu menembakkan panah | Panah Petir: panah berpetir yang menyeret lawan jauh ke belakang |
 
-Ciri khas tambahan: Marthadin menyerang dengan lompatan split *Grand Jeté* (TENDANG) dan menukik dari udara,
-Fatim bergerak maju dengan lari merunduk yang cepat, Tio punya tendangan salto (PUKUL 3x).
+Ciri khas tambahan: TENDANG Mrs. Dina adalah terjangan secepat kilat yang melempar lawan,
+Fatim bergerak maju dengan lari merunduk yang cepat, Mas Tio punya tendangan salto (PUKUL 3x).
 Pukulan & tendangan Pak Jef 35% lebih kuat dan mendorong lawan lebih jauh, tapi ia bergerak lebih lambat.
-Pukulan & tendangan King Andri berupa angin sabit yang menjangkau setengah layar, dan cakranya penuh dalam 2 detik.
+Pukulan & tendangan King Andri melepaskan petir sejauh setengah layar yang mendorong lawan, dan cakranya penuh dalam 2 detik.
 
-4 slot karakter lain sudah disiapkan (terkunci, "segera hadir").
+3 slot karakter lain sudah disiapkan (terkunci, "segera hadir").
 
 ## Cara main
 
@@ -67,7 +68,7 @@ Game akan terbuka layar penuh dan mendatar seperti aplikasi.
 
 ## Memperbarui game yang sudah online
 
-Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.2` → `?v=1.3`) dan `VERSION` di `js/config.js`
+Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.3` → `?v=1.4`) dan `VERSION` di `js/config.js`
 agar HP pemain langsung memuat versi terbaru, bukan versi lama yang tersimpan di browser.
 GitHub Pages butuh sekitar 1–10 menit untuk menampilkan perubahan.
 
@@ -92,6 +93,7 @@ Nama, deskripsi, kutipan, dan kekuatan karakter ada di `js/characters.js`.
    node extract-sprites.js <id-karakter>
    ```
 
+   Sheet boleh JPG atau PNG dengan latar kotak-kotak gelap maupun terang (lihat contoh `kingandri` & `nita`).
    Hasilnya `assets/sprites/<id>.webp`, `<id>.json`, `<id>-portrait.webp`, `<id>-face.webp`.
 4. Di `js/characters.js`, ganti salah satu slot `locked` dengan data karakter baru (salin data karakter yang ada lalu sesuaikan pose, jangkauan serangan, dan jurusnya). Jurus baru ditulis di `js/jutsu.js`.
 
@@ -105,8 +107,9 @@ js/config.js          pengaturan umum
 js/characters.js      data 12 slot karakter
 js/fighter.js         gerak, serangan, & status petarung
 js/jutsu.js           jurus-jurus ninja (Nur, Sit, Ranti) + dasar proyektil
-js/jutsu2.js          jurus Marthadin, Fatim, Tio
+js/jutsu2.js          jurus Mrs. Dina, Fatim, Mas Tio
 js/jutsu3.js          jurus Pak Jef, King Andri
+js/jutsu4.js          jurus Mbak Nita
 js/ai.js              kecerdasan komputer
 js/input.js           keyboard & tombol layar sentuh
 js/fx.js              efek visual

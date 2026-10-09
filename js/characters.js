@@ -43,7 +43,7 @@ window.ROSTER = [
   },
   {
     id: 'sit',
-    name: 'SIT HOKAGE',
+    name: 'SITI HOKAGE',
     title: 'Hokage Api Konoha',
     element: 'KATON (API)',
     desc: 'Pewaris tekad api. Menyemburkan bola api dan memanggil pilar api dari segel tanah.',
@@ -99,10 +99,10 @@ window.ROSTER = [
   },
   {
     id: 'marthadin',
-    name: 'MARTHADIN',
-    title: 'Balerina Angin Puyuh',
+    name: 'MRS. DINA',
+    title: 'Balerina Kilat',
     element: 'FUTON (ANGIN)',
-    desc: 'Lincah dan anggun bak balerina. Gerakan memutarnya melepaskan tendangan angin jarak jauh.',
+    desc: 'Lincah dan anggun bak balerina. Tendangannya menerjang secepat kilat, ultinya tendangan badai jarak jauh.',
     color: 0x7fd8ff,
     color2: 0xdff6ff,
     walk: 4.4, backWalk: 3.6, jumpV: 19.2, jumpX: 5.8,
@@ -115,13 +115,13 @@ window.ROSTER = [
       p1: { frame: 'palm', startup: 4, active: 3, recovery: 9, dmg: 40, hitstun: 18, blockstun: 11, push: 5, box: [128, 195, 100, 70], lunge: 2, next: 'p2' },
       p2: { frame: 'spin', startup: 5, active: 5, recovery: 11, dmg: 45, hitstun: 20, blockstun: 12, push: 6, box: [95, 175, 140, 140], lunge: 3, next: 'p3', slash: 0xbfe9ff },
       p3: { frame: 'highkick', pre: 'stance', startup: 7, active: 5, recovery: 17, dmg: 70, blockstun: 15, push: 7, box: [85, 240, 104, 190], lunge: 3, kd: true, launch: [5, -15], heavy: true },
-      // Grand Jete: lompatan split ke depan yang menyerang dari jauh
-      kick: { frame: 'jete', pre: 'stance', startup: 8, active: 8, recovery: 14, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 95, 160, 100], lunge: 7, hop: -8, heavy: true, slash: 0xdff6ff },
+      // Terjangan kilat: melesat ke lawan lalu menendang hingga terlempar ke belakang
+      kick: { frame: 'tornado', pre: 'stance', startup: 6, active: 14, recovery: 16, dmg: 90, blockstun: 14, push: 12, box: [110, 150, 150, 170], lunge: 16, trail: 0x9fe8ff, kd: true, launch: [17, -10], heavy: true, slash: 0xdff6ff },
       // Serangan Menukik: menukik dan menghantam tanah
       air: { frame: 'dive', startup: 4, active: 40, recovery: 8, dmg: 80, hitstun: 22, blockstun: 12, push: 6, box: [40, 45, 160, 120], dive: [3, 15], heavy: true },
     },
     jurus: { type: 'tornadokick', name: 'TENDANGAN PUTAR UDARA', cost: 30, range: 1500, desc: 'Tendangan memutar di udara yang melepaskan bilah angin' },
-    ulti: { type: 'cyclone', name: 'PUTARAN TORNADO', cost: 100, range: 480, desc: 'Berputar menjadi angin puyuh yang menghisap lawan' },
+    ulti: { type: 'galekick', name: 'TENDANGAN BADAI', cost: 100, range: 1500, desc: 'Berputar mengumpulkan angin lalu melepas tendangan jarak jauh yang melempar lawan' },
     quotes: {
       intro: 'Mari menari... di atas kekalahanmu!',
       win: 'Terima kasih atas tariannya.',
@@ -159,7 +159,7 @@ window.ROSTER = [
   },
   {
     id: 'tio',
-    name: 'TIO',
+    name: 'MAS TIO',
     title: 'Pendekar Salto Kilat',
     element: 'KECEPATAN KILAT',
     desc: 'Pesilat lincah dengan tendangan salto. Mampu menerjang lawan secepat kilat hingga terjatuh.',
@@ -220,38 +220,68 @@ window.ROSTER = [
   {
     id: 'kingandri',
     name: 'KING ANDRI',
-    title: 'Raja Telekinesis',
-    element: 'TELEKINESIS (OVER POWER)',
-    desc: 'Karakter terkuat! Pukulan & tendangannya berupa angin sabit yang melesat setengah layar. Cakra penuh hanya 2 detik.',
+    title: 'Raja Petir',
+    element: 'PETIR (OVER POWER)',
+    desc: 'Karakter terkuat! Pukulan & tendangannya melepaskan petir setengah layar yang mendorong lawan. Cakra penuh hanya 2 detik.',
     color: 0x5fe0ff,
     color2: 0xbff4ff,
     walk: 4.6, backWalk: 4.0, jumpV: 19, jumpX: 5.6,
     chargeRate: 0.84, // cakra penuh dalam 2 detik
     ranged: true,      // pukulan & tendangan menyerang dari jauh (dipakai AI)
+    flatPoses: true,   // pose terlempar/terbaring sudah digambar miring, jangan diputar lagi
     hurtbox: { w: 106, h: 272 },
     frames: {
-      idle: 'stance', walk: 'stance', walkF: 'fly', jump: 'float', fall: 'float', hurt: 'charge', fly: 'float', lie: 'book',
-      getup: 'charge', guard: 'shield', charge: 'aura', intro: 'float', win: 'book', seal: 'charge',
+      idle: 'stance', walk: 'stance', walkF: 'dash', jump: 'dash', fall: 'dash', hurt: 'hurt', fly: 'hurt', lie: 'lie',
+      getup: 'hurt', guard: 'shield', charge: 'aura', intro: 'book', win: 'book', seal: 'aura',
     },
-    // proj: angin sabit ("pisang angin") yang terbang setengah layar
+    // proj: petir yang melesat setengah layar & mendorong lawan jauh ke belakang
     moves: {
-      p1: { frame: 'punch', startup: 4, active: 3, recovery: 10, dmg: 40, hitstun: 18, blockstun: 11, push: 6, box: [130, 205, 90, 70], next: 'p2', proj: { h: 205, speed: 18 } },
-      p2: { frame: 'telekinesis', startup: 5, active: 3, recovery: 12, dmg: 45, hitstun: 20, blockstun: 12, push: 7, box: [130, 200, 90, 70], next: 'p3', proj: { h: 195, speed: 18 } },
-      p3: { frame: 'rocks', startup: 7, active: 3, recovery: 18, dmg: 70, blockstun: 15, push: 9, box: [130, 190, 120, 120], kd: true, launch: [9, -12], heavy: true, proj: { h: 185, speed: 17, scale: 1.4 } },
-      kick: { frame: 'kick', pre: 'stance', startup: 8, active: 3, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [130, 175, 120, 120], heavy: true, proj: { h: 175, speed: 17, scale: 1.3 } },
-      air: { frame: 'rain', startup: 4, active: 3, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [100, 120, 90, 90], air: true, proj: { h: 140, speed: 15, vy: 6 } },
+      p1: { frame: 'punch', startup: 4, active: 3, recovery: 10, dmg: 40, hitstun: 18, blockstun: 11, push: 17, box: [130, 205, 90, 70], next: 'p2', proj: { h: 205, speed: 22, bolt: true } },
+      p2: { frame: 'palm', startup: 5, active: 3, recovery: 12, dmg: 45, hitstun: 20, blockstun: 12, push: 19, box: [130, 200, 90, 70], next: 'p3', proj: { h: 185, speed: 22, bolt: true } },
+      p3: { frame: 'push', startup: 7, active: 3, recovery: 18, dmg: 70, blockstun: 15, push: 16, box: [130, 190, 120, 120], kd: true, launch: [15, -10], heavy: true, proj: { h: 195, speed: 21, scale: 1.4, bolt: true } },
+      kick: { frame: 'kick', pre: 'stance', startup: 8, active: 3, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 24, box: [130, 175, 120, 120], heavy: true, proj: { h: 200, speed: 21, scale: 1.3, bolt: true } },
+      air: { frame: 'kick', startup: 4, active: 3, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 12, box: [100, 120, 90, 90], air: true, proj: { h: 170, speed: 18, vy: 6, bolt: true } },
     },
     jurus: { type: 'kamehameha', name: 'KAMEHAMEHA', cost: 30, range: 1500, desc: 'Gelombang energi yang menjangkau tepi layar' },
-    ulti: { type: 'redlaser', name: 'SINAR LASER MERAH', cost: 100, range: 1500, desc: 'Tubuh bercahaya lalu menembakkan laser merah sampai tepi layar' },
+    ulti: { type: 'skylaser', name: 'LASER MERAH LANGIT', cost: 100, range: 1500, desc: 'Melompat tinggi lalu menembakkan laser merah ke bawah hingga lawan terlempar' },
     quotes: {
       intro: 'Raja tidak perlu mendekat.',
       win: 'Itulah kekuatan seorang raja!',
     },
   },
+  {
+    id: 'nita',
+    name: 'MBAK NITA',
+    title: 'Pemanah Petir',
+    element: 'PANAH CAHAYA',
+    desc: 'Pesilat sekaligus pemanah jitu. Busur cahayanya melepas panah berpetir yang menyeret lawan jauh ke belakang.',
+    color: 0xff6fae,
+    color2: 0xffd75a,
+    walk: 4.3, backWalk: 3.6, jumpV: 18.8, jumpX: 5.4,
+    flatPoses: true,
+    hurtbox: { w: 104, h: 272 },
+    frames: {
+      idle: 'stance', walk: 'stance', jump: 'stance', fall: 'stance', hurt: 'hurt', fly: 'fall', lie: 'lie', getup: 'hurt',
+      guard: 'guard', charge: 'drawbow', intro: 'aimbow', win: 'drawbow', seal: 'drawbow',
+    },
+    moves: {
+      p1: { frame: 'punch', startup: 4, active: 3, recovery: 9, dmg: 40, hitstun: 18, blockstun: 11, push: 5, box: [128, 205, 90, 70], lunge: 2, next: 'p2' },
+      p2: { frame: 'punch2', startup: 5, active: 4, recovery: 11, dmg: 45, hitstun: 20, blockstun: 12, push: 6, box: [138, 205, 100, 80], lunge: 4, next: 'p3', slash: 0xffd75a },
+      p3: { frame: 'highkick', pre: 'stance', startup: 7, active: 5, recovery: 17, dmg: 70, blockstun: 15, push: 8, box: [110, 225, 120, 170], lunge: 3, kd: true, launch: [7, -14], heavy: true, slash: 0xfff0c0 },
+      kick: { frame: 'kick', pre: 'stance', startup: 8, active: 4, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [125, 150, 130, 130], lunge: 2, heavy: true },
+      air: { frame: 'kick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [100, 120, 140, 130] },
+    },
+    jurus: { type: 'arrow', name: 'PANAH CAHAYA', cost: 25, range: 1500, desc: 'Mengeluarkan busur lalu menembakkan panah' },
+    ulti: { type: 'thunderarrow', name: 'PANAH PETIR', cost: 100, range: 1500, desc: 'Panah berpetir yang menyeret lawan jauh ke belakang' },
+    quotes: {
+      intro: 'Satu anak panah, satu sasaran.',
+      win: 'Tepat sasaran, seperti biasa!',
+    },
+  },
 ];
 
 // Slot karakter yang akan dikembangkan nanti.
-for (let i = 1; i <= 4; i++) {
+for (let i = 1; i <= 3; i++) {
   window.ROSTER.push({ id: 'locked' + i, name: '???', locked: true });
 }
 

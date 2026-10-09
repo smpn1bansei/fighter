@@ -286,7 +286,7 @@ class Fighter {
       this.setPose(m.frame);
       // serangan jarak jauh (mis. angin sabit King Andri)
       if (m.proj) {
-        new WindCrescent(this, m);
+        new LightningBolt(this, m);
         this.hasHit = true;
       }
       if (m.slash) {
@@ -299,6 +299,11 @@ class Fighter {
       }
     }
     if (this.onGround || m.hop) this.vx = t < a1 && m.lunge ? this.facing * m.lunge : this.vx * 0.7;
+    // jejak bayangan & kilat saat menerjang cepat
+    if (m.trail && t >= a0 - 2 && t < a1) {
+      if (t % 2 === 0) this.afterimage(m.trail, 0.5, 200);
+      if (t % 3 === 0) this.fx.burst(this.fx.sparks, this.x - this.facing * 40, this.y - Phaser.Math.Between(60, 220), 2, m.trail);
+    }
 
     if (t >= a0 && t < a1 && !this.hasHit) this.scene.checkMoveHit(this, m);
 
@@ -498,8 +503,9 @@ class Fighter {
       sx *= 1.06;
     }
     if (st === 'hurt' && this.t < 10) ox = (Math.random() - 0.5) * 9;
-    if (st === 'launched') rot = -this.facing * Math.min(this.t * 0.075, 1.35);
-    if (st === 'down') {
+    const flat = this.def.flatPoses; // pose terlempar/terbaring yang sudah digambar miring
+    if (st === 'launched') rot = -this.facing * Math.min(this.t * 0.075, flat ? 0.35 : 1.35);
+    if (st === 'down' && !flat) {
       rot = -this.facing * Math.PI / 2;
       const f = this.frames[this.pose];
       oy = -f.ax * f.w * this.S;

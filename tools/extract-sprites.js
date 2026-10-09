@@ -94,24 +94,40 @@ const SHEETS = {
     anchorFix: { kick: -40 },
   },
   kingandri: {
-    file: 'king andri.jpg',
-    colors: [[120, 120, 120], [166, 166, 166]],
-    tol: 12,
-    frames: ['stance', 'fly', 'telekinesis', 'punch', 'charge', 'kick', 'rocks', 'shield', 'float', 'rain', 'aura', 'book'],
+    // sheet perbaikan (PNG, kotak-kotak terang, resolusi lebih kecil)
+    file: 'perbaikan-king andri.png',
+    colors: [[232, 232, 232], [254, 254, 254]],
+    tol: 10,
+    frames: ['stance', 'dash', 'punch', 'kick', 'eyebeam', 'shield', 'hurt', 'lie', 'palm', 'push', 'aura', 'book'],
     stand: 'book',
     portrait: 'stance',
-    matte: { stance: 30, fly: 40, telekinesis: 40, punch: 40, charge: 30, kick: 50, rocks: 30, shield: 160, float: 40, rain: 50, aura: 110, book: 30 },
-    glass: { shield: [150, 225, 255], aura: [215, 245, 255] },
-    anchorFix: { telekinesis: -95, shield: -70, kick: -55 },
+    matte: { dash: 40, punch: 40, kick: 40, eyebeam: 60, shield: 160, hurt: 30, lie: 30, palm: 50, push: 50, aura: 80, book: 30 },
+    glass: { shield: [150, 225, 255] },
+    // efek biru pada pose sinar mata diubah menjadi merah (laser ulti)
+    recolor: { eyebeam: 'red' },
+    anchorFix: { punch: -60, kick: -70, eyebeam: -60, shield: -75, palm: -80, push: -60, dash: 40 },
+  },
+  nita: {
+    file: 'dwi-rose.jpg',
+    colors: [[100, 100, 100], [156, 156, 156]],
+    tol: 12,
+    frames: ['stance', 'drawbow', 'aimbow', 'shoot', 'punch', 'punch2', 'kick', 'highkick', 'guard', 'hurt', 'fall', 'lie'],
+    stand: 'stance',
+    portrait: 'aimbow',
+    face: 'stance', // ikon wajah diambil dari pose ini (di pose busur, busur menutupi kepala)
+    matte: { drawbow: 40, aimbow: 40, shoot: 40, punch: 20, punch2: 20, kick: 20, highkick: 30, guard: 30, lie: 20 },
+    anchorFix: { kick: -50, highkick: -50 },
   },
 };
 
 function findFrames(fg, w, h, count) {
   const grown = dilate(fg, w, h, 6);
   const { labels, comps } = labelComponents(grown, w, h, 1);
-  let blobs = comps.filter(c => c.area > 1500).map(c => ({ ...c, ids: [c.id], cy: (c.minY + c.maxY) / 2 }));
-  const big = blobs.filter(b => b.area >= 30000);
-  const small = blobs.filter(b => b.area < 30000);
+  // ambang ukuran disesuaikan dengan resolusi sheet (acuan 2400x1792)
+  const k = (w * h) / (2400 * 1792), kl = Math.sqrt(k);
+  let blobs = comps.filter(c => c.area > 1500 * k).map(c => ({ ...c, ids: [c.id], cy: (c.minY + c.maxY) / 2 }));
+  const big = blobs.filter(b => b.area >= 30000 * k);
+  const small = blobs.filter(b => b.area < 30000 * k);
   // Gabungkan potongan kecil (mis. efek api yang terpisah) ke pose terdekat.
   for (const s of small) {
     let best = null, bestD = Infinity;
@@ -124,7 +140,7 @@ function findFrames(fg, w, h, count) {
       const d = dx + dy - (ox * oy) / 1e6;
       if (d < bestD) { bestD = d; best = b; }
     }
-    if (best && bestD < 60) {
+    if (best && bestD < 60 * kl) {
       best.ids.push(s.id);
       best.minX = Math.min(best.minX, s.minX); best.maxX = Math.max(best.maxX, s.maxX);
       best.minY = Math.min(best.minY, s.minY); best.maxY = Math.max(best.maxY, s.maxY);
@@ -136,7 +152,7 @@ function findFrames(fg, w, h, count) {
   big.sort((a, b) => a.cy - b.cy);
   const rows = [];
   for (const b of big) {
-    const row = rows.find(r => Math.abs(r.cy - b.cy) < 220);
+    const row = rows.find(r => Math.abs(r.cy - b.cy) < 220 * kl);
     if (row) row.items.push(b); else rows.push({ cy: b.cy, items: [b] });
   }
   const ordered = [];
@@ -193,6 +209,19 @@ function matteGlow(rgba, bw, bh, colors, maxDist, glass) {
     rgba[o + 1] = Math.max(0, Math.min(255, Math.round(B[1] + (g - B[1]) / a)));
     rgba[o + 2] = Math.max(0, Math.min(255, Math.round(B[2] + (b - B[2]) / a)));
     rgba[o + 3] = Math.round(a * 255);
+  }
+}
+
+// Ubah piksel efek biru/cyan menjadi merah (warna kulit & seragam tidak tersentuh).
+function recolorCyanToRed(rgba) {
+  for (let o = 0; o < rgba.length; o += 4) {
+    if (!rgba[o + 3]) continue;
+    const r = rgba[o], g = rgba[o + 1], b = rgba[o + 2];
+    if (b > r + 30 && g > r + 10) {
+      rgba[o] = b;
+      rgba[o + 1] = Math.round(r * 0.7);
+      rgba[o + 2] = Math.round(r * 0.7);
+    }
   }
 }
 
@@ -298,6 +327,7 @@ async function processSheet(id) {
   frames.forEach((b, k) => {
     const name = cfg.frames[k];
     crops[name] = cropFrame(img, fg, labels, b, cfg.colors, (cfg.matte || {})[name], (cfg.glass || {})[name]);
+    if ((cfg.recolor || {})[name] === 'red') recolorCyanToRed(crops[name].rgba);
   });
 
   const standBox = tightBox(crops[cfg.stand].rgba, crops[cfg.stand].w, crops[cfg.stand].h);
@@ -331,16 +361,18 @@ async function processSheet(id) {
   const p = await scaled(crops[cfg.portrait], PORTRAIT_HEIGHT / standBox.h);
   await sharp(p.rgba, { raw: { width: p.w, height: p.h, channels: 4 } }).webp(WEBP)
     .toFile(path.join(OUT_DIR, `${id}-portrait.webp`));
-  const headTop = tightBox(p.rgba, p.w, p.h).minY;
+  // ikon wajah: dari pose `face` bila ada (default sama dengan potret)
+  const fp = cfg.face ? await scaled(crops[cfg.face], PORTRAIT_HEIGHT / standBox.h) : p;
+  const headTop = tightBox(fp.rgba, fp.w, fp.h).minY;
   let sx = 0, n = 0;
-  for (let y = headTop; y < headTop + p.h * 0.1; y++) for (let x = 0; x < p.w; x++) {
-    if (p.rgba[(y * p.w + x) * 4 + 3] > 128) { sx += x; n++; }
+  for (let y = headTop; y < headTop + fp.h * 0.1; y++) for (let x = 0; x < fp.w; x++) {
+    if (fp.rgba[(y * fp.w + x) * 4 + 3] > 128) { sx += x; n++; }
   }
-  const cx = n ? sx / n : p.w / 2;
-  const size2 = Math.round(p.h * 0.3);
-  const left = Math.max(0, Math.min(p.w - size2, Math.round(cx - size2 / 2)));
-  await sharp(p.rgba, { raw: { width: p.w, height: p.h, channels: 4 } })
-    .extract({ left, top: Math.max(0, headTop - 6), width: Math.min(size2, p.w), height: size2 })
+  const cx = n ? sx / n : fp.w / 2;
+  const size2 = Math.round(fp.h * 0.3);
+  const left = Math.max(0, Math.min(fp.w - size2, Math.round(cx - size2 / 2)));
+  await sharp(fp.rgba, { raw: { width: fp.w, height: fp.h, channels: 4 } })
+    .extract({ left, top: Math.max(0, headTop - 6), width: Math.min(size2, fp.w), height: size2 })
     .webp(WEBP).toFile(path.join(OUT_DIR, `${id}-face.webp`));
 
   if (DEBUG_DIR) await debugSheet(id, out);

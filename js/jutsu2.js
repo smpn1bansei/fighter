@@ -1,29 +1,38 @@
 // =====================================================================
-// JURUS KARAKTER GELOMBANG 2: Marthadin, Fatim, Tio
+// JURUS KARAKTER GELOMBANG 2: Mrs. Dina (id: marthadin), Fatim, Mas Tio (id: tio)
 // (memakai Actor, ADD, rnd, circleRect, fadeOut dari jutsu.js)
 // =====================================================================
 
 // ---------------------------------------------------------------------
-// MARTHADIN — Tendangan Putar Udara: melompat memutar & melepas bilah angin
+// MRS. DINA — Tendangan Putar Udara: melompat memutar & melepas bilah angin
 // ---------------------------------------------------------------------
+// opts (opsional): s = ukuran, speed, power, hit = data serangan
 class WindBlade extends Actor {
-  constructor(f, x, y) {
+  constructor(f, x, y, opts) {
     super(f.scene, f);
     const sc = this.scene;
+    const o = opts || {};
+    const s = (this.s = o.s || 1);
     this.x = x;
     this.y = y;
-    this.vx = f.facing * 13;
-    this.kind = 'low';
+    this.vx = f.facing * (o.speed || 13);
+    this.kind = s > 1.4 ? 'big' : 'low';
     this.projectile = true;
-    this.power = 1;
+    this.power = o.power || 1;
+    this.hit = o.hit || { dmg: 100, hitstun: 26, blockstun: 16, push: 12, chip: 0.2, heavy: true, hitstop: 7 };
     this.vis = sc.add.container(x, y).setDepth(32);
-    const glow = sc.add.image(0, 0, 'fx_glow').setTint(0x7fd8ff).setBlendMode(ADD()).setScale(1.3, 0.9).setAlpha(0.7);
-    const back = sc.add.image(-f.facing * 18, 0, 'fx_slash').setTint(0x7fd8ff).setBlendMode(ADD())
-      .setScale(0.7, 0.9).setFlipX(f.facing < 0).setAlpha(0.8);
-    const blade = sc.add.image(0, 0, 'fx_slash').setTint(0xdff6ff).setBlendMode(ADD()).setScale(0.9, 1.1).setFlipX(f.facing < 0);
+    const glow = sc.add.image(0, 0, 'fx_glow').setTint(0x7fd8ff).setBlendMode(ADD()).setScale(1.3 * s, 0.9 * s).setAlpha(0.7);
+    const back = sc.add.image(-f.facing * 18 * s, 0, 'fx_slash').setTint(0x7fd8ff).setBlendMode(ADD())
+      .setScale(0.7 * s, 0.9 * s).setFlipX(f.facing < 0).setAlpha(0.8);
+    const blade = sc.add.image(0, 0, 'fx_slash').setTint(0xdff6ff).setBlendMode(ADD()).setScale(0.9 * s, 1.1 * s).setFlipX(f.facing < 0);
     this.vis.add([glow, back, blade]);
+    if (s > 1.4) {
+      // pusaran angin besar di sekeliling bilah
+      this.ring = sc.add.image(0, 0, 'fx_wind').setTint(0xbff4ff).setBlendMode(ADD()).setScale(0.6 * s, 1.4 * s).setAngle(90);
+      this.vis.add(this.ring);
+    }
   }
-  rect() { return { x: this.x - 36, y: this.y - 55, w: 72, h: 110 }; }
+  rect() { return { x: this.x - 36 * this.s, y: this.y - 55 * this.s, w: 72 * this.s, h: 110 * this.s }; }
   explode(silent) {
     if (this.dead) return;
     const sc = this.scene;
@@ -39,10 +48,15 @@ class WindBlade extends Actor {
     this.y = Phaser.Math.Linear(this.y, f.ground - 120, 0.15);
     this.vis.setPosition(this.x, this.y);
     this.vis.scaleY = 1 + Math.sin(this.t * 0.8) * 0.08;
-    if (this.t % 2 === 0) sc.fx.auraAt(this.x - Math.sign(this.vx) * 30, this.y + rnd(-30, 30), 0xdff6ff);
+    if (this.ring) this.ring.scaleY = 1.4 * this.s * (1 + Math.sin(this.t * 1.3) * 0.12);
+    if (this.t % 2 === 0) sc.fx.auraAt(this.x - Math.sign(this.vx) * 30 * this.s, this.y + rnd(-30, 30) * this.s, 0xdff6ff);
     if (this.clash()) return false;
     if (rectsOverlap(this.rect(), vic.hurtbox())) {
-      sc.applyHit(f, vic, { dmg: 100, hitstun: 26, blockstun: 16, push: 12, chip: 0.2, heavy: true, srcX: this.x, x: this.x, y: this.y, hitstop: 7, noGain: true });
+      sc.applyHit(f, vic, Object.assign({ srcX: this.x, x: this.x, y: this.y, noGain: true }, this.hit));
+      if (this.s > 1.4) {
+        sc.shake(400, 0.018);
+        sc.flash(150, 220, 245, 255);
+      }
       this.explode();
       return false;
     }
@@ -100,78 +114,50 @@ JUTSU.tornadokick = function (f) {
 };
 
 // ---------------------------------------------------------------------
-// MARTHADIN — ULTIMATE: Putaran Tornado (menghisap lawan ke pusaran)
+// MRS. DINA — ULTIMATE: Tendangan Badai
+// Berputar mengumpulkan angin, lalu tendangan tinggi melepas badai
+// jarak jauh yang melempar lawan jauh ke belakang.
 // ---------------------------------------------------------------------
-JUTSU.cyclone = function (f) {
+JUTSU.galekick = function (f) {
   const sc = f.scene, fx = f.fx;
   f.setPose('cyclone');
-  let tornado = sc.add.container(f.x, f.ground).setDepth(31);
-  tornado.add(sc.add.image(0, 10, 'fx_beam').setOrigin(0.5, 1).setTint(0x9fe8ff).setBlendMode(ADD()).setScale(2.4, 1.9).setAlpha(0.35));
-  const rings = [];
-  for (let i = 0; i < 7; i++) {
-    const r = sc.add.image(0, -i * 62 - 20, 'fx_wind').setTint(i % 2 ? 0xdff6ff : 0x7fd8ff).setBlendMode(ADD());
-    r.baseScale = 0.55 + i * 0.16;
-    r.setScale(r.baseScale, 0.9 + i * 0.08);
+  let rings = [];
+  for (let i = 0; i < 4; i++) {
+    const r = sc.add.image(f.x, f.ground - 40 - i * 70, 'fx_wind').setTint(i % 2 ? 0xdff6ff : 0x7fd8ff)
+      .setBlendMode(ADD()).setDepth(23).setScale(0.3, 0.8).setAlpha(0);
     rings.push(r);
-    tornado.add(r);
   }
-  tornado.setScale(0.1, 1).setAlpha(0);
-  sc.tweens.add({ targets: tornado, scaleX: 1, alpha: 1, duration: 260, ease: 'Back.easeOut' });
+  const clear = () => { rings.forEach((r) => r.destroy()); rings = []; };
   Sound.play('wind');
-  let captured = false, hits = 0, cd = 0, phase = 'spin', pt = 0;
   return {
     step(t) {
-      pt++;
-      const vic = f.opp;
-      if (tornado) {
-        tornado.setPosition(f.x, f.ground);
+      if (t <= 34) {
         rings.forEach((r, i) => {
-          r.x = Math.sin(t * 0.45 + i * 0.8) * (10 + i * 3);
-          r.scaleX = r.baseScale * (1 + Math.sin(t * 0.9 + i) * 0.06);
-          r.setAlpha(0.65 + Math.sin(t * 1.3 + i * 2) * 0.3);
+          r.setPosition(f.x + Math.sin(t * 0.5 + i) * 10, f.ground - 40 - i * 70);
+          r.setScale(0.5 + t * 0.012 + i * 0.08, 0.8 + i * 0.05).setAlpha(Math.min(1, t / 8) * (0.7 + Math.sin(t + i) * 0.3));
         });
-        if (t % 2 === 0) fx.dust(f.x + rnd(-90, 90), f.ground, 1);
-        else fx.auraAt(f.x + rnd(-120, 120), f.ground - rnd(0, 420), 0xdff6ff);
-        if (t % 20 === 0) Sound.play('wind');
+        fx.auraAt(f.x + rnd(-110, 110), f.ground - rnd(0, 300), 0xdff6ff);
+        if (t % 3 === 0) fx.dust(f.x + rnd(-80, 80), f.ground, 1);
+        if (t % 14 === 0) Sound.play('wind');
+        return true;
       }
-      if (phase === 'spin') {
-        f.vx = f.facing * (captured ? 1.5 : 4.5);
-        if (cd > 0) cd--;
-        if (captured) {
-          if (vic.ko) { phase = 'end'; pt = 0; return true; }
-          vic.x = Phaser.Math.Linear(vic.x, f.x + f.facing * 40, 0.25);
-          vic.vx = 0;
-          if (pt % 6 === 0) {
-            hits++;
-            const last = hits >= 9;
-            sc.applyHit(f, vic, last
-              ? { dmg: 110, kd: true, launch: [7, -21], heavy: true, hitstop: 14, force: true, srcX: f.x - f.facing * 40, x: vic.x, y: f.ground - 200, noGain: true }
-              : { dmg: 20, hitstun: 30, push: 0, hitstop: 2, force: true, srcX: f.x, x: vic.x + rnd(-40, 40), y: f.ground - rnd(80, 300), noGain: true });
-            if (!last) Sound.play('light');
-            else {
-              Sound.play('explosion');
-              sc.shake(450, 0.018);
-              fx.shock(f.x, f.ground, 0x9fe8ff, 4);
-              phase = 'end';
-              pt = 0;
-            }
-          }
-          if (phase === 'spin' && pt > 70) { phase = 'end'; pt = 0; }
-        } else if (cd === 0 && rectsOverlap({ x: f.x - 115, y: f.ground - 470, w: 230, h: 470 }, vic.hurtbox())) {
-          const res = sc.applyHit(f, vic, { dmg: 20, hitstun: 30, blockstun: 16, push: 0, chip: 0.35, hitstop: 4, srcX: f.x, x: vic.x, y: f.ground - 180, noGain: true });
-          if (res === 'hit') { captured = true; hits = 1; pt = 0; f.grabbing = true; }
-          else if (res === 'block') { cd = 12; vic.vx = f.facing * 10; }
-        }
-        if (!captured && t >= 80) { phase = 'end'; pt = 0; }
-      } else {
-        f.vx *= 0.8;
-        f.grabbing = false;
-        if (pt === 1 && tornado) { fadeOut(sc, tornado, 300, { scaleX: 1.6 }); tornado = null; }
-        return pt < 22;
+      if (t === 35) {
+        clear();
+        f.setPose('highkick');
+        const p = f.at(150, 200);
+        fx.slash(p.x, p.y, f.facing, 0xdff6ff);
+        fx.image('fx_ring', p.x, p.y, { tint: 0x9fe8ff, from: 0.5, to: 2.6, ms: 300, scaleY: 1.4 });
+        new WindBlade(f, p.x, p.y, {
+          s: 2.2, speed: 15, power: 3,
+          hit: { dmg: 240, kd: true, launch: [22, -16], heavy: true, hitstop: 16, chip: 0.35, blockstun: 24, push: 18 },
+        });
+        Sound.play('whoosh');
+        Sound.play('wind');
+        sc.shake(250, 0.01);
       }
-      return true;
+      return t < 60;
     },
-    cancel() { if (tornado) { tornado.destroy(); tornado = null; } },
+    cancel: clear,
   };
 };
 

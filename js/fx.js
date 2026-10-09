@@ -240,6 +240,50 @@ window.FX = {
       g.fillStyle = 'rgba(255,255,255,0.18)';
       g.beginPath(); g.ellipse(36, 32, 12, 7, -0.5, 0, Math.PI * 2); g.fill();
     });
+    // Petir horizontal (3 bentuk berbeda agar bisa berkedip)
+    for (let v = 0; v < 3; v++) {
+      make('fx_bolt' + v, 200, 64, (g) => {
+        let seed = 7 + v * 31;
+        const r = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+        const pts = [];
+        for (let i = 0; i <= 12; i++) pts.push([6 + i * 15.6, 32 + (i === 0 || i === 12 ? 0 : (r() - 0.5) * 40)]);
+        const path = () => { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); };
+        g.lineCap = 'round';
+        g.lineJoin = 'round';
+        g.shadowColor = '#fff';
+        g.shadowBlur = 10;
+        g.strokeStyle = 'rgba(255,255,255,0.45)';
+        g.lineWidth = 10;
+        path(); g.stroke();
+        g.strokeStyle = '#fff';
+        g.lineWidth = 4;
+        path(); g.stroke();
+        // cabang kecil
+        g.lineWidth = 2;
+        for (let k = 2; k < 11; k += 3) {
+          const [x, y] = pts[k];
+          g.beginPath();
+          g.moveTo(x, y);
+          g.lineTo(x + 10 + r() * 10, y + (r() - 0.5) * 36);
+          g.stroke();
+        }
+      });
+    }
+    // Anak panah bercahaya
+    make('fx_arrow', 140, 28, (g) => {
+      g.shadowColor = '#fff';
+      g.shadowBlur = 8;
+      g.fillStyle = '#fff';
+      g.fillRect(14, 12, 104, 4);
+      g.beginPath();
+      g.moveTo(138, 14); g.lineTo(112, 3); g.lineTo(118, 14); g.lineTo(112, 25);
+      g.closePath();
+      g.fill();
+      g.beginPath();
+      g.moveTo(26, 14); g.lineTo(6, 2); g.lineTo(14, 14); g.lineTo(6, 26);
+      g.closePath();
+      g.fill();
+    });
     // Shuriken baja (tidak diwarnai ulang)
     make('fx_shuriken', 48, 48, (g) => {
       g.translate(24, 24);

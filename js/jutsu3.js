@@ -174,16 +174,17 @@ JUTSU.megaboulder = function (f) {
 };
 
 // ---------------------------------------------------------------------
-// KING ANDRI — angin sabit ("pisang angin") dari pukulan & tendangan
+// KING ANDRI — petir dari pukulan & tendangan (melesat setengah layar,
+// mendorong lawan jauh ke belakang)
 // ---------------------------------------------------------------------
-class WindCrescent extends Actor {
+class LightningBolt extends Actor {
   constructor(f, m) {
     super(f.scene, f);
     const sc = this.scene, pr = m.proj;
     const p = f.at(pr.x || 120, pr.h);
     this.x = this.x0 = p.x;
     this.y = p.y;
-    this.vx = f.facing * (pr.speed || 18);
+    this.vx = f.facing * (pr.speed || 20);
     this.vy = pr.vy || 0;
     // jangkauan total dari tubuh ~ setengah layar
     this.range = CFG.W * 0.5 - (pr.x || 120) - 40;
@@ -194,18 +195,17 @@ class WindCrescent extends Actor {
     this.power = 1;
     const s = this.s, flip = f.facing < 0;
     this.vis = sc.add.container(p.x, p.y).setDepth(32);
-    this.vis.add([
-      sc.add.image(0, 0, 'fx_glow').setTint(0x5fe0ff).setBlendMode(ADD()).setScale(1.2 * s, 0.9 * s).setAlpha(0.6),
-      sc.add.image(-f.facing * 16 * s, 0, 'fx_slash').setTint(0x5fe0ff).setBlendMode(ADD()).setScale(0.75 * s, 0.95 * s).setFlipX(flip).setAlpha(0.7),
-      sc.add.image(0, 0, 'fx_slash').setTint(0xdffaff).setBlendMode(ADD()).setScale(0.85 * s, 1.05 * s).setFlipX(flip),
-    ]);
+    this.glow = sc.add.image(0, 0, 'fx_glow').setTint(0x3fa8ff).setBlendMode(ADD()).setScale(1.4 * s, 0.8 * s).setAlpha(0.7);
+    this.bolt = sc.add.image(0, 0, 'fx_bolt0').setTint(0xbff4ff).setBlendMode(ADD()).setScale(s).setFlipX(flip);
+    this.bolt2 = sc.add.image(0, 0, 'fx_bolt1').setTint(0x5fe0ff).setBlendMode(ADD()).setScale(s * 0.9, s * 1.3).setFlipX(flip);
+    this.vis.add([this.glow, this.bolt2, this.bolt]);
     if (this.vy) this.vis.setAngle(Phaser.Math.RadToDeg(Math.atan2(this.vy, Math.abs(this.vx))) * f.facing);
-    Sound.play('whoosh');
+    Sound.play('shuriken');
   }
-  rect() { return { x: this.x - 30 * this.s, y: this.y - 50 * this.s, w: 60 * this.s, h: 100 * this.s }; }
+  rect() { return { x: this.x - 50 * this.s, y: this.y - 32 * this.s, w: 100 * this.s, h: 64 * this.s }; }
   explode() {
     if (this.dead) return;
-    this.scene.fx.burst(this.scene.fx.sparks, this.x, this.y, 8, 0xbff4ff);
+    zapAt(this.scene, this.x, this.y, 0xbff4ff);
     this.vis.destroy();
     this.destroy();
   }
@@ -214,6 +214,9 @@ class WindCrescent extends Actor {
     this.x += this.vx;
     this.y += this.vy;
     this.vis.setPosition(this.x, this.y);
+    // petir berkedip: ganti bentuk tiap langkah
+    this.bolt.setTexture('fx_bolt' + (this.t % 3));
+    this.bolt2.setTexture('fx_bolt' + ((this.t + 1) % 3));
     const gone = Math.abs(this.x - this.x0) / this.range;
     this.vis.setAlpha(gone > 0.75 ? Math.max(0, (1 - gone) * 4) : 1);
     if (this.clash()) return false;
@@ -226,12 +229,19 @@ class WindCrescent extends Actor {
       return false;
     }
     if (gone >= 1 || this.y > f.ground - 10) {
-      if (this.y > f.ground - 10) sc.fx.dust(this.x, f.ground, 3);
+      if (this.y > f.ground - 10) zapAt(sc, this.x, f.ground - 10, 0xbff4ff);
       this.vis.destroy();
       return false;
     }
     return true;
   }
+}
+
+// Percikan listrik kecil
+function zapAt(sc, x, y, color) {
+  sc.fx.image('fx_bolt' + rnd(0, 2), x, y, { tint: color, from: 0.4, to: 0.9, angle: rnd(0, 180), ms: 160 });
+  sc.fx.image('fx_bolt' + rnd(0, 2), x, y, { tint: 0xffffff, from: 0.3, to: 0.7, angle: rnd(0, 180), ms: 120 });
+  sc.fx.burst(sc.fx.sparks, x, y, 8, color);
 }
 
 // Sinar panjang sampai tepi layar (Kamehameha & laser)
@@ -268,22 +278,22 @@ JUTSU.kamehameha = function (f) {
   const sc = f.scene, fx = f.fx;
   let ball = sc.add.image(0, 0, 'fx_glow').setTint(0x7fd8ff).setBlendMode(ADD()).setDepth(33).setScale(0.2);
   let beam = null;
-  f.setPose('charge');
+  f.setPose('aura');
   Sound.play('charge');
   return {
     step(t) {
       if (t <= 24) {
-        const p = f.at(30, 140);
+        const p = f.at(60, 150);
         ball.setPosition(p.x, p.y).setScale(0.3 + t * 0.045 + Math.sin(t) * 0.05);
         const a = Math.random() * Math.PI * 2;
         fx.auraAt(p.x + Math.cos(a) * 90, p.y + Math.sin(a) * 70, 0x9fe8ff);
         if (t === 12) Sound.play('rasengan');
         return true;
       }
-      const hand = f.at(150, 205);
+      const hand = f.at(150, 185);
       const len = f.facing > 0 ? CFG.W + 60 - hand.x : hand.x + 60;
       if (t === 25) {
-        f.setPose('punch');
+        f.setPose('palm');
         ball.destroy();
         ball = null;
         beam = makeBeam(sc, 0x2a7fff, 0x7fd8ff);
@@ -315,61 +325,123 @@ JUTSU.kamehameha = function (f) {
 };
 
 // ---------------------------------------------------------------------
-// KING ANDRI — ULTIMATE: Sinar Laser Merah (tubuh bercahaya, laser ke tepi layar)
+// KING ANDRI — ULTIMATE: Laser Merah Langit
+// Melompat tinggi, melayang, lalu menembakkan laser merah dari mata ke arah
+// lawan di bawah. Lawan yang terkena terlempar jauh ke belakang.
 // ---------------------------------------------------------------------
-JUTSU.redlaser = function (f) {
+JUTSU.skylaser = function (f) {
   const sc = f.scene, fx = f.fx;
-  let glow = sc.add.image(f.x, f.y - 150, 'fx_glow').setTint(0xff2020).setBlendMode(ADD()).setDepth(19);
-  let halo = sc.add.image(f.x, f.y - 150, 'fx_glow').setTint(0xff6060).setBlendMode(ADD()).setDepth(23).setAlpha(0);
-  let beam = null;
+  const HOVER = 180; // ketinggian melayang (dari tanah ke kaki)
+  let glow = sc.add.image(f.x, f.y - 150, 'fx_glow').setTint(0xff2020).setBlendMode(ADD()).setDepth(19).setAlpha(0);
+  let beam = null, spot = null;
+  let phase = 'ready', pt = 0, tx = 0, ty = 0;
   f.setPose('aura');
+  // pose 'eyebeam' digambar bersama sinarnya, jadi kakinya ~64px di atas dasar gambar
+  const EYEBEAM_FOOT = 64;
+  const eye = () => f.at(47, 242 - EYEBEAM_FOOT); // posisi mata pada pose 'eyebeam'
+  const api = { offsetY: 0 };
   const done = () => {
+    api.offsetY = 0;
     f.tintOverride = null;
-    if (halo) { halo.destroy(); halo = null; }
     if (glow) { fadeOut(sc, glow, 200); glow = null; }
     if (beam) { beam.destroy(); beam = null; }
+    if (spot) { spot.destroy(); spot = null; }
   };
-  return {
+  return Object.assign(api, {
     step(t) {
-      if (t <= 45) {
-        glow.setPosition(f.x, f.y - 150).setScale(3 + t * 0.04 + Math.sin(t * 0.6) * 0.3).setAlpha(0.9);
-        // tubuh berdenyut bercahaya merah
-        halo.setPosition(f.x, f.y - 140).setScale(1.6, 3.2).setAlpha(0.25 + Math.sin(t * 0.5) * 0.15);
-        f.tintOverride = t % 8 < 4 ? 0xff7a7a : 0xffc0c0;
-        if (t % 10 === 0) fx.shock(f.x, f.ground, 0xff3030, 2.2);
-        fx.auraAt(f.x + rnd(-90, 90), f.y - rnd(0, 280), t % 2 ? 0xff4040 : 0xffffff);
-        if (t % 15 === 1) Sound.play('charge');
-        if (t === 40) sc.flash(150, 255, 60, 60);
+      pt++;
+      const vic = f.opp;
+      if (phase === 'ready') {
+        // ancang-ancang: tubuh berkilat merah
+        f.tintOverride = t % 4 < 2 ? 0xff7a7a : 0xffc0c0;
+        fx.auraAt(f.x + rnd(-60, 60), f.y - rnd(0, 250), 0xff4040);
+        if (pt >= 8) {
+          phase = 'rise';
+          pt = 0;
+          f.setPose('dash');
+          f.onGround = false;
+          f.vy = -26;
+          Sound.play('jump');
+          Sound.play('whoosh');
+          fx.shock(f.x, f.ground, 0xff3030, 2.6);
+          fx.dust(f.x, f.ground, 6);
+        }
         return true;
       }
-      const hand = f.at(150, 205);
-      const len = f.facing > 0 ? CFG.W + 60 - hand.x : hand.x + 60;
-      if (t === 46) {
-        f.setPose('punch');
-        f.tintOverride = 0xffb0b0;
-        if (halo) { halo.destroy(); halo = null; }
-        beam = makeBeam(sc, 0xff1a1a, 0xff7070);
-        Sound.play('explosion');
-        Sound.play('fire');
-      }
-      if (beam) {
-        const grow = Math.min(1, (t - 45) / 5);
-        const th = t <= 106 ? 120 + Math.sin(t * 2.1) * 12 : Math.max(0, 120 * (1 - (t - 106) / 14));
-        beam.setPosition(hand.x, hand.y).set(len * grow, th, f.facing);
-        if (glow) glow.setPosition(hand.x, hand.y).setScale(2 + Math.sin(t) * 0.3);
-        if (t % 4 === 0) sc.shake(70, 0.007);
-        if (t % 2 === 0) fx.burst(fx.sparks, hand.x, hand.y, 2, 0xff8080);
-        if (t >= 51 && t <= 106 && (t - 51) % 5 === 0 && rectsOverlap(beamRect(f, hand, len * grow, 110), f.opp.hurtbox())) {
-          const last = t === 106;
-          sc.applyHit(f, f.opp, last
-            ? { dmg: 120, kd: true, launch: [16, -14], heavy: true, hitstop: 16, chip: 0.5, blockstun: 24, push: 16, srcX: hand.x, x: f.opp.x, y: hand.y, noGain: true }
-            : { dmg: 22, hitstun: 24, blockstun: 14, push: 2, chip: 0.5, hitstop: 2, srcX: hand.x, x: f.opp.x - f.facing * 20, y: hand.y, noGain: true });
-          if (last) sc.flash(200, 255, 80, 80);
+      if (phase === 'rise') {
+        // meluncur ke posisi tembak: lawan berada di depan-bawah
+        const want = Phaser.Math.Clamp(vic.x - f.facing * 300, CFG.WALL, CFG.W - CFG.WALL);
+        f.x += (want - f.x) * 0.1;
+        f.vx = 0;
+        if (pt % 2 === 0) f.afterimage(0xff4040, 0.4, 180);
+        if (f.y <= f.ground - HOVER || f.vy >= 0) {
+          phase = 'aim';
+          pt = 0;
+          f.setPose('eyebeam');
+          api.offsetY = EYEBEAM_FOOT;
+          tx = vic.x;
+          ty = vic.y - 110;
         }
-        if (t >= 120) done();
+        return true;
       }
-      return t < 124;
+      if (phase === 'aim' || phase === 'fire') {
+        f.vy = -CFG.GRAVITY; // melayang di udara
+        f.vx = 0;
+        const e = eye();
+        if (glow) glow.setPosition(e.x, e.y).setScale(1.2 + Math.sin(t) * 0.25).setAlpha(0.9);
+      }
+      if (phase === 'aim') {
+        f.tintOverride = pt % 4 < 2 ? 0xff9090 : 0xffffff;
+        if (pt === 1) Sound.play('charge');
+        if (pt >= 10) {
+          phase = 'fire';
+          pt = 0;
+          f.tintOverride = 0xffb0b0;
+          beam = makeBeam(sc, 0xff1a1a, 0xff6060);
+          spot = sc.add.image(tx, ty, 'fx_glow').setTint(0xff3030).setBlendMode(ADD()).setDepth(34);
+          Sound.play('explosion');
+          Sound.play('fire');
+          sc.flash(120, 255, 60, 60);
+        }
+        return true;
+      }
+      if (phase === 'fire') {
+        // laser mengikuti lawan
+        tx = Phaser.Math.Linear(tx, vic.x, 0.15);
+        ty = Phaser.Math.Linear(ty, vic.y - 110, 0.15);
+        const e = eye();
+        const len = Phaser.Math.Distance.Between(e.x, e.y, tx, ty) + 30;
+        const th = pt <= 56 ? 46 + Math.sin(pt * 2.1) * 6 : Math.max(0, 46 * (1 - (pt - 56) / 10));
+        beam.setPosition(e.x, e.y).set(len * Math.min(1, pt / 4), th, 1);
+        beam.setRotation(Math.atan2(ty - e.y, tx - e.x));
+        spot.setPosition(tx, ty).setScale(1.6 + Math.sin(pt) * 0.3);
+        if (pt % 3 === 0) fx.burst(fx.sparks, tx, ty, 3, 0xff8080);
+        if (pt % 4 === 0) sc.shake(70, 0.008);
+        if (pt % 6 === 0) fx.flameAt(tx + rnd(-30, 30), f.ground, 0xff3030, 1);
+        if (pt >= 5 && pt <= 55 && pt % 5 === 0 && rectsOverlap(circleRect(tx, ty, 80), vic.hurtbox())) {
+          const last = pt === 55;
+          sc.applyHit(f, vic, last
+            ? { dmg: 140, kd: true, launch: [24, -15], heavy: true, hitstop: 16, chip: 0.5, blockstun: 24, push: 20, srcX: f.x, x: tx, y: ty, noGain: true }
+            : { dmg: 22, hitstun: 26, blockstun: 14, push: 3, chip: 0.5, hitstop: 2, srcX: f.x, x: tx, y: ty, noGain: true });
+          if (last) {
+            sc.flash(220, 255, 80, 80);
+            sc.shake(450, 0.02);
+            fx.image('fx_glow', tx, ty, { tint: 0xff4040, from: 1, to: 5, ms: 420 });
+            fx.shock(tx, f.ground, 0xff3030, 4);
+          }
+        }
+        if (pt >= 66) {
+          done();
+          phase = 'fall';
+          pt = 0;
+          f.setPose('dash');
+        }
+        return true;
+      }
+      // turun kembali ke tanah lalu selesai
+      f.vx = 0;
+      return !f.onGround && pt < 90;
     },
     cancel: done,
-  };
+  });
 };
