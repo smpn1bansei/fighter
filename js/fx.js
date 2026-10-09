@@ -269,6 +269,22 @@ window.FX = {
         }
       });
     }
+    // Mawar merah bertangkai
+    make('fx_rose', 64, 64, (g) => {
+      g.strokeStyle = '#2f8a3a';
+      g.lineWidth = 4;
+      g.beginPath(); g.moveTo(14, 56); g.lineTo(34, 30); g.stroke();
+      g.fillStyle = '#3fae4a';
+      g.beginPath(); g.ellipse(20, 46, 8, 4, -0.8, 0, Math.PI * 2); g.fill();
+      const petals = [['#8a0f2a', 15], ['#c4183c', 11], ['#e83a5c', 7], ['#ff7a96', 3]];
+      for (const [c, r] of petals) {
+        g.fillStyle = c;
+        g.beginPath(); g.arc(40, 22, r, 0, Math.PI * 2); g.fill();
+      }
+      g.strokeStyle = '#5a0718';
+      g.lineWidth = 1.5;
+      g.beginPath(); g.arc(40, 22, 9, 0.5, 4.2); g.stroke();
+    });
     // Anak panah bercahaya
     make('fx_arrow', 140, 28, (g) => {
       g.shadowColor = '#fff';

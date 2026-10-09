@@ -94,18 +94,28 @@ const SHEETS = {
     anchorFix: { kick: -40 },
   },
   kingandri: {
-    // sheet perbaikan (PNG, kotak-kotak terang, resolusi lebih kecil)
+    // sheet lama: hanya pose yang masih cocok dipakai ('-' = dilewati)
     file: 'perbaikan-king andri.png',
     colors: [[232, 232, 232], [254, 254, 254]],
     tol: 10,
-    frames: ['stance', 'dash', 'punch', 'kick', 'eyebeam', 'shield', 'hurt', 'lie', 'palm', 'push', 'aura', 'book'],
+    frames: ['-stance', 'dash', '-punch', '-kick', 'eyebeam', '-shield', '-hurt', '-lie', 'palm', '-push', 'aura', 'book'],
     stand: 'book',
     portrait: 'stance',
-    matte: { dash: 40, punch: 40, kick: 40, eyebeam: 60, shield: 160, hurt: 30, lie: 30, palm: 50, push: 50, aura: 80, book: 30 },
-    glass: { shield: [150, 225, 255] },
-    // efek biru pada pose sinar mata diubah menjadi merah (laser ulti)
-    recolor: { eyebeam: 'red' },
-    anchorFix: { punch: -60, kick: -70, eyebeam: -60, shield: -75, palm: -80, push: -60, dash: 40 },
+    face: 'stance',
+    matte: { dash: 40, eyebeam: 60, palm: 50, aura: 80, book: 30 },
+    // sinar mata tercetak dihapus: laser ulti digambar oleh game (agar tidak dobel)
+    recolor: { eyebeam: 'erase' },
+    anchorFix: { palm: -80, dash: 40 },
+    // sheet perbaikan ke-2: jalan dengan kaki, pukul & tendang tanpa efek tercetak
+    extra: [{
+      file: 'king-andri-fix2.jpg',
+      colors: [[118, 118, 118], [162, 162, 162]],
+      tol: 12,
+      frames: ['walk1', 'walk2', 'walk3', 'stance', 'punch', 'punch2', 'kick', 'kick2', 'guard', 'hurt', 'lie', 'ready', 'charge'],
+      stand: 'walk3',
+      matte: { charge: 30 },
+      anchorFix: {},
+    }],
   },
   nita: {
     file: 'dwi-rose.jpg',
@@ -117,6 +127,28 @@ const SHEETS = {
     face: 'stance', // ikon wajah diambil dari pose ini (di pose busur, busur menutupi kepala)
     matte: { drawbow: 40, aimbow: 40, shoot: 40, punch: 20, punch2: 20, kick: 20, highkick: 30, guard: 30, lie: 20 },
     anchorFix: { kick: -50, highkick: -50 },
+  },
+  suci: {
+    file: 'suci.jpg',
+    colors: [[101, 101, 101], [150, 150, 150]],
+    tol: 12,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'roseup', 'throw', 'kick', 'kick2', 'hurt', 'lie', 'meditate', 'aura'],
+    stand: 'walk4',
+    portrait: 'roseup',
+    face: 'walk4',
+    matte: { roseup: 40, throw: 40, kick: 30, kick2: 30, hurt: 20, lie: 20, meditate: 60, aura: 90 },
+    anchorFix: {},
+  },
+  septi: {
+    file: 'septi.jpg',
+    colors: [[98, 98, 98], [145, 145, 145]],
+    tol: 12,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'fan1', 'fan2', 'skirtkick', 'kick2', 'hurt', 'lie', 'meditate', 'aura'],
+    stand: 'walk1',
+    portrait: 'fan1',
+    face: 'walk1',
+    matte: { fan1: 40, fan2: 40, skirtkick: 40, kick2: 40, meditate: 60, aura: 90 },
+    anchorFix: {},
   },
 };
 
@@ -209,6 +241,44 @@ function matteGlow(rgba, bw, bh, colors, maxDist, glass) {
     rgba[o + 1] = Math.max(0, Math.min(255, Math.round(B[1] + (g - B[1]) / a)));
     rgba[o + 2] = Math.max(0, Math.min(255, Math.round(B[2] + (b - B[2]) / a)));
     rgba[o + 3] = Math.round(a * 255);
+  }
+}
+
+// Hapus efek cahaya cyan/putih yang tercetak pada pose (mis. sinar mata),
+// lalu buang serpihan kecil yang tersisa.
+function eraseEffect(rgba, w, h) {
+  // area kepala dilindungi agar wajah tidak ikut terhapus
+  const isFx = (o) => {
+    const r = rgba[o], g = rgba[o + 1], b = rgba[o + 2];
+    return (b > r + 25 && g > r + 5) || (r > 190 && g > 190 && b > 190);
+  };
+  let top = h, bottom = 0;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const o = (y * w + x) * 4;
+    if (rgba[o + 3] && !isFx(o)) { if (y < top) top = y; if (y > bottom) bottom = y; }
+  }
+  const headBottom = top + (bottom - top) * 0.28;
+  let headRight = 0;
+  for (let y = top; y < headBottom; y++) for (let x = 0; x < w; x++) {
+    const o = (y * w + x) * 4;
+    if (rgba[o + 3] && !isFx(o) && x > headRight) headRight = x;
+  }
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const o = (y * w + x) * 4;
+    if (!rgba[o + 3] || !isFx(o)) continue;
+    if (y <= headBottom && x <= headRight + 3) {
+      // sisa cahaya di wajah menjadi mata menyala merah
+      rgba[o] = 255; rgba[o + 1] = 70; rgba[o + 2] = 60;
+      continue;
+    }
+    rgba[o + 3] = 0;
+  }
+  const mask = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) mask[i] = rgba[i * 4 + 3] > 0 ? 1 : 0;
+  const { labels, comps } = labelComponents(mask, w, h, 1);
+  const biggest = comps.reduce((m, c) => (c.area > m ? c.area : m), 0);
+  for (let i = 0; i < w * h; i++) {
+    if (mask[i] && comps[labels[i]].area < biggest * 0.02) rgba[i * 4 + 3] = 0;
   }
 }
 
@@ -316,27 +386,46 @@ function pack(frames) {
   return { w: width, h: y + rowH + PAD };
 }
 
-async function processSheet(id) {
-  const cfg = SHEETS[id];
-  console.log(`== ${id} (${cfg.file})`);
-  const img = await loadRGB(path.join(__dirname, '..', 'asset-custom', cfg.file));
-  const fg = removeChecker(img, { colors: cfg.colors, segColors: cfg.segColors, tol: cfg.tol, removeLines: cfg.removeLines });
-  const { labels, frames } = findFrames(fg, img.w, img.h, cfg.frames.length);
-
+// Potong semua pose dari satu sheet. Mengembalikan { nama: { crop, scale } }.
+// Nama pose yang diawali '-' tetap dipotong (agar urutan cocok) tapi tidak dipakai.
+async function cutSheet(sh) {
+  console.log(`  sheet ${sh.file}`);
+  const img = await loadRGB(path.join(__dirname, '..', 'asset-custom', sh.file));
+  const fg = removeChecker(img, { colors: sh.colors, segColors: sh.segColors, tol: sh.tol, removeLines: sh.removeLines });
+  const { labels, frames } = findFrames(fg, img.w, img.h, sh.frames.length);
   const crops = {};
   frames.forEach((b, k) => {
-    const name = cfg.frames[k];
-    crops[name] = cropFrame(img, fg, labels, b, cfg.colors, (cfg.matte || {})[name], (cfg.glass || {})[name]);
-    if ((cfg.recolor || {})[name] === 'red') recolorCyanToRed(crops[name].rgba);
+    const name = sh.frames[k];
+    const c = cropFrame(img, fg, labels, b, sh.colors, (sh.matte || {})[name], (sh.glass || {})[name]);
+    const fix = (sh.recolor || {})[name];
+    if (fix === 'red') recolorCyanToRed(c.rgba);
+    if (fix === 'erase') eraseEffect(c.rgba, c.w, c.h);
+    crops[name] = { crop: c };
   });
+  // skala: pose acuan `stand` dibuat setinggi `standHeight` (default STAND_HEIGHT)
+  const ref = crops[sh.stand].crop;
+  const scale = (sh.standHeight || STAND_HEIGHT) / tightBox(ref.rgba, ref.w, ref.h).h;
+  console.log(`    skala ${scale.toFixed(3)}`);
+  for (const k in crops) crops[k].scale = scale;
+  return crops;
+}
 
-  const standBox = tightBox(crops[cfg.stand].rgba, crops[cfg.stand].w, crops[cfg.stand].h);
-  const scale = STAND_HEIGHT / standBox.h;
-  console.log(`  skala ${scale.toFixed(3)} (tinggi berdiri asli ${standBox.h}px)`);
+async function processSheet(id) {
+  const cfg = SHEETS[id];
+  console.log(`== ${id}`);
+  const crops = await cutSheet(cfg);
+  const names = cfg.frames.slice();
+  for (const ex of cfg.extra || []) {
+    Object.assign(crops, await cutSheet(ex));
+    names.push(...ex.frames);
+    Object.assign(cfg.anchorFix, ex.anchorFix || {});
+  }
 
   const out = [];
-  for (const name of cfg.frames) {
-    const s = await scaled(crops[name], scale);
+  for (const name of names) {
+    if (name.startsWith('-')) continue;
+    const { crop, scale } = crops[name];
+    const s = await scaled(crop, scale);
     const ax = autoAnchorX(s.rgba, s.w, s.h) + (cfg.anchorFix[name] || 0);
     out.push({ name, ...s, ax: Math.round(ax) });
   }
@@ -358,11 +447,12 @@ async function processSheet(id) {
   fs.writeFileSync(path.join(OUT_DIR, `${id}.json`), JSON.stringify(json, null, 1));
 
   // Potret besar + wajah untuk layar pilih karakter.
-  const p = await scaled(crops[cfg.portrait], PORTRAIT_HEIGHT / standBox.h);
+  const pScale = (k) => crops[k].scale * PORTRAIT_HEIGHT / STAND_HEIGHT;
+  const p = await scaled(crops[cfg.portrait].crop, pScale(cfg.portrait));
   await sharp(p.rgba, { raw: { width: p.w, height: p.h, channels: 4 } }).webp(WEBP)
     .toFile(path.join(OUT_DIR, `${id}-portrait.webp`));
   // ikon wajah: dari pose `face` bila ada (default sama dengan potret)
-  const fp = cfg.face ? await scaled(crops[cfg.face], PORTRAIT_HEIGHT / standBox.h) : p;
+  const fp = cfg.face ? await scaled(crops[cfg.face].crop, pScale(cfg.face)) : p;
   const headTop = tightBox(fp.rgba, fp.w, fp.h).minY;
   let sx = 0, n = 0;
   for (let y = headTop; y < headTop + fp.h * 0.1; y++) for (let x = 0; x < fp.w; x++) {

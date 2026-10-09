@@ -278,12 +278,12 @@ JUTSU.kamehameha = function (f) {
   const sc = f.scene, fx = f.fx;
   let ball = sc.add.image(0, 0, 'fx_glow').setTint(0x7fd8ff).setBlendMode(ADD()).setDepth(33).setScale(0.2);
   let beam = null;
-  f.setPose('aura');
+  f.setPose('charge'); // mengumpulkan bola energi di tangan
   Sound.play('charge');
   return {
     step(t) {
       if (t <= 24) {
-        const p = f.at(60, 150);
+        const p = f.at(22, 125);
         ball.setPosition(p.x, p.y).setScale(0.3 + t * 0.045 + Math.sin(t) * 0.05);
         const a = Math.random() * Math.PI * 2;
         fx.auraAt(p.x + Math.cos(a) * 90, p.y + Math.sin(a) * 70, 0x9fe8ff);
@@ -336,9 +336,9 @@ JUTSU.skylaser = function (f) {
   let beam = null, spot = null;
   let phase = 'ready', pt = 0, tx = 0, ty = 0;
   f.setPose('aura');
-  // pose 'eyebeam' digambar bersama sinarnya, jadi kakinya ~64px di atas dasar gambar
-  const EYEBEAM_FOOT = 64;
-  const eye = () => f.at(47, 242 - EYEBEAM_FOOT); // posisi mata pada pose 'eyebeam'
+  // sinar yang tercetak di pose 'eyebeam' sudah dihapus; laser hanya digambar oleh game
+  const EYEBEAM_FOOT = 0;
+  const eye = () => f.at(49, 182); // posisi mata menyala pada pose 'eyebeam'
   const api = { offsetY: 0 };
   const done = () => {
     api.offsetY = 0;

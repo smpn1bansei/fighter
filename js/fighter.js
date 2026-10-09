@@ -164,8 +164,15 @@ class Fighter {
           this.vx = dir * (fwd ? d.walk : d.backWalk);
           if (this.state !== 'walk') this.setState('walk');
           // pose khusus saat maju (mis. lari merunduk Fatim)
-          this.setPose(fwd && d.frames.walkF ? d.frames.walkF : d.frames.walk);
           this.walkPhase += 0.22;
+          if (d.walkCycle) {
+            // animasi langkah kaki kiri-kanan (mundur = urutan dibalik)
+            const n = d.walkCycle.length;
+            const k = Math.floor(this.walkPhase / 1.15) % n;
+            this.setPose(d.walkCycle[fwd ? k : n - 1 - k]);
+          } else {
+            this.setPose(fwd && d.frames.walkF ? d.frames.walkF : d.frames.walk);
+          }
           if (fwd && d.frames.walkF && this.t % 4 === 0) {
             if (d.walkFx === 'dust') this.fx.dust(this.x - this.facing * 30, this.ground, 1);
             else this.afterimage(d.color, 0.3, 160);
@@ -495,8 +502,9 @@ class Fighter {
     }
     if (st === 'walk') {
       const run = this.def.frames.walkF && this.pose === this.def.frames.walkF;
-      oy = -Math.abs(Math.sin(this.walkPhase)) * (run ? 3 : 7);
-      rot = Math.sin(this.walkPhase) * (run ? 0.015 : 0.035);
+      const steps = !!this.def.walkCycle; // langkah sudah digambar: cukup goyang kecil
+      oy = -Math.abs(Math.sin(this.walkPhase)) * (steps ? 2 : run ? 3 : 7);
+      rot = Math.sin(this.walkPhase) * (steps ? 0 : run ? 0.015 : 0.035);
     }
     if (st === 'prejump' || st === 'landing') {
       sy *= 0.9;

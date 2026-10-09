@@ -230,16 +230,17 @@ window.ROSTER = [
     ranged: true,      // pukulan & tendangan menyerang dari jauh (dipakai AI)
     flatPoses: true,   // pose terlempar/terbaring sudah digambar miring, jangan diputar lagi
     hurtbox: { w: 106, h: 272 },
+    walkCycle: ['walk1', 'walk2', 'walk3', 'walk2'], // jalan dengan langkah kaki
     frames: {
-      idle: 'stance', walk: 'stance', walkF: 'dash', jump: 'dash', fall: 'dash', hurt: 'hurt', fly: 'hurt', lie: 'lie',
-      getup: 'hurt', guard: 'shield', charge: 'aura', intro: 'book', win: 'book', seal: 'aura',
+      idle: 'stance', walk: 'stance', jump: 'dash', fall: 'dash', hurt: 'hurt', fly: 'hurt', lie: 'lie',
+      getup: 'ready', guard: 'guard', charge: 'charge', intro: 'book', win: 'book', seal: 'charge',
     },
     // proj: petir yang melesat setengah layar & mendorong lawan jauh ke belakang
     moves: {
       p1: { frame: 'punch', startup: 4, active: 3, recovery: 10, dmg: 40, hitstun: 18, blockstun: 11, push: 17, box: [130, 205, 90, 70], next: 'p2', proj: { h: 205, speed: 22, bolt: true } },
-      p2: { frame: 'palm', startup: 5, active: 3, recovery: 12, dmg: 45, hitstun: 20, blockstun: 12, push: 19, box: [130, 200, 90, 70], next: 'p3', proj: { h: 185, speed: 22, bolt: true } },
-      p3: { frame: 'push', startup: 7, active: 3, recovery: 18, dmg: 70, blockstun: 15, push: 16, box: [130, 190, 120, 120], kd: true, launch: [15, -10], heavy: true, proj: { h: 195, speed: 21, scale: 1.4, bolt: true } },
-      kick: { frame: 'kick', pre: 'stance', startup: 8, active: 3, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 24, box: [130, 175, 120, 120], heavy: true, proj: { h: 200, speed: 21, scale: 1.3, bolt: true } },
+      p2: { frame: 'punch2', startup: 5, active: 3, recovery: 12, dmg: 45, hitstun: 20, blockstun: 12, push: 19, box: [130, 200, 90, 70], next: 'p3', proj: { h: 200, speed: 22, bolt: true } },
+      p3: { frame: 'kick2', pre: 'ready', startup: 7, active: 3, recovery: 18, dmg: 70, blockstun: 15, push: 16, box: [130, 190, 120, 120], kd: true, launch: [15, -10], heavy: true, proj: { h: 180, speed: 21, scale: 1.4, bolt: true } },
+      kick: { frame: 'kick', pre: 'stance', startup: 8, active: 3, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 24, box: [130, 175, 120, 120], heavy: true, proj: { h: 175, speed: 21, scale: 1.3, bolt: true } },
       air: { frame: 'kick', startup: 4, active: 3, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 12, box: [100, 120, 90, 90], air: true, proj: { h: 170, speed: 18, vy: 6, bolt: true } },
     },
     jurus: { type: 'kamehameha', name: 'KAMEHAMEHA', cost: 30, range: 1500, desc: 'Gelombang energi yang menjangkau tepi layar' },
@@ -277,11 +278,73 @@ window.ROSTER = [
       intro: 'Satu anak panah, satu sasaran.',
       win: 'Tepat sasaran, seperti biasa!',
     },
+  },  {
+    id: 'suci',
+    name: 'SUCI FLOWER',
+    title: 'Mawar Berduri',
+    element: 'MAWAR & RACUN',
+    desc: 'Anggun membawa setangkai mawar. Kibasan mawarnya melepas angin pisau merah, lemparan mawarnya mengandung racun.',
+    color: 0xff3d8a,
+    color2: 0xffa8cc,
+    walk: 4.2, backWalk: 3.5, jumpV: 18.5, jumpX: 5.2,
+    flatPoses: true,
+    hurtbox: { w: 100, h: 272 },
+    walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
+    frames: {
+      idle: 'walk4', walk: 'walk4', jump: 'roseup', fall: 'roseup', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
+      guard: 'walk4', charge: 'meditate', intro: 'aura', win: 'aura', seal: 'meditate',
+    },
+    moves: {
+      // pukulan mawar dari bawah ke atas
+      p1: { frame: 'roseup', pre: 'walk4', startup: 4, active: 4, recovery: 10, dmg: 40, hitstun: 18, blockstun: 11, push: 5, box: [105, 240, 110, 150], lunge: 2, next: 'p2', slash: 0xff3d8a },
+      p2: { frame: 'kick', startup: 5, active: 4, recovery: 11, dmg: 45, hitstun: 20, blockstun: 12, push: 6, box: [120, 170, 120, 110], lunge: 3, next: 'p3' },
+      p3: { frame: 'kick2', pre: 'walk4', startup: 7, active: 5, recovery: 17, dmg: 70, blockstun: 15, push: 8, box: [120, 225, 120, 150], lunge: 3, kd: true, launch: [8, -13], heavy: true, slash: 0xffa8cc },
+      kick: { frame: 'kick', pre: 'walk4', startup: 8, active: 4, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [125, 170, 130, 120], lunge: 2, heavy: true, slash: 0xffa8cc },
+      air: { frame: 'kick2', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [110, 150, 140, 140] },
+    },
+    jurus: { type: 'roseblade', name: 'ANGIN PISAU MAWAR', cost: 25, range: 1500, desc: 'Kibasan mawar melepas angin pisau merah yang mementalkan lawan' },
+    ulti: { type: 'poisonrose', name: 'MAWAR BERACUN', cost: 100, range: 1500, desc: 'Melempar mawar yang meledakkan racun hingga lawan roboh' },
+    quotes: {
+      intro: 'Indah, tapi berduri.',
+      win: 'Setiap mawar punya durinya sendiri.',
+    },
+  },
+  {
+    id: 'septi',
+    name: 'SEPTI',
+    title: 'Penari Kipas Angin',
+    element: 'FUTON (ANGIN KIPAS)',
+    desc: 'Penari kipas yang tenang. Satu kibasan kipasnya menjatuhkan lawan, dua kipas sekaligus melempar lawan ke tepi arena.',
+    color: 0xe8c38a,
+    color2: 0xdff4ff,
+    walk: 4.3, backWalk: 3.6, jumpV: 18.5, jumpX: 5.3,
+    flatPoses: true,
+    hurtbox: { w: 102, h: 272 },
+    walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
+    frames: {
+      idle: 'walk1', walk: 'walk1', jump: 'walk2', fall: 'walk2', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
+      guard: 'walk1', charge: 'meditate', intro: 'meditate', win: 'meditate', seal: 'meditate',
+    },
+    moves: {
+      // pukulan dengan kipas
+      p1: { frame: 'fan1', startup: 4, active: 3, recovery: 10, dmg: 40, hitstun: 18, blockstun: 11, push: 6, box: [130, 200, 110, 110], lunge: 2, next: 'p2' },
+      p2: { frame: 'fan2', startup: 5, active: 4, recovery: 11, dmg: 45, hitstun: 20, blockstun: 12, push: 7, box: [125, 180, 140, 150], lunge: 2, next: 'p3' },
+      p3: { frame: 'kick2', pre: 'walk1', startup: 7, active: 5, recovery: 17, dmg: 70, blockstun: 15, push: 8, box: [120, 230, 120, 150], lunge: 3, kd: true, launch: [8, -13], heavy: true },
+      // tendangan dengan rok
+      kick: { frame: 'skirtkick', pre: 'walk1', startup: 8, active: 5, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 190, 140, 150], lunge: 2, heavy: true },
+      air: { frame: 'skirtkick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [110, 160, 140, 140] },
+    },
+    jurus: { type: 'fangust', name: 'KIBASAN KIPAS', cost: 25, range: 1500, desc: 'Satu kibasan kipas melepas angin yang menjatuhkan lawan' },
+    ulti: { type: 'twinfan', name: 'BADAI DUA KIPAS', cost: 100, range: 1500, desc: 'Badai angin dua kipas yang melempar lawan sampai tepi arena' },
+    quotes: {
+      intro: 'Biarkan anginku menari.',
+      win: 'Angin selalu menang dengan tenang.',
+    },
   },
 ];
 
 // Slot karakter yang akan dikembangkan nanti.
-for (let i = 1; i <= 3; i++) {
+for (let i = 1; i <= 1; i++) {
   window.ROSTER.push({ id: 'locked' + i, name: '???', locked: true });
 }
 
