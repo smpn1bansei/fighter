@@ -40,7 +40,13 @@ class VersusScene extends Phaser.Scene {
     const na = UI.title(this, W * 0.24, H - 92, a.name, 64, UI.hex(a.color)).setAlpha(0);
     const nb = UI.title(this, W * 0.76, H - 92, b.name, 64, UI.hex(b.color)).setAlpha(0);
     const la = UI.text(this, W * 0.24, H - 40, 'KAMU', 14, '#ffffff').setAlpha(0);
+    const arc = this.match.arcade;
     const lb = UI.text(this, W * 0.76, H - 40, 'CPU - ' + diff.name, 14, '#ffffff').setAlpha(0);
+    if (arc) {
+      const last = arc.index === arc.order.length - 1;
+      const st = UI.title(this, W / 2, 46, last ? 'ARCADE - PERTARUNGAN TERAKHIR!' : 'ARCADE - LAWAN ' + (arc.index + 1) + ' / ' + arc.order.length, 40, last ? '#ff6a6a' : '#d9b8ff');
+      st.setDepth(5);
+    }
     const qa = UI.text(this, W * 0.24, 70, '"' + a.quotes.intro + '"', 12, '#ffffff', { wordWrap: { width: W * 0.4 } }).setAlpha(0);
     const qb = UI.text(this, W * 0.76, 70, '"' + b.quotes.intro + '"', 12, '#ffffff', { wordWrap: { width: W * 0.4 } }).setAlpha(0);
     this.tweens.add({ targets: [na, nb, la, lb], alpha: 1, delay: 350, duration: 250 });

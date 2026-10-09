@@ -24,6 +24,12 @@ Pukulan & tendangan King Andri melepaskan petir sejauh setengah layar yang mendo
 
 3 slot karakter lain sudah disiapkan (terkunci, "segera hadir").
 
+## Mode permainan
+
+- **VS BATTLE**: pilih karaktermu dan satu lawan (komputer).
+- **ARCADE**: pilih satu karakter, lalu kalahkan semua karakter lain satu per satu (urutan acak, King Andri selalu jadi bos terakhir).
+  Kalah di tengah jalan? Pilih **COBA LAGI** untuk mengulang lawan yang sama.
+
 ## Cara main
 
 | Aksi | Layar sentuh | Keyboard |
@@ -68,7 +74,7 @@ Game akan terbuka layar penuh dan mendatar seperti aplikasi.
 
 ## Memperbarui game yang sudah online
 
-Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.3` → `?v=1.4`) dan `VERSION` di `js/config.js`
+Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.4` → `?v=1.5`) dan `VERSION` di `js/config.js`
 agar HP pemain langsung memuat versi terbaru, bukan versi lama yang tersimpan di browser.
 GitHub Pages butuh sekitar 1–10 menit untuk menampilkan perubahan.
 

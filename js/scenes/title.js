@@ -43,11 +43,18 @@ class TitleScene extends Phaser.Scene {
     };
     show(true);
     if (groups > 1) this.time.addEvent({ delay: 4500, loop: true, callback: () => show(false) });
-    const ghost = this.add.image(W * 0.71, H + 400, chars[0].id + '_portrait').setOrigin(0.5, 1)
-      .setScale(0.74).setTintFill(0x10101c).setAlpha(0.85).setFlipX(true).setDepth(1);
-    this.tweens.add({ targets: ghost, y: H + 8, duration: 700, delay: 500, ease: 'Back.easeOut' });
-    const q = UI.title(this, W * 0.71, H - 250, '?', 110, '#ffc83d').setAlpha(0).setDepth(1);
-    this.tweens.add({ targets: q, alpha: 0.9, delay: 1100, duration: 400 });
+    // Siluet "karakter berikutnya": tanda tanya di dalam lingkaran bercahaya,
+    // diletakkan di antara tombol & karakter kanan agar tidak menumpuk gambar lain.
+    const mx = W * 0.71, my = H - 230;
+    const mys = this.add.container(mx, my).setDepth(1).setAlpha(0);
+    const halo = this.add.image(0, 0, 'fx_glow').setTint(0xffc83d).setBlendMode(Phaser.BlendModes.ADD).setScale(2.2).setAlpha(0.35);
+    const ring = this.add.image(0, 0, 'fx_ring').setTint(0xffc83d).setScale(1.05).setAlpha(0.7);
+    const q = UI.title(this, 0, 4, '?', 120, '#ffd75a');
+    const soon = UI.text(this, 0, 104, 'SEGERA HADIR', 11, '#ffd75a');
+    mys.add([halo, ring, q, soon]);
+    this.tweens.add({ targets: mys, alpha: 1, delay: 900, duration: 400 });
+    this.tweens.add({ targets: ring, angle: 360, duration: 6000, repeat: -1 });
+    this.tweens.add({ targets: q, scale: 1.12, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     // Judul
     const t1 = UI.title(this, W / 2, 128, 'SEIKIJANG', 132, '#ffd75a').setDepth(5);
@@ -60,16 +67,26 @@ class TitleScene extends Phaser.Scene {
     });
     UI.text(this, W / 2, 312, CFG.SUBTITLE, 16, '#ffffff').setDepth(5);
 
-    const start = UI.button(this, W / 2, 420, 320, 76, 'MULAI', () => this.go(), { size: 26, color: 0xff6a2a });
-    const help = UI.button(this, W / 2, 516, 320, 60, 'CARA MAIN', () => this.showHelp(), { size: 18, color: 0x4aa8ff });
-    [start, help].forEach((b) => b.setDepth(6));
-    this.menu = UI.menu(this, [start, help]);
+    const start = UI.button(this, W / 2, 400, 320, 68, 'VS BATTLE', () => this.go('vs'), { size: 24, color: 0xff6a2a });
+    const arcade = UI.button(this, W / 2, 484, 320, 62, 'ARCADE', () => this.go('arcade'), { size: 22, color: 0xb06cff });
+    const help = UI.button(this, W / 2, 562, 320, 52, 'CARA MAIN', () => this.showHelp(), { size: 16, color: 0x4aa8ff });
+    [start, arcade, help].forEach((b) => b.setDepth(6));
+    this.menu = UI.menu(this, [start, arcade, help]);
+    // abaikan tombol yang masih tertekan dari layar sebelumnya
+    this.menu.active = false;
+    this.time.delayedCall(350, () => { if (!this.help) this.menu.active = true; });
+    this.modeHint = UI.text(this, W / 2, 618, '', 10, '#cfd5ea').setDepth(6);
+    const hints = ['Lawan 1 karakter pilihanmu', 'Kalahkan semua karakter satu per satu!', 'Daftar tombol & tips'];
+    const upd = () => this.modeHint.setText(hints[this.menu.index] || '');
+    upd();
+    this.input.keyboard.on('keydown', upd);
+    [start, arcade, help].forEach((b) => b.on('pointerover', upd));
     this.tweens.add({ targets: start, scale: 1.05, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     UI.soundToggle(this, W - 90, 40);
     UI.fullscreenToggle(this, W - 246, 40);
     UI.text(this, W - 16, H - 16, 'v' + CFG.VERSION, 10, '#9aa3c0').setOrigin(1, 1).setDepth(6);
-    const hint = this.sys.game.device.input.touch ? 'Tekan MULAI untuk bermain layar penuh' : 'Gunakan panah & Enter untuk memilih';
+    const hint = this.sys.game.device.input.touch ? 'Pilih mode untuk bermain layar penuh' : 'Gunakan panah & Enter untuk memilih';
     UI.text(this, W / 2, H - 26, hint, 11, '#cfd5ea').setDepth(6);
 
     this.input.keyboard.on('keydown-ESC', () => this.hideHelp());
@@ -81,14 +98,14 @@ class TitleScene extends Phaser.Scene {
     t.setFill(g);
   }
 
-  go() {
+  go(mode) {
     if (this.leaving) return;
     this.leaving = true;
     Sound.init();
     // Di HP: masuk layar penuh & kunci posisi mendatar bila didukung browser
     if (this.sys.game.device.input.touch) UI.goFullscreen(this);
     this.cameras.main.fadeOut(250, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Select'));
+    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Select', { mode }));
   }
 
   showHelp() {

@@ -476,7 +476,8 @@ class FightScene extends Phaser.Scene {
     const c = this.add.container(0, 0).setDepth(100);
     const dim = this.add.rectangle(0, 0, W, H, 0x000000, 0.7).setOrigin(0).setInteractive();
     c.add(dim);
-    c.add(UI.title(this, W / 2, 150, title, 96, color));
+    c.titleText = UI.title(this, W / 2, 150, title, 96, color);
+    c.add(c.titleText);
     return c;
   }
 
@@ -529,16 +530,59 @@ class FightScene extends Phaser.Scene {
     const quote = UI.text(this, W / 2, 240, '"' + winner.def.quotes.win + '"', 14, '#ffffff', { wordWrap: { width: W * 0.5 } });
     const stats = UI.text(this, W / 2, 292, 'KOMBO TERBANYAK: ' + this.maxCombo + ' HIT', 12, '#7fd8ff');
     c.add([por, quote, stats]);
-    const btns = [
-      UI.button(this, W / 2, 380, 360, 66, 'TANDING ULANG', () => this.leave('Fight', this.match), { size: 18, color: 0xff6a2a }),
-      UI.button(this, W / 2, 462, 360, 62, 'GANTI LAWAN', () => this.leave('Select', { p1: this.match.p1 }), { size: 16 }),
-      UI.button(this, W / 2, 540, 360, 62, 'GANTI KARAKTER', () => this.leave('Select', {}), { size: 16 }),
-      UI.button(this, W / 2, 618, 360, 62, 'MENU UTAMA', () => this.leave('Title'), { size: 16 }),
-    ];
+    const title = c.titleText;
+    const arc = this.match.arcade;
+    let btns;
+    if (arc) {
+      const done = arc.index + 1;
+      const total = arc.order.length;
+      if (won && done >= total) {
+        // semua lawan dikalahkan
+        title.setText('JUARA ARCADE!');
+        stats.setText('Semua ' + total + ' lawan dikalahkan dengan ' + winner.def.name + '!');
+        Sound.play('confirm');
+        this.celebrate();
+        btns = [
+          UI.button(this, W / 2, 400, 360, 66, 'MAIN ARCADE LAGI', () => this.leave('Select', { mode: 'arcade' }), { size: 16, color: 0xb06cff }),
+          UI.button(this, W / 2, 482, 360, 62, 'MENU UTAMA', () => this.leave('Title'), { size: 16 }),
+        ];
+      } else if (won) {
+        stats.setText('ARCADE: ' + done + ' / ' + total + ' LAWAN DIKALAHKAN');
+        const next = Object.assign({}, this.match, { cpu: arc.order[done], arcade: { order: arc.order, index: done } });
+        btns = [
+          UI.button(this, W / 2, 400, 360, 66, 'LAWAN BERIKUTNYA', () => this.leave('Versus', next), { size: 17, color: 0xb06cff }),
+          UI.button(this, W / 2, 482, 360, 62, 'MENU UTAMA', () => this.leave('Title'), { size: 16 }),
+        ];
+      } else {
+        stats.setText('ARCADE: berhenti di lawan ' + done + ' / ' + total);
+        btns = [
+          UI.button(this, W / 2, 400, 360, 66, 'COBA LAGI', () => this.leave('Fight', this.match), { size: 18, color: 0xff6a2a }),
+          UI.button(this, W / 2, 482, 360, 62, 'ULANG DARI AWAL', () => this.leave('Select', { mode: 'arcade' }), { size: 16 }),
+          UI.button(this, W / 2, 560, 360, 62, 'MENU UTAMA', () => this.leave('Title'), { size: 16 }),
+        ];
+      }
+    } else {
+      btns = [
+        UI.button(this, W / 2, 380, 360, 66, 'TANDING ULANG', () => this.leave('Fight', this.match), { size: 18, color: 0xff6a2a }),
+        UI.button(this, W / 2, 462, 360, 62, 'GANTI LAWAN', () => this.leave('Select', { p1: this.match.p1 }), { size: 16 }),
+        UI.button(this, W / 2, 540, 360, 62, 'GANTI KARAKTER', () => this.leave('Select', {}), { size: 16 }),
+        UI.button(this, W / 2, 618, 360, 62, 'MENU UTAMA', () => this.leave('Title'), { size: 16 }),
+      ];
+    }
     btns.forEach((b) => c.add(b));
     c.setAlpha(0);
     this.tweens.add({ targets: c, alpha: 1, duration: 300 });
     this.time.delayedCall(300, () => { this.resultMenu = UI.menu(this, btns); });
+  }
+
+  // Hujan kertas warna-warni saat juara arcade
+  celebrate() {
+    const colors = [0xffd75a, 0xff6a2a, 0x4cd964, 0x4aa8ff, 0xb06cff, 0xff6fae];
+    const em = this.add.particles(0, -20, 'fx_px', {
+      x: { min: 0, max: CFG.W }, lifespan: 4000, speedY: { min: 120, max: 260 }, speedX: { min: -60, max: 60 },
+      scale: { min: 1, max: 2.2 }, rotate: { start: 0, end: 720 }, frequency: 30, tint: colors,
+    }).setDepth(150);
+    this.time.delayedCall(6000, () => em.stop());
   }
 
   leave(scene, data) {

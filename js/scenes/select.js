@@ -1,9 +1,11 @@
 // Layar pilih karakter: 1) pilih karaktermu  2) pilih lawan (CPU)  3) pilih tingkat kesulitan.
+// Mode ARCADE: langkah 2 dilewati — lawan adalah semua karakter lain secara berurutan.
 class SelectScene extends Phaser.Scene {
   constructor() { super('Select'); }
 
   init(data) {
     this.leaving = false;
+    this.mode = (data && data.mode) || 'vs';
     this.step = 1;
     this.p1 = null;
     this.cpu = null;
@@ -191,6 +193,11 @@ class SelectScene extends Phaser.Scene {
     Sound.play('confirm');
     if (this.step === 1) {
       this.p1 = c.id;
+      if (this.mode === 'arcade') {
+        this.step = 3;
+        this.refresh();
+        return;
+      }
       this.step = 2;
       // pindahkan kursor ke karakter lain sebagai usulan lawan
       const others = ROSTER.filter((r) => !r.locked && r.id !== c.id);
@@ -208,7 +215,11 @@ class SelectScene extends Phaser.Scene {
       return;
     }
     Sound.play('back');
-    if (this.step === 3) {
+    if (this.step === 3 && this.mode === 'arcade') {
+      this.cursor = ROSTER.findIndex((c) => c.id === this.p1);
+      this.p1 = null;
+      this.step = 1;
+    } else if (this.step === 3) {
       this.cpu = null;
       this.step = 2;
     } else if (this.step === 2) {
@@ -231,14 +242,25 @@ class SelectScene extends Phaser.Scene {
     Sound.play('confirm');
     this.cameras.main.fadeOut(250, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('Versus', { p1: this.p1, cpu: this.cpu, diff: this.diff });
+      if (this.mode === 'arcade') {
+        // urutan lawan acak, King Andri (karakter terkuat) selalu jadi bos terakhir
+        const others = Phaser.Utils.Array.Shuffle(ROSTER.filter((c) => !c.locked && c.id !== this.p1).map((c) => c.id));
+        const boss = others.indexOf('kingandri');
+        if (boss >= 0) others.push(others.splice(boss, 1)[0]);
+        this.scene.start('Versus', { p1: this.p1, cpu: others[0], diff: this.diff, arcade: { order: others, index: 0 } });
+      } else {
+        this.scene.start('Versus', { p1: this.p1, cpu: this.cpu, diff: this.diff });
+      }
     });
   }
 
   refresh() {
     const cur = ROSTER[this.cursor];
-    const headers = ['', 'PILIH KARAKTERMU', 'PILIH LAWANMU', 'SIAP BERTARUNG?'];
-    const subs = ['', 'Sentuh kotak karakter, lalu tekan PILIH', 'Lawanmu akan dikendalikan komputer', 'Pilih tingkat kesulitan lalu MULAI'];
+    const arc = this.mode === 'arcade';
+    const headers = ['', arc ? 'ARCADE: PILIH KARAKTER' : 'PILIH KARAKTERMU', 'PILIH LAWANMU', arc ? 'SIAP MENANTANG SEMUA?' : 'SIAP BERTARUNG?'];
+    const nOpp = ROSTER.filter((c) => !c.locked).length - 1;
+    const subs = ['', arc ? 'Pilih jagoanmu untuk melawan ' + nOpp + ' karakter berturut-turut' : 'Sentuh kotak karakter, lalu tekan PILIH',
+      'Lawanmu akan dikendalikan komputer', 'Pilih tingkat kesulitan lalu MULAI'];
     this.header.setText(headers[this.step]);
     this.subheader.setText(subs[this.step]);
 
@@ -251,10 +273,14 @@ class SelectScene extends Phaser.Scene {
       this.setPanel(this.panels[1], cur, false);
     } else {
       this.setPanel(this.panels[0], getChar(this.p1), true);
-      this.setPanel(this.panels[1], getChar(this.cpu), true);
+      this.setPanel(this.panels[1], arc ? null : getChar(this.cpu), !arc);
+      if (arc) {
+        this.panels[1].name.setText(nOpp + ' LAWAN');
+        this.panels[1].title.setText('BOS TERAKHIR: KING ANDRI');
+      }
     }
     this.panels[0].stamp.setVisible(this.step >= 2);
-    this.panels[1].stamp.setVisible(this.step >= 3);
+    this.panels[1].stamp.setVisible(this.step >= 3 && !arc);
 
     // Slot
     this.slots.forEach((s, i) => {
