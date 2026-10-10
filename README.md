@@ -8,10 +8,10 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 | Karakter | Jurus (butuh cakra) | Jurus Pamungkas (cakra penuh) |
 |---|---|---|
 | **Nur Hokage**: Hokage Cahaya Emas | Rasengan Cahaya: melesat maju membawa bola cakra berputar | Rasen-Shuriken Hokage: shuriken angin raksasa yang mengurung lawan |
-| **Siti Hokage**: Hokage Api Konoha | Katon: Bola Api, segel tangan lalu menyemburkan bola api | Kuchiyose: Pilar Api, segel pemanggil memunculkan pilar api di bawah lawan |
-| **Ranti**: Sannin Tinju Seratus | Retakan Bumi: tinju ke tanah, batu menjalar ke lawan | Byakugo: Tinju Seratus, memulihkan darah lalu menghantam dengan tinju raksasa |
-| **Mrs. Dina**: Balerina Kilat | Tendangan Putar Udara: tendangan memutar di udara yang melepas bilah angin jarak jauh | Tendangan Badai: tendangan jarak jauh berupa badai angin yang melempar lawan |
-| **Fatim**: Ninja Bayangan Bercadar | Shuriken Rahasia: tiga shuriken dari balik jubah | Tusukan Seribu Bayangan: menerjang lalu menusuk bertubi-tubi bersama bayangannya |
+| **Siti Hokage**: Pemimpin Tekad Api | Laser Angin Berputar: dua tangan, lawan terhempas ke ujung arena (ditangkis: setengah damage) | Bola Tekad Api: bola energi dari dada, menghapus serangan lawan & tak bisa ditangkis |
+| **Ranti**: Pengurus Administrasi Ninja | Hentakan Bumi: tanah retak sejauh 55% arena, lawan di tanah pasti jatuh | Bola Pusaran Angin: sejauh 50% arena (ditangkis: setengah damage) |
+| **Mrs. Dina**: ASN Angin Petir | Tinju Kilat Angin: melesat kilat lalu meninju dari bawah, lawan terlempar ke atas | Badai Turbo: angin turbo berpetir menghempaskan lawan ke ujung arena (ditangkis: setengah damage) |
+| **Fatim**: Ninja Senjata Kilat | Tabrakan Petir: melesat menabrak lawan lalu menyetrum (ditangkis: setengah damage) | Bola Petir: bola petir sejauh 70% arena masuk ke tubuh lawan (ditangkis: setengah damage) |
 | **Mas Tio**: Operator Kilat | Flash Punch: lari kilat lalu meninju, ditangkis pun lawan terpental ke ujung arena | Hantaman Langit: muncul di atas kepala lawan & menghantam ke bawah, tak bisa ditangkis, tanah retak |
 | **Pak Jef**: Otot Baja Sekolah | Bola Basket Api: lawan yang terkena langsung jatuh | Tendangan Bola Petir Super: lawan terdorong ke ujung arena walau menangkis |
 | **King Andri**: Raja Petir *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Laser Merah Langit: melompat tinggi lalu menembakkan laser merah ke bawah, lawan terlempar |
@@ -20,8 +20,9 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 | **Septi**: Penari Kipas Angin | Kibasan Kipas: satu kipas melepas angin yang menjatuhkan lawan | Badai Dua Kipas: badai angin yang melempar lawan sampai tepi arena |
 | **Almusbar**: Pelatih Bola Petir | Lemparan Bola: bola dari tangan yang menjatuhkan lawan | Tendangan Bola Petir: menghancurkan perisai lawan dan melempar lawan ke ujung arena |
 
-Ciri khas tambahan: TENDANG Mrs. Dina adalah terjangan secepat kilat yang melempar lawan,
-Fatim bergerak maju dengan lari merunduk yang cepat, Mas Tio bisa meluncur kilat: tekan arah depan sekali untuk melesat ke depan lawan, arah belakang untuk mundur ke ujung arena.
+Nur Hokage & Siti Hokage: tekan arah ATAS untuk menghilang & muncul di belakang lawan (memakai cakra seperti jurus).
+Ciri khas tambahan: pukulan Mrs. Dina berupa petir kuning sejauh 30% arena dan tendangannya mendorong lawan ke ujung arena (ditangkis: tanpa damage),
+Fatim melempar shuriken sejauh 45% arena dan bisa meluncur kilat seperti Mas Tio, Mas Tio bisa meluncur kilat: tekan arah depan sekali untuk melesat ke depan lawan, arah belakang untuk mundur ke ujung arena.
 Almusbar punya kombo 5 pukulan kiri-kanan (tekan PUKUL berulang) dan tendangan yang mementalkan lawan jauh.
 Pukulan Mbak Nita menyemburkan api sejauh 25% arena.
 Tendangan Pak Jef menembakkan bola sejauh 40% arena; pukulannya 35% lebih kuat dan mendorong lawan lebih jauh, tapi ia bergerak lebih lambat.
@@ -80,7 +81,7 @@ Game akan terbuka layar penuh dan mendatar seperti aplikasi.
 
 ## Memperbarui game yang sudah online
 
-Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.9` → `?v=2.0`) dan `VERSION` di `js/config.js`
+Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=2.3` → `?v=2.4`) dan `VERSION` di `js/config.js`
 agar HP pemain langsung memuat versi terbaru, bukan versi lama yang tersimpan di browser.
 GitHub Pages butuh sekitar 1–10 menit untuk menampilkan perubahan.
 
@@ -126,6 +127,9 @@ js/jutsu4.js          jurus Mbak Nita
 js/jutsu5.js          jurus Suci Flower, Septi
 js/jutsu6.js          jurus Almusbar + api pukulan Mbak Nita
 js/jutsu7.js          jurus Mas Tio
+js/jutsu8.js          jurus Mrs. Dina
+js/jutsu9.js          jurus Siti Hokage & Ranti
+js/jutsu10.js         jurus Fatim
 js/ai.js              kecerdasan komputer
 js/input.js           keyboard & tombol layar sentuh
 js/fx.js              efek visual

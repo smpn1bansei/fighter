@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------
 JUTSU.flashpunch = function (f) {
   const sc = f.scene, fx = f.fx;
-  let phase = 'ready', pt = 0, dir = f.facing;
+  let phase = 'ready', pt = 0, dir = f.facing, half = 1;
   f.setPose('aura');
   return {
     step() {
@@ -29,8 +29,13 @@ JUTSU.flashpunch = function (f) {
           f.setPose('double');
           dir = f.facing;
           const p = f.at(130, 205);
-          if (vic.state === 'guard' || vic.state === 'blockstun') shatterShield(sc, vic, f.x);
-          sc.applyHit(f, vic, { dmg: 90, hitstun: 60, heavy: true, unblockable: true, hitstop: 10, push: 0, srcX: f.x, x: p.x, y: p.y, noGain: true });
+          // lawan menangkis: tetap terpental, tapi damage hanya setengah
+          half = vic.state === 'guard' || vic.state === 'blockstun' ? 0.5 : 1;
+          if (half < 1) {
+            shatterShield(sc, vic, f.x);
+            fx.popup(vic.x, vic.y - 380, 'SETENGAH DAMAGE', '#bff4ff', 26);
+          }
+          sc.applyHit(f, vic, { dmg: Math.round(90 * half), hitstun: 60, heavy: true, unblockable: true, hitstop: 10, push: 0, srcX: f.x, x: p.x, y: p.y, noGain: true });
           fx.image('fx_ring', p.x, p.y, { tint: 0xffffff, from: 0.4, to: 2.4, ms: 300 });
           sc.shake(300, 0.016);
           Sound.play('explosion');
@@ -49,7 +54,7 @@ JUTSU.flashpunch = function (f) {
         if (pt % 2 === 0) fx.dust(vic.x, vic.ground, 2);
         const wall = vic.x <= CFG.WALL || vic.x >= CFG.W - CFG.WALL;
         if (wall || pt > 50) {
-          sc.applyHit(f, vic, { dmg: 60, kd: true, launch: [4, -12], heavy: true, force: true, hitstop: 12, srcX: vic.x - dir * 60, x: vic.x, y: vic.y - 150, noGain: true });
+          sc.applyHit(f, vic, { dmg: Math.round(60 * half), kd: true, launch: [4, -12], heavy: true, force: true, hitstop: 12, srcX: vic.x - dir * 60, x: vic.x, y: vic.y - 150, noGain: true });
           sc.shake(350, 0.02);
           fx.shock(vic.x, f.ground, f.def.color, 3);
           phase = 'end';

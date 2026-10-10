@@ -144,6 +144,11 @@ class Fighter {
           break;
         }
         if (this.tryActions()) break;
+        if (d.teleport && c.pressed('up') && this.chakra >= d.jurus.cost && this.flashCD <= 0) {
+          c.consume('up');
+          this.teleportBehind();
+          break;
+        }
         if (c.held('up')) {
           this.setState('prejump');
           this.vx = 0;
@@ -297,6 +302,26 @@ class Fighter {
     if (this.t % 20 === 1) this.fx.shock(this.x, this.ground, this.def.color, 1.6);
   }
 
+  // Nur Hokage: menghilang lalu muncul di belakang lawan (memakai cakra seperti jurus).
+  teleportBehind() {
+    const opp = this.opp, side = Math.sign(opp.x - this.x) || this.facing;
+    this.chakra -= this.def.jurus.cost;
+    this.afterimage(this.def.color, 0.7, 260);
+    this.fx.image('fx_glow', this.x, this.y - 150, { tint: this.def.color, from: 1.5, to: 0.2, ms: 220 });
+    let nx = opp.x + side * (CFG.PUSH_W + 20);
+    if (nx < CFG.WALL || nx > CFG.W - CFG.WALL) nx = Phaser.Math.Clamp(nx, CFG.WALL, CFG.W - CFG.WALL);
+    this.x = nx;
+    this.vx = 0;
+    this.faceOpponent();
+    this.fx.image('fx_ring', this.x, this.y - 150, { tint: this.def.color, from: 0.2, to: 1.8, ms: 260, scaleY: 1.6 });
+    this.fx.burst(this.fx.sparks, this.x, this.y - 150, 10, this.def.color);
+    this.invuln = 8;
+    this.flashCD = 20;
+    this.setState('landing');
+    this.landWait = 6;
+    Sound.play('dash');
+  }
+
   // Meluncur secepat kilat: ke depan lawan, atau mundur ke ujung arena sendiri.
   startFlash(dir) {
     const fwd = dir === this.facing;
@@ -310,7 +335,8 @@ class Fighter {
       this.flashTarget = dir > 0 ? hi : lo;
     }
     this.setState('flash');
-    this.setPose(fwd ? 'dash' : 'run');
+    const F = this.def.frames;
+    this.setPose(fwd ? F.flashF || 'dash' : F.flashB || 'run');
     Sound.play('dash');
   }
 
@@ -337,7 +363,8 @@ class Fighter {
       this.setPose(m.frame);
       // serangan jarak jauh (mis. angin sabit King Andri)
       if (m.proj) {
-        if (m.proj.fire) new FlameShot(this, m);
+        if (m.proj.star) new ThrowStar(this, m);
+        else if (m.proj.fire) new FlameShot(this, m);
         else if (m.proj.ball) new KickBall(this, m);
         else new LightningBolt(this, m);
         this.hasHit = true;
@@ -567,7 +594,7 @@ class Fighter {
     if (this.jutsu && this.jutsu.offsetY) oy += this.jutsu.offsetY;
 
     sp.setPosition(this.x + ox, this.y + oy);
-    sp.setFlipX(this.facing < 0);
+    sp.setFlipX((this.facing < 0) !== !!this.spinFlip);
     sp.setScale(sx, sy);
     sp.setRotation(rot);
     sp.setDepth(st === 'attack' || st === 'jutsu' ? 22 : 20 + this.side * 0.5);

@@ -104,7 +104,7 @@ JUTSU.rasengan = function (f) {
         if (pt % 3 === 0) fx.dust(f.x - f.facing * 40, f.ground, 1);
         const vic = f.opp;
         if (rectsOverlap(circleRect(h.x, h.y, 50), vic.hurtbox())) {
-          const res = sc.applyHit(f, vic, { dmg: 24, hitstun: 30, blockstun: 18, push: 1, chip: 0.2, srcX: f.x, x: h.x, y: h.y, hitstop: 5, noGain: true });
+          const res = sc.applyHit(f, vic, { dmg: 24, hitstun: 30, blockstun: 18, push: 1, chip: 0.2, guard: 'full', srcX: f.x, x: h.x, y: h.y, hitstop: 5, noGain: true });
           if (res === 'block') { f.vx = -f.facing * 7; end(true); }
           else if (res === 'hit') { phase = 'grind'; pt = 0; hits = 1; f.vx = 0; }
         }
@@ -123,6 +123,7 @@ JUTSU.rasengan = function (f) {
             ? { dmg: 70, kd: true, launch: [13, -13], heavy: true, hitstop: 12, srcX: f.x, x: h.x, y: h.y, noGain: true }
             : { dmg: 22, hitstun: 30, push: 0, hitstop: 3, srcX: f.x, x: h.x, y: h.y, noGain: true });
           if (last) {
+            if (!vic.ko) new WallShove(f, vic, false); // terlempar sampai ujung arena
             Sound.play('explosion');
             sc.shake(250, 0.012);
             fx.shock(h.x, f.ground, 0xffd75a, 3);
@@ -202,7 +203,7 @@ class ShurikenShot extends Actor {
       if (this.t % 18 === 0) Sound.play('wind');
       if (this.clash()) return false;
       if (rectsOverlap(this.rect(), vic.hurtbox())) {
-        const res = sc.applyHit(f, vic, { dmg: 20, hitstun: 40, blockstun: 26, push: 2, chip: 0.35, srcX: this.x, x: this.x, y: this.y, hitstop: 6, noGain: true });
+        const res = sc.applyHit(f, vic, { dmg: 20, hitstun: 40, blockstun: 26, push: 2, chip: 0.35, guard: 'full', srcX: this.x, x: this.x, y: this.y, hitstop: 6, noGain: true });
         if (res === 'block') { this.explode(); return false; }
         if (res === 'hit') { this.phase = 'trap'; this.pt = 0; this.hits = 1; }
       }

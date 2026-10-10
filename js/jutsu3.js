@@ -187,7 +187,8 @@ class LightningBolt extends Actor {
     this.vx = f.facing * (pr.speed || 20);
     this.vy = pr.vy || 0;
     // jangkauan total dari tubuh ~ setengah layar
-    this.range = CFG.W * 0.5 - (pr.x || 120) - 40;
+    // reach: jangkauan ujung petir dari tubuh (pecahan lebar arena), default setengah layar
+    this.range = CFG.W * (pr.reach || 0.5) - (pr.x || 120) - (pr.reach ? 50 : 40);
     this.m = m;
     this.s = pr.scale || 1;
     this.kind = 'mid';
@@ -195,9 +196,11 @@ class LightningBolt extends Actor {
     this.power = 1;
     const s = this.s, flip = f.facing < 0;
     this.vis = sc.add.container(p.x, p.y).setDepth(32);
-    this.glow = sc.add.image(0, 0, 'fx_glow').setTint(0x3fa8ff).setBlendMode(ADD()).setScale(1.4 * s, 0.8 * s).setAlpha(0.7);
-    this.bolt = sc.add.image(0, 0, 'fx_bolt0').setTint(0xbff4ff).setBlendMode(ADD()).setScale(s).setFlipX(flip);
-    this.bolt2 = sc.add.image(0, 0, 'fx_bolt1').setTint(0x5fe0ff).setBlendMode(ADD()).setScale(s * 0.9, s * 1.3).setFlipX(flip);
+    const yellow = pr.color === 'yellow';
+    this.zap = yellow ? 0xfff3a0 : 0xbff4ff;
+    this.glow = sc.add.image(0, 0, 'fx_glow').setTint(yellow ? 0xffc400 : 0x3fa8ff).setBlendMode(ADD()).setScale(1.4 * s, 0.8 * s).setAlpha(0.7);
+    this.bolt = sc.add.image(0, 0, 'fx_bolt0').setTint(this.zap).setBlendMode(ADD()).setScale(s).setFlipX(flip);
+    this.bolt2 = sc.add.image(0, 0, 'fx_bolt1').setTint(yellow ? 0xffe066 : 0x5fe0ff).setBlendMode(ADD()).setScale(s * 0.9, s * 1.3).setFlipX(flip);
     this.vis.add([this.glow, this.bolt2, this.bolt]);
     if (this.vy) this.vis.setAngle(Phaser.Math.RadToDeg(Math.atan2(this.vy, Math.abs(this.vx))) * f.facing);
     Sound.play('shuriken');
@@ -205,7 +208,7 @@ class LightningBolt extends Actor {
   rect() { return { x: this.x - 50 * this.s, y: this.y - 32 * this.s, w: 100 * this.s, h: 64 * this.s }; }
   explode() {
     if (this.dead) return;
-    zapAt(this.scene, this.x, this.y, 0xbff4ff);
+    zapAt(this.scene, this.x, this.y, this.zap);
     this.vis.destroy();
     this.destroy();
   }

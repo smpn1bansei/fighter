@@ -63,10 +63,10 @@ class ColorBlade extends Actor {
       vic.vx = 0;
       const atWall = vic.x <= CFG.WALL + 2 || vic.x >= CFG.W - CFG.WALL - 2;
       if (this.pt % 7 === 0 && !atWall) {
-        sc.applyHit(f, vic, { dmg: 16, hitstun: 30, push: 0, hitstop: 1, force: true, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true });
+        sc.applyHit(f, vic, { dmg: 16, hitstun: 30, push: 0, hitstop: 1, force: true, half: this.half, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true });
       }
       if (atWall || this.pt > 80 || vic.ko) {
-        sc.applyHit(f, vic, Object.assign({ force: true, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true }, o.hit));
+        sc.applyHit(f, vic, Object.assign({ force: true, half: this.half, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true }, o.hit));
         sc.shake(500, 0.022);
         sc.flash(180, 230, 245, 255);
         this.explode();
@@ -78,7 +78,8 @@ class ColorBlade extends Actor {
     if (this.clash()) return false;
     if (rectsOverlap(this.rect(), vic.hurtbox())) {
       if (o.carry) {
-        const res = sc.applyHit(f, vic, { dmg: 30, hitstun: 40, blockstun: 22, push: 4, chip: 0.35, heavy: true, srcX: this.x, x: this.x, y: this.y, hitstop: 8, noGain: true });
+        const res = sc.applyHit(f, vic, { dmg: 30, hitstun: 40, blockstun: 22, push: 4, chip: 0.35, heavy: true, guard: 'half', srcX: this.x, x: this.x, y: this.y, hitstop: 8, noGain: true });
+        this.half = sc.lastGuarded ? 0.5 : 0;
         if (res === 'hit') {
           this.phase = 'carry';
           this.pt = 0;
@@ -177,7 +178,9 @@ class PoisonRose extends Actor {
       const hb = vic.hurtbox();
       const landed = this.y >= f.ground - 20;
       if (rectsOverlap(this.rect(), hb) || (landed && Math.abs(vic.x - this.x) < 120 && hb)) {
-        const res = sc.applyHit(f, vic, { dmg: 30, hitstun: 50, blockstun: 24, push: 2, chip: 0.4, hitstop: 8, srcX: this.x, x: this.x, y: this.y, noGain: true });
+        // racun menembus perisai (setengah damage bila menangkis)
+        const res = sc.applyHit(f, vic, { dmg: 30, hitstun: 50, blockstun: 24, push: 2, chip: 0.4, guard: 'half', hitstop: 8, srcX: this.x, x: this.x, y: this.y, noGain: true });
+        this.half = sc.lastGuarded ? 0.5 : 0;
         Sound.play('explosion');
         if (res !== 'hit') { this.explode(); return false; }
         // racun menyebar
@@ -200,11 +203,11 @@ class PoisonRose extends Actor {
     vic.vx = 0;
     if (this.pt % 4 === 0) this.cloud(3);
     if (this.pt % 10 === 0 && this.pt < 80) {
-      sc.applyHit(f, vic, { dmg: 22, hitstun: 30, push: 0, hitstop: 1, force: true, srcX: f.x, x: vic.x + rnd(-30, 30), y: vic.y - rnd(80, 240), noGain: true });
+      sc.applyHit(f, vic, { dmg: 22, hitstun: 30, push: 0, hitstop: 1, force: true, half: this.half, srcX: f.x, x: vic.x + rnd(-30, 30), y: vic.y - rnd(80, 240), noGain: true });
     }
     if (this.pt >= 80 || vic.ko) {
       vic.tintOverride = null;
-      sc.applyHit(f, vic, { dmg: 90, kd: true, launch: [3, -7], heavy: true, hitstop: 14, force: true, srcX: f.x, x: vic.x, y: vic.y - 120, noGain: true });
+      sc.applyHit(f, vic, { dmg: 90, kd: true, launch: [3, -7], heavy: true, hitstop: 14, force: true, half: this.half, srcX: f.x, x: vic.x, y: vic.y - 120, noGain: true });
       this.cloud(20);
       fadeOut(sc, this.glow, 400);
       this.vis.destroy();

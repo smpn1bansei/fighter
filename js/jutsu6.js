@@ -14,25 +14,30 @@ class FlameShot extends Actor {
     this.x = this.x0 = p.x;
     this.y = p.y;
     this.vx = f.facing * (pr.speed || 16);
-    this.range = CFG.W * 0.25 - (pr.x || 110) - 40; // ujung depan api tepat 25% arena dari tubuh
+    // reach: jangkauan ujung api dari tubuh (pecahan arena, default 25%); wind: versi angin putih
+    this.range = CFG.W * (pr.reach || 0.25) - (pr.x || 110) - (pr.reach ? 100 : 40);
+    this.wind = !!pr.wind;
     this.m = m;
     this.kind = 'mid';
     this.projectile = true;
     this.power = 1;
     const flip = f.facing < 0;
     this.vis = sc.add.container(p.x, p.y).setDepth(32);
-    this.glow = sc.add.image(0, 0, 'fx_glow').setTint(0xff6a1a).setBlendMode(ADD()).setScale(1.3, 0.8).setAlpha(0.8);
-    this.flame = sc.add.image(0, 0, 'fx_flame').setTint(0xffa040).setBlendMode(ADD()).setScale(1.1, 1.3).setAngle(flip ? -90 : 90);
-    this.core = sc.add.image(0, 0, 'fx_glow').setTint(0xfff0b0).setBlendMode(ADD()).setScale(0.55);
+    const w = this.wind;
+    this.glow = sc.add.image(0, 0, 'fx_glow').setTint(w ? 0x9fe8ff : 0xff6a1a).setBlendMode(ADD()).setScale(1.3, 0.8).setAlpha(0.8);
+    this.flame = w
+      ? sc.add.image(0, 0, 'fx_slash').setTint(0xffffff).setBlendMode(ADD()).setScale(0.7, 0.8).setFlipX(flip)
+      : sc.add.image(0, 0, 'fx_flame').setTint(0xffa040).setBlendMode(ADD()).setScale(1.1, 1.3).setAngle(flip ? -90 : 90);
+    this.core = sc.add.image(0, 0, 'fx_glow').setTint(w ? 0xffffff : 0xfff0b0).setBlendMode(ADD()).setScale(0.55);
     this.vis.add([this.glow, this.flame, this.core]);
-    Sound.play('fire');
+    Sound.play(w ? 'whoosh' : 'fire');
   }
   rect() { return { x: this.x - 40, y: this.y - 34, w: 80, h: 68 }; }
   explode() {
     if (this.dead) return;
     const sc = this.scene;
-    sc.fx.image('fx_glow', this.x, this.y, { tint: 0xff7a1a, from: 0.6, to: 2.2, ms: 220 });
-    for (let i = 0; i < 4; i++) sc.fx.flameAt(this.x + rnd(-20, 20), this.y + rnd(-15, 15), i % 2 ? 0xff5a1a : 0xffc04a);
+    sc.fx.image('fx_glow', this.x, this.y, { tint: this.wind ? 0x9fe8ff : 0xff7a1a, from: 0.6, to: 2.2, ms: 220 });
+    if (!this.wind) for (let i = 0; i < 4; i++) sc.fx.flameAt(this.x + rnd(-20, 20), this.y + rnd(-15, 15), i % 2 ? 0xff5a1a : 0xffc04a);
     this.vis.destroy();
     this.destroy();
   }
@@ -41,7 +46,8 @@ class FlameShot extends Actor {
     this.x += this.vx;
     this.vis.setPosition(this.x, this.y);
     this.flame.scaleX = 1.1 + Math.sin(this.t * 1.4) * 0.15;
-    sc.fx.flameAt(this.x - Math.sign(this.vx) * 20 + rnd(-6, 6), this.y + rnd(-12, 12), this.t % 2 ? 0xff5a1a : 0xffb030);
+    if (this.wind) sc.fx.auraAt(this.x - Math.sign(this.vx) * 20, this.y + rnd(-12, 12), 0xdff6ff);
+    else sc.fx.flameAt(this.x - Math.sign(this.vx) * 20 + rnd(-6, 6), this.y + rnd(-12, 12), this.t % 2 ? 0xff5a1a : 0xffb030);
     const gone = Math.abs(this.x - this.x0) / this.range;
     this.vis.setAlpha(gone > 0.7 ? Math.max(0, (1 - gone) * 3.3) : 1);
     if (this.clash()) return false;

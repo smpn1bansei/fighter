@@ -114,7 +114,7 @@ class AIController extends Controller {
     }
 
     // Karakter dengan serangan jarak jauh (angin sabit) menyerang dari jauh
-    if (me.def.ranged && dist > 180 && dist < CFG.W * 0.47 && r < lv.aggression * 0.75) {
+    if (me.def.ranged && dist > 180 && dist < CFG.W * (me.def.rangedReach || 0.47) && r < lv.aggression * 0.75) {
       this.press(Math.random() < 0.6 ? 'punch' : 'kick');
       return;
     }

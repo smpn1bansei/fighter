@@ -247,7 +247,7 @@ class FightScene extends Phaser.Scene {
     const iy = (Math.max(ab.y, hb.y) + Math.min(ab.y + ab.h, hb.y + hb.h)) / 2;
     // power: karakter bertenaga besar (mis. Pak Jef) memukul lebih keras & lebih jauh
     const pw = att.def.power || 1;
-    this.applyHit(att, att.opp, {
+    const res = this.applyHit(att, att.opp, {
       dmg: Math.round(m.dmg * pw),
       hitstun: (m.hitstun || 18) + (pw > 1 ? 5 : 0),
       blockstun: (m.blockstun || 12) + (pw > 1 ? 3 : 0),
@@ -255,10 +255,26 @@ class FightScene extends Phaser.Scene {
       kd: m.kd, launch: m.launch && [m.launch[0] * pw, m.launch[1]],
       heavy: m.heavy || pw > 1.2, x: ix, y: iy,
     });
+    // wallBlast: lawan terdorong sampai ujung arena (ditangkis = tanpa damage)
+    // wallBlast: true = dorong sampai ujung arena; angka = dorong sejauh pecahan arena itu
+    if (m.wallBlast && res !== 'miss') new WallShove(att, att.opp, res === 'block', m.wallBlast === true ? 0 : m.wallBlast);
   }
 
   applyHit(att, vic, hit) {
     if (this.phase !== 'fight') return 'miss';
+    // hit.guard: 'full' = tembus tangkisan (damage penuh), 'half' = tembus tangkisan (setengah damage)
+    // hit.half : pengali damage tambahan (serangan lanjutan dari jurus yang tadinya ditangkis)
+    this.lastGuarded = false;
+    const guarding = vic.onGround && (vic.state === 'guard' || vic.state === 'blockstun');
+    if (hit.guard && guarding && vic.hurtbox()) {
+      hit = Object.assign({}, hit, { unblockable: true });
+      if (hit.guard === 'half') {
+        hit.dmg = Math.round(hit.dmg * 0.5);
+        this.fx.popup(vic.x, vic.y - 380, 'SETENGAH DAMAGE', '#bff4ff', 26);
+      }
+      this.lastGuarded = true;
+    }
+    if (hit.half) hit = Object.assign({}, hit, { dmg: Math.round(hit.dmg * hit.half) });
     const res = vic.receive(att, hit);
     if (res === 'miss') return res;
     const cx = hit.x !== undefined ? hit.x : vic.x;

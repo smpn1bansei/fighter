@@ -57,10 +57,10 @@ class ArrowShot extends Actor {
       if (this.pt % 3 === 0) zapAt(sc, vic.x + rnd(-30, 30), vic.y - rnd(80, 240), 0xbff4ff);
       const atWall = vic.x <= CFG.WALL + 2 || vic.x >= CFG.W - CFG.WALL - 2;
       if (this.pt % 6 === 0 && !atWall) {
-        sc.applyHit(f, vic, { dmg: 18, hitstun: 30, push: 0, hitstop: 1, force: true, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true });
+        sc.applyHit(f, vic, { dmg: 18, hitstun: 30, push: 0, hitstop: 1, force: true, half: this.half, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true });
       }
       if (atWall || this.pt > 70 || vic.ko) {
-        sc.applyHit(f, vic, { dmg: 130, kd: true, launch: [10, -15], heavy: true, hitstop: 16, force: true, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true });
+        sc.applyHit(f, vic, { dmg: 130, kd: true, launch: [10, -15], heavy: true, hitstop: 16, force: true, half: this.half, srcX: this.x - Math.sign(this.vx) * 60, x: vic.x, y: this.y, noGain: true });
         sc.shake(500, 0.022);
         sc.flash(200, 200, 240, 255);
         this.explode();
@@ -72,11 +72,13 @@ class ArrowShot extends Actor {
     if (this.clash()) return false;
     if (rectsOverlap(this.rect(), vic.hurtbox())) {
       if (!this.thunder) {
-        sc.applyHit(f, vic, { dmg: 110, hitstun: 24, blockstun: 14, push: 12, chip: 0.2, heavy: true, srcX: this.x, x: this.x, y: this.y, hitstop: 7, noGain: true });
+        // lawan jatuh walau menangkis (setengah damage)
+        sc.applyHit(f, vic, { dmg: 110, kd: true, launch: [9, -11], heavy: true, guard: 'half', srcX: this.x, x: this.x, y: this.y, hitstop: 7, noGain: true });
         this.explode();
         return false;
       }
-      const res = sc.applyHit(f, vic, { dmg: 30, hitstun: 40, blockstun: 22, push: 4, chip: 0.35, heavy: true, srcX: this.x, x: this.x, y: this.y, hitstop: 8, noGain: true });
+      const res = sc.applyHit(f, vic, { dmg: 30, hitstun: 40, blockstun: 22, push: 4, chip: 0.35, heavy: true, guard: 'half', srcX: this.x, x: this.x, y: this.y, hitstop: 8, noGain: true });
+      this.half = sc.lastGuarded ? 0.5 : 0;
       if (res === 'hit') {
         this.phase = 'carry';
         this.pt = 0;

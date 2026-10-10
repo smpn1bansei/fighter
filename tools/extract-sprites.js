@@ -29,50 +29,72 @@ const SHEETS = {
     anchorFix: {},
   },
   sit: {
-    file: 'sit hokage.jpg',
-    colors: [[106, 106, 106], [155, 155, 155]],
-    tol: 12,
-    frames: ['sign', 'firestance', 'fireball', 'firepalm', 'stand', 'kneel', 'jumpup', 'flykick', 'crouch', 'seal',
-      'fists', 'boom', 'firering', 'summon', 'scroll', 'fist'],
-    stand: 'stand',
-    portrait: 'scroll',
-    matte: { seal: 70, jumpup: 40, firestance: 40, fireball: 30, firepalm: 30, boom: 30, firering: 40, summon: 30, scroll: 30, sign: 20, flykick: 30 },
-    anchorFix: { kneel: 55, crouch: 50 },
+    // sprite baru Siti Hokage: latar putih TANPA garis grid (kotak dibagi rata 4x5);
+    // jubah putih -> lubang putih tertutup tidak dihapus. Sinar pada pose 'beam' dihapus
+    // karena digambar oleh game.
+    file: 'siti-hokage-fix.jpg',
+    grid: { cols: [0, 458, 896, 1344, 1792], rows: [0, 500, 972, 1458, 1940, 2400], rowCols: { 3: [0, 458, 896, 1792] }, inset: 2, holeBottom: -1,
+      erase: [[778, 2025, 1062, 2140]] },
+    colors: [[245, 0, 245], [255, 10, 255]],
+    tol: 30,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'punch', 'punch2', 'kick', 'palm', 'kick2', 'kick3', 'jump', 'groundpunch',
+      'guard', 'hurt', 'lie', 'aura', 'beam', 'orb', 'shield'],
+    stand: 'walk4',
+    portrait: 'aura',
+    standHeight: 306, // 10% lebih kecil dari ukuran standar
+    face: 'walk4',
+    anchorFix: {},
   },
+
   ranti: {
-    file: 'ranti.jpg',
-    colors: [[125, 133, 144], [158, 167, 177]],
-    tol: 12,
-    removeLines: true,
-    frames: ['sign', 'bluefist', 'bigpunch', 'punch', 'sign2', 'stance', 'kick', 'groundpunch', 'guard', 'back',
-      'byakugo', 'heal', 'jump', 'jump2', 'kneel', 'stand'],
-    stand: 'stand',
-    portrait: 'sign',
-    matte: { heal: 70, guard: 45, bluefist: 45, byakugo: 30, bigpunch: 30, kick: 30 },
+    // sprite baru Ranti (pengurus administrasi ninja), sheet GRID 4x5;
+    // baris ke-4 kotak terakhirnya gabungan 2 kolom (pose terbaring)
+    file: 'ranti-fix.jpg',
+    grid: { cols: [0, 446, 896, 1345, 1792], rows: [0, 480, 960, 1440, 1920, 2400], rowCols: { 3: [0, 446, 896, 1792] }, inset: 6, holeBottom: -1,
+      erase: [[790, 2062, 893, 2152]] },
+    colors: [[245, 0, 245], [255, 10, 255]],
+    tol: 30,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'punch', 'punch2', 'kick', 'palm', 'kick2', 'kick3', 'jump', 'groundpunch',
+      'guard', 'hurt', 'lie', 'aura', 'beam', 'orb', 'shield'],
+    stand: 'walk4',
+    portrait: 'aura',
+    standHeight: 306, // 10% lebih kecil dari ukuran standar
+    face: 'walk4',
     anchorFix: {},
   },
+
   marthadin: {
-    file: 'marthadin.jpg',
-    colors: [[103, 103, 103], [149, 149, 149]],
-    // sheet ini punya garis grid abu-abu terang (~188) di antara sel
-    segColors: [[103, 103, 103], [190, 190, 190]],
-    tol: 12,
-    frames: ['ballet', 'stance', 'palm', 'spin', 'highkick', 'tornado', 'guard', 'hurt', 'jete', 'dive', 'cyclone', 'bow'],
-    stand: 'bow',
-    portrait: 'ballet',
-    matte: { palm: 30, spin: 40, tornado: 50, guard: 50, dive: 30, cyclone: 60 },
+    // sprite baru Mrs. Dina (pegawai ASN), sheet GRID 4x5 tanpa nomor.
+    // Baju & jilbab putih di latar putih: lubang putih tertutup TIDAK dihapus (holeBottom: 0)
+    file: 'mrs-dina.jpg',
+    grid: { cols: [0, 447, 897, 1346, 1792], rows: [0, 480, 960, 1440, 1920, 2400], rowCols: { 3: [0, 447, 897, 1792] }, inset: 6, holeBottom: -1 },
+    colors: [[245, 0, 245], [255, 10, 255]],
+    tol: 30,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'punch', 'punch2', 'spin', 'double', 'kick', 'kick2', 'jump', 'uppercut',
+      'guard', 'hurt', 'lie', 'aura', 'flykick', 'dash', 'palm'],
+    stand: 'walk4',
+    portrait: 'aura',
+    face: 'walk4',
     anchorFix: {},
   },
+
   fatim: {
-    file: 'fatim.jpg',
-    colors: [[132, 132, 132], [193, 193, 193]],
-    tol: 12,
-    frames: ['ready', 'dash', 'claw', 'stab', 'stance', 'kick', 'guard', 'recoil', 'jump', 'divekick', 'groundstrike', 'calm'],
-    stand: 'calm',
-    portrait: 'ready',
-    matte: { dash: 20, claw: 40, stab: 30, kick: 40, guard: 30, divekick: 30, groundstrike: 30 },
+    // sprite baru Fatim (ninja bercadar ahli senjata), sheet GRID 4x5;
+    // shuriken yang terlempar di pose 'throw' dihapus (digambar oleh game)
+    file: 'fatim-fix.jpg',
+    grid: { cols: [0, 446, 896, 1346, 1792], rows: [0, 480, 960, 1440, 1920, 2400], inset: 6, holeBottom: -1,
+      erase: [[786, 2060, 894, 2136]] },
+    colors: [[245, 0, 245], [255, 10, 255]],
+    tol: 30,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'punch', 'punch2', 'kick', 'palm', 'kick2', 'kick3', 'jump', 'dash',
+      'zap', 'hurt', 'getup', 'lie', 'meditate', 'throw', 'aura', 'orb'],
+    stand: 'walk4',
+    standHeight: 306, // 10% lebih kecil dari ukuran standar
+    portrait: 'aura',
+    face: 'walk4',
     anchorFix: {},
   },
+
   tio: {
     // sprite baru Mas Tio (operator sekolah), sheet GRID 4x5 tanpa nomor;
     // baris ke-4 kotak terakhirnya gabungan 2 kolom (pose terbaring)
@@ -180,6 +202,7 @@ const SHEETS = {
       'guard', 'hurt', 'lie', 'stance', 'charge', 'soccer', 'ballready', 'throw'],
     stand: 'stance',
     portrait: 'charge',
+    standHeight: 306, // 10% lebih kecil dari ukuran standar
     face: 'stance',
     anchorFix: {},
   },
