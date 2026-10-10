@@ -132,4 +132,84 @@ function removeThinLines(fg, w, h) {
   for (let i = 0; i < w * h; i++) if (fg[i] && comps[labels[i]].area < 30) fg[i] = 0;
 }
 
-module.exports = { sharp, loadRGB, labelComponents, dilate, removeChecker };
+/**
+ * Siapkan sheet berformat GRID (latar putih polos, garis kotak hitam, label nomor
+ * di pojok kiri atas tiap kotak). Latar diganti warna penanda magenta agar bisa
+ * diproses removeChecker seperti sheet lain.
+ * g = { cols: [tepi x], rows: [tepi y], inset, label: [lebar, tinggi] }
+ */
+function prepGrid(img, g) {
+  const { data, w, h } = img;
+  const BG = 1, inset = g.inset || 6, [lw, lh] = g.label || [0, 0];
+  const mask = new Uint8Array(w * h).fill(BG); // mulai: semuanya latar
+  const px = (i) => [data[i * 3], data[i * 3 + 1], data[i * 3 + 2]];
+  const whiteish = (i) => {
+    const [r, gg, b] = px(i);
+    return Math.min(r, gg, b) > 215 && Math.max(r, gg, b) - Math.min(r, gg, b) < 30;
+  };
+  for (let cx = 0; cx < g.cols.length - 1; cx++) {
+    for (let cy = 0; cy < g.rows.length - 1; cy++) {
+      const X0 = g.cols[cx], Y0 = g.rows[cy];
+      const x0 = X0 + inset, x1 = g.cols[cx + 1] - inset, y0 = Y0 + inset, y1 = g.rows[cy + 1] - inset;
+      const cw = x1 - x0, ch = y1 - y0;
+      // area kotak: anggap isi (0) dulu
+      const cell = new Uint8Array(cw * ch);
+      const at = (x, y) => (y0 + y) * w + (x0 + x);
+      // label nomor: piksel hitam/putih/abu di area label dianggap latar
+      const isLabel = (x, y) => {
+        if (x0 + x >= X0 + lw || y0 + y >= Y0 + lh) return false;
+        const [r, gg, b] = px(at(x, y));
+        return Math.max(r, gg, b) - Math.min(r, gg, b) < 40;
+      };
+      // isi banjir dari tepi kotak melalui piksel putih
+      const st = [];
+      const pass = (x, y) => whiteish(at(x, y)) || isLabel(x, y);
+      for (let x = 0; x < cw; x++) { st.push(x, 0, x, ch - 1); }
+      for (let y = 0; y < ch; y++) { st.push(0, y, cw - 1, y); }
+      while (st.length) {
+        const y = st.pop(), x = st.pop();
+        if (x < 0 || y < 0 || x >= cw || y >= ch) continue;
+        const k = y * cw + x;
+        if (cell[k] || !pass(x, y)) continue;
+        cell[k] = 2; // latar
+        st.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
+      }
+      // lubang putih bersih yang tertutup (celah lengan-badan) juga latar,
+      // kecuali di bagian bawah kotak (sepatu putih)
+      const hole = new Uint8Array(cw * ch);
+      for (let k = 0; k < cw * ch; k++) {
+        const [r, gg, b] = px(at(k % cw, (k / cw) | 0));
+        if (!cell[k] && r > 246 && gg > 246 && b > 246) hole[k] = 1;
+      }
+      const { labels, comps } = labelComponents(hole, cw, ch, 1);
+      for (let k = 0; k < cw * ch; k++) {
+        if (!hole[k]) continue;
+        const c = comps[labels[k]];
+        const cyc = (c.minY + c.maxY) / 2;
+        if (c.area > 250 && cyc < ch * 0.8) cell[k] = 2;
+      }
+      // tepi abu-abu halus di sekitar latar ikut dibuang (2 lapis)
+      for (let it = 0; it < 2; it++) {
+        const grow = [];
+        for (let y = 1; y < ch - 1; y++) for (let x = 1; x < cw - 1; x++) {
+          const k = y * cw + x;
+          if (cell[k]) continue;
+          if (!(cell[k - 1] === 2 || cell[k + 1] === 2 || cell[k - cw] === 2 || cell[k + cw] === 2)) continue;
+          const [r, gg, b] = px(at(x, y));
+          if (Math.min(r, gg, b) > 170 && Math.max(r, gg, b) - Math.min(r, gg, b) < 30) grow.push(k);
+        }
+        grow.forEach((k) => { cell[k] = 2; });
+      }
+      for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+        if (cell[y * cw + x] !== 2) mask[at(x, y)] = 0;
+      }
+    }
+  }
+  const out = Buffer.from(data);
+  for (let i = 0; i < w * h; i++) {
+    if (mask[i]) { out[i * 3] = 255; out[i * 3 + 1] = 0; out[i * 3 + 2] = 255; }
+  }
+  return { data: out, w, h };
+}
+
+module.exports = { sharp, loadRGB, labelComponents, dilate, removeChecker, prepGrid };

@@ -266,8 +266,9 @@ window.ROSTER = [
       guard: 'guard', charge: 'drawbow', intro: 'aimbow', win: 'drawbow', seal: 'drawbow',
     },
     moves: {
-      p1: { frame: 'punch', startup: 4, active: 3, recovery: 9, dmg: 40, hitstun: 18, blockstun: 11, push: 5, box: [128, 205, 90, 70], lunge: 2, next: 'p2' },
-      p2: { frame: 'punch2', startup: 5, active: 4, recovery: 11, dmg: 45, hitstun: 20, blockstun: 12, push: 6, box: [138, 205, 100, 80], lunge: 4, next: 'p3', slash: 0xffd75a },
+      // pukulan tangan menyemburkan api sejauh 25% arena
+      p1: { frame: 'punch', startup: 4, active: 3, recovery: 10, dmg: 40, hitstun: 18, blockstun: 11, push: 6, box: [128, 205, 90, 70], lunge: 2, next: 'p2', proj: { fire: true, h: 222, x: 120, speed: 17 } },
+      p2: { frame: 'punch2', startup: 5, active: 4, recovery: 12, dmg: 45, hitstun: 20, blockstun: 12, push: 7, box: [138, 205, 100, 80], lunge: 4, next: 'p3', proj: { fire: true, h: 222, x: 130, speed: 17 } },
       p3: { frame: 'highkick', pre: 'stance', startup: 7, active: 5, recovery: 17, dmg: 70, blockstun: 15, push: 8, box: [110, 225, 120, 170], lunge: 3, kd: true, launch: [7, -14], heavy: true, slash: 0xfff0c0 },
       kick: { frame: 'kick', pre: 'stance', startup: 8, active: 4, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [125, 150, 130, 130], lunge: 2, heavy: true },
       air: { frame: 'kick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [100, 120, 140, 130] },
@@ -341,10 +342,44 @@ window.ROSTER = [
       win: 'Angin selalu menang dengan tenang.',
     },
   },
+  {
+    id: 'almusbar',
+    name: 'ALMUSBAR',
+    title: 'Pelatih Bola Petir',
+    element: 'BOLA & PETIR',
+    desc: 'Pelatih olahraga bertinju cepat. Pukulan kiri-kanannya beruntun, tendangannya mementalkan lawan jauh.',
+    color: 0xff8a1a,
+    color2: 0x7fd8ff,
+    walk: 4.3, backWalk: 3.6, jumpV: 18.5, jumpX: 5.2,
+    flatPoses: true,
+    hurtbox: { w: 110, h: 275 },
+    walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
+    frames: {
+      idle: 'stance', walk: 'stance', jump: 'kick2', fall: 'kick2', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
+      guard: 'guard', charge: 'charge', intro: 'stance', win: 'charge', seal: 'charge',
+    },
+    // kombo pukulan kiri-kanan cepat & beruntun (tekan PUKUL berkali-kali)
+    moves: {
+      p1: { frame: 'jab', startup: 3, active: 3, recovery: 7, dmg: 26, hitstun: 18, blockstun: 10, push: 3, box: [130, 215, 90, 70], lunge: 2, next: 'p2' },
+      p2: { frame: 'cross', startup: 3, active: 3, recovery: 7, dmg: 26, hitstun: 18, blockstun: 10, push: 3, box: [130, 215, 90, 70], lunge: 2, next: 'p3' },
+      p3: { frame: 'jab2', startup: 3, active: 3, recovery: 7, dmg: 26, hitstun: 18, blockstun: 10, push: 3, box: [130, 215, 90, 70], lunge: 2, next: 'p4' },
+      p4: { frame: 'cross', startup: 3, active: 3, recovery: 7, dmg: 26, hitstun: 18, blockstun: 10, push: 3, box: [130, 215, 90, 70], lunge: 2, next: 'p5' },
+      p5: { frame: 'double', startup: 5, active: 4, recovery: 16, dmg: 55, blockstun: 15, push: 9, box: [140, 215, 110, 90], lunge: 4, kd: true, launch: [9, -11], heavy: true, slash: 0xffd27a },
+      // tendangan yang mementalkan lawan jauh dalam sekali tendang
+      kick: { frame: 'bigkick', pre: 'stance', startup: 8, active: 4, recovery: 18, dmg: 95, blockstun: 15, push: 14, box: [135, 160, 130, 130], lunge: 2, kd: true, launch: [24, -12], heavy: true, slash: 0xffd27a },
+      air: { frame: 'kick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [115, 170, 140, 130] },
+    },
+    jurus: { type: 'ballthrow', name: 'LEMPARAN BOLA', cost: 25, range: 1500, desc: 'Melempar bola dari tangan hingga lawan terjatuh' },
+    ulti: { type: 'thunderkick', name: 'TENDANGAN BOLA PETIR', cost: 100, range: 1500, desc: 'Tendangan bola berlapis petir yang melempar lawan ke ujung arena' },
+    quotes: {
+      intro: 'Pemanasan dulu? Tidak perlu!',
+      win: 'Priiit! Pertandingan selesai!',
+    },
+  },
 ];
 
-// Slot karakter yang akan dikembangkan nanti.
-for (let i = 1; i <= 1; i++) {
+// Slot karakter yang akan dikembangkan nanti (saat ini semua 12 slot sudah terisi).
+for (let i = 1; i <= 0; i++) {
   window.ROSTER.push({ id: 'locked' + i, name: '???', locked: true });
 }
 

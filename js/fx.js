@@ -269,6 +269,40 @@ window.FX = {
         }
       });
     }
+    // Bola putih (dilempar Almusbar)
+    make('fx_ball', 48, 48, (g) => {
+      const gr = g.createRadialGradient(18, 16, 3, 24, 24, 22);
+      gr.addColorStop(0, '#ffffff');
+      gr.addColorStop(0.7, '#e6e6e6');
+      gr.addColorStop(1, '#a8a8a8');
+      g.fillStyle = gr;
+      g.beginPath(); g.arc(24, 24, 21, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = '#333'; g.lineWidth = 2; g.stroke();
+      g.strokeStyle = '#c03030'; g.lineWidth = 1.5;
+      g.beginPath(); g.arc(4, 24, 16, -0.9, 0.9); g.stroke();
+      g.beginPath(); g.arc(44, 24, 16, Math.PI - 0.9, Math.PI + 0.9); g.stroke();
+    });
+    // Bola sepak
+    make('fx_soccer', 64, 64, (g) => {
+      g.fillStyle = '#fff';
+      g.beginPath(); g.arc(32, 32, 29, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#1a1a1a';
+      const pent = (cx, cy, r, rot) => {
+        g.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const a = rot + (i * Math.PI * 2) / 5;
+          g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+        }
+        g.closePath(); g.fill();
+      };
+      pent(32, 32, 9, -Math.PI / 2);
+      for (let i = 0; i < 5; i++) {
+        const a = -Math.PI / 2 + (i * Math.PI * 2) / 5;
+        pent(32 + Math.cos(a) * 25, 32 + Math.sin(a) * 25, 7, a + Math.PI);
+      }
+      g.strokeStyle = '#222'; g.lineWidth = 2.5;
+      g.beginPath(); g.arc(32, 32, 29, 0, Math.PI * 2); g.stroke();
+    });
     // Mawar merah bertangkai
     make('fx_rose', 64, 64, (g) => {
       g.strokeStyle = '#2f8a3a';

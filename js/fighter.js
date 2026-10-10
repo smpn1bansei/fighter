@@ -293,7 +293,8 @@ class Fighter {
       this.setPose(m.frame);
       // serangan jarak jauh (mis. angin sabit King Andri)
       if (m.proj) {
-        new LightningBolt(this, m);
+        if (m.proj.fire) new FlameShot(this, m);
+        else new LightningBolt(this, m);
         this.hasHit = true;
       }
       if (m.slash) {

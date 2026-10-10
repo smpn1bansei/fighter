@@ -9,7 +9,7 @@
 // baca (kiri->kanan, atas->bawah).
 const fs = require('fs');
 const path = require('path');
-const { sharp, loadRGB, labelComponents, dilate, removeChecker } = require('./lib');
+const { sharp, loadRGB, labelComponents, dilate, removeChecker, prepGrid } = require('./lib');
 
 const OUT_DIR = path.join(__dirname, '..', 'assets', 'sprites');
 const DEBUG_DIR = process.env.DEBUG_DIR || null;
@@ -148,6 +148,19 @@ const SHEETS = {
     portrait: 'fan1',
     face: 'walk1',
     matte: { fan1: 40, fan2: 40, skirtkick: 40, kick2: 40, meditate: 60, aura: 90 },
+    anchorFix: {},
+  },
+  almusbar: {
+    file: 'almusbar.jpg',
+    // sheet GRID 4x5: latar putih, garis kotak, label nomor (lihat prepGrid di lib.js)
+    grid: { cols: [0, 424, 847, 1270, 1693], rows: [0, 507, 1022, 1536, 2039, 2528], inset: 6, label: [86, 86] },
+    colors: [[245, 0, 245], [255, 10, 255]],
+    tol: 30,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'jab', 'jab2', 'cross', 'double', 'kick', 'kick2', 'lowkick', 'bigkick',
+      'guard', 'hurt', 'lie', 'stance', 'charge', 'soccer', 'ballready', 'throw'],
+    stand: 'stance',
+    portrait: 'charge',
+    face: 'stance',
     anchorFix: {},
   },
 };
@@ -390,7 +403,8 @@ function pack(frames) {
 // Nama pose yang diawali '-' tetap dipotong (agar urutan cocok) tapi tidak dipakai.
 async function cutSheet(sh) {
   console.log(`  sheet ${sh.file}`);
-  const img = await loadRGB(path.join(__dirname, '..', 'asset-custom', sh.file));
+  let img = await loadRGB(path.join(__dirname, '..', 'asset-custom', sh.file));
+  if (sh.grid) img = prepGrid(img, sh.grid); // sheet berlatar putih dengan garis kotak
   const fg = removeChecker(img, { colors: sh.colors, segColors: sh.segColors, tol: sh.tol, removeLines: sh.removeLines });
   const { labels, frames } = findFrames(fg, img.w, img.h, sh.frames.length);
   const crops = {};
@@ -400,6 +414,12 @@ async function cutSheet(sh) {
     const fix = (sh.recolor || {})[name];
     if (fix === 'red') recolorCyanToRed(c.rgba);
     if (fix === 'erase') eraseEffect(c.rgba, c.w, c.h);
+    if (sh.grid) {
+      // sisa warna penanda magenta (celah kecil tertutup) dibuat transparan
+      for (let o = 0; o < c.rgba.length; o += 4) {
+        if (c.rgba[o] > 190 && c.rgba[o + 1] < 90 && c.rgba[o + 2] > 190) c.rgba[o + 3] = 0;
+      }
+    }
     crops[name] = { crop: c };
   });
   // skala: pose acuan `stand` dibuat setinggi `standHeight` (default STAND_HEIGHT)

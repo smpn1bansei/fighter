@@ -47,6 +47,8 @@ class TitleScene extends Phaser.Scene {
     // diletakkan di antara tombol & karakter kanan agar tidak menumpuk gambar lain.
     const mx = W * 0.71, my = H - 230;
     const mys = this.add.container(mx, my).setDepth(1).setAlpha(0);
+    // semua karakter sudah tersedia: tanda tanya tidak ditampilkan
+    if (!ROSTER.some((c) => c.locked)) mys.setVisible(false);
     const halo = this.add.image(0, 0, 'fx_glow').setTint(0xffc83d).setBlendMode(Phaser.BlendModes.ADD).setScale(2.2).setAlpha(0.35);
     const ring = this.add.image(0, 0, 'fx_ring').setTint(0xffc83d).setScale(1.05).setAlpha(0.7);
     const q = UI.title(this, 0, 4, '?', 120, '#ffd75a');

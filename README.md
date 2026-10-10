@@ -18,14 +18,17 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 | **Mbak Nita**: Pemanah Petir | Panah Cahaya: mengeluarkan busur lalu menembakkan panah | Panah Petir: panah berpetir yang menyeret lawan jauh ke belakang |
 | **Suci Flower**: Mawar Berduri | Angin Pisau Mawar: kibasan mawar melepas angin pisau merah yang mementalkan lawan | Mawar Beracun: mawar dilempar, meledak menjadi racun, lawan roboh |
 | **Septi**: Penari Kipas Angin | Kibasan Kipas: satu kipas melepas angin yang menjatuhkan lawan | Badai Dua Kipas: badai angin yang melempar lawan sampai tepi arena |
+| **Almusbar**: Pelatih Bola Petir | Lemparan Bola: bola dari tangan yang menjatuhkan lawan | Tendangan Bola Petir: bola sepak berpetir yang melempar lawan ke ujung arena |
 
 Ciri khas tambahan: TENDANG Mrs. Dina adalah terjangan secepat kilat yang melempar lawan,
 Fatim bergerak maju dengan lari merunduk yang cepat, Mas Tio punya tendangan salto (PUKUL 3x).
+Almusbar punya kombo 5 pukulan kiri-kanan (tekan PUKUL berulang) dan tendangan yang mementalkan lawan jauh.
+Pukulan Mbak Nita menyemburkan api sejauh 25% arena.
 Pukulan & tendangan Pak Jef 35% lebih kuat dan mendorong lawan lebih jauh, tapi ia bergerak lebih lambat.
-King Andri, Suci Flower, dan Septi berjalan dengan langkah kaki bergantian.
+King Andri, Suci Flower, Septi, dan Almusbar berjalan dengan langkah kaki bergantian.
 Pukulan & tendangan King Andri melepaskan petir sejauh setengah layar yang mendorong lawan, dan cakranya penuh dalam 2 detik.
 
-1 slot karakter lain sudah disiapkan (terkunci, "segera hadir").
+Semua 12 slot karakter sudah terisi.
 
 ## Mode permainan
 
@@ -77,7 +80,7 @@ Game akan terbuka layar penuh dan mendatar seperti aplikasi.
 
 ## Memperbarui game yang sudah online
 
-Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.5` → `?v=1.6`) dan `VERSION` di `js/config.js`
+Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.6` → `?v=1.7`) dan `VERSION` di `js/config.js`
 agar HP pemain langsung memuat versi terbaru, bukan versi lama yang tersimpan di browser.
 GitHub Pages butuh sekitar 1–10 menit untuk menampilkan perubahan.
 
@@ -102,7 +105,8 @@ Nama, deskripsi, kutipan, dan kekuatan karakter ada di `js/characters.js`.
    node extract-sprites.js <id-karakter>
    ```
 
-   Sheet boleh JPG atau PNG dengan latar kotak-kotak gelap maupun terang (lihat contoh `kingandri` & `nita`).
+   Sheet boleh JPG atau PNG dengan latar kotak-kotak gelap maupun terang (lihat contoh `kingandri` & `nita`),
+   atau sheet GRID berlatar putih dengan garis kotak & nomor (lihat contoh `almusbar`, opsi `grid`).
    Hasilnya `assets/sprites/<id>.webp`, `<id>.json`, `<id>-portrait.webp`, `<id>-face.webp`.
 4. Di `js/characters.js`, ganti salah satu slot `locked` dengan data karakter baru (salin data karakter yang ada lalu sesuaikan pose, jangkauan serangan, dan jurusnya). Jurus baru ditulis di `js/jutsu.js`.
 
@@ -120,6 +124,7 @@ js/jutsu2.js          jurus Mrs. Dina, Fatim, Mas Tio
 js/jutsu3.js          jurus Pak Jef, King Andri
 js/jutsu4.js          jurus Mbak Nita
 js/jutsu5.js          jurus Suci Flower, Septi
+js/jutsu6.js          jurus Almusbar + api pukulan Mbak Nita
 js/ai.js              kecerdasan komputer
 js/input.js           keyboard & tombol layar sentuh
 js/fx.js              efek visual
