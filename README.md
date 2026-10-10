@@ -12,19 +12,19 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 | **Ranti**: Sannin Tinju Seratus | Retakan Bumi: tinju ke tanah, batu menjalar ke lawan | Byakugo: Tinju Seratus, memulihkan darah lalu menghantam dengan tinju raksasa |
 | **Mrs. Dina**: Balerina Kilat | Tendangan Putar Udara: tendangan memutar di udara yang melepas bilah angin jarak jauh | Tendangan Badai: tendangan jarak jauh berupa badai angin yang melempar lawan |
 | **Fatim**: Ninja Bayangan Bercadar | Shuriken Rahasia: tiga shuriken dari balik jubah | Tusukan Seribu Bayangan: menerjang lalu menusuk bertubi-tubi bersama bayangannya |
-| **Mas Tio**: Pendekar Salto Kilat | Terjangan Kilat: menabrak lawan dengan kecepatan tinggi hingga terjatuh | Salto Badai: terjangan, tendangan salto ke udara, lalu hantaman ke tanah |
-| **Pak Jef**: Otot Baja Sekolah | Lemparan Batu Meriam: mencabut batu dari tanah lalu melemparnya | Batu Raksasa: mengangkat batu sangat besar dari tanah lalu melemparkannya |
+| **Mas Tio**: Operator Kilat | Flash Punch: lari kilat lalu meninju, ditangkis pun lawan terpental ke ujung arena | Hantaman Langit: muncul di atas kepala lawan & menghantam ke bawah, tak bisa ditangkis, tanah retak |
+| **Pak Jef**: Otot Baja Sekolah | Bola Basket Api: lawan yang terkena langsung jatuh | Tendangan Bola Petir Super: lawan terdorong ke ujung arena walau menangkis |
 | **King Andri**: Raja Petir *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Laser Merah Langit: melompat tinggi lalu menembakkan laser merah ke bawah, lawan terlempar |
 | **Mbak Nita**: Pemanah Petir | Panah Cahaya: mengeluarkan busur lalu menembakkan panah | Panah Petir: panah berpetir yang menyeret lawan jauh ke belakang |
 | **Suci Flower**: Mawar Berduri | Angin Pisau Mawar: kibasan mawar melepas angin pisau merah yang mementalkan lawan | Mawar Beracun: mawar dilempar, meledak menjadi racun, lawan roboh |
 | **Septi**: Penari Kipas Angin | Kibasan Kipas: satu kipas melepas angin yang menjatuhkan lawan | Badai Dua Kipas: badai angin yang melempar lawan sampai tepi arena |
-| **Almusbar**: Pelatih Bola Petir | Lemparan Bola: bola dari tangan yang menjatuhkan lawan | Tendangan Bola Petir: bola sepak berpetir yang melempar lawan ke ujung arena |
+| **Almusbar**: Pelatih Bola Petir | Lemparan Bola: bola dari tangan yang menjatuhkan lawan | Tendangan Bola Petir: menghancurkan perisai lawan dan melempar lawan ke ujung arena |
 
 Ciri khas tambahan: TENDANG Mrs. Dina adalah terjangan secepat kilat yang melempar lawan,
-Fatim bergerak maju dengan lari merunduk yang cepat, Mas Tio punya tendangan salto (PUKUL 3x).
+Fatim bergerak maju dengan lari merunduk yang cepat, Mas Tio bisa meluncur kilat: tekan arah depan sekali untuk melesat ke depan lawan, arah belakang untuk mundur ke ujung arena.
 Almusbar punya kombo 5 pukulan kiri-kanan (tekan PUKUL berulang) dan tendangan yang mementalkan lawan jauh.
 Pukulan Mbak Nita menyemburkan api sejauh 25% arena.
-Pukulan & tendangan Pak Jef 35% lebih kuat dan mendorong lawan lebih jauh, tapi ia bergerak lebih lambat.
+Tendangan Pak Jef menembakkan bola sejauh 40% arena; pukulannya 35% lebih kuat dan mendorong lawan lebih jauh, tapi ia bergerak lebih lambat.
 King Andri, Suci Flower, Septi, dan Almusbar berjalan dengan langkah kaki bergantian.
 Pukulan & tendangan King Andri melepaskan petir sejauh setengah layar yang mendorong lawan, dan cakranya penuh dalam 2 detik.
 
@@ -80,7 +80,7 @@ Game akan terbuka layar penuh dan mendatar seperti aplikasi.
 
 ## Memperbarui game yang sudah online
 
-Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.6` → `?v=1.7`) dan `VERSION` di `js/config.js`
+Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=1.9` → `?v=2.0`) dan `VERSION` di `js/config.js`
 agar HP pemain langsung memuat versi terbaru, bukan versi lama yang tersimpan di browser.
 GitHub Pages butuh sekitar 1–10 menit untuk menampilkan perubahan.
 
@@ -125,6 +125,7 @@ js/jutsu3.js          jurus Pak Jef, King Andri
 js/jutsu4.js          jurus Mbak Nita
 js/jutsu5.js          jurus Suci Flower, Septi
 js/jutsu6.js          jurus Almusbar + api pukulan Mbak Nita
+js/jutsu7.js          jurus Mas Tio
 js/ai.js              kecerdasan komputer
 js/input.js           keyboard & tombol layar sentuh
 js/fx.js              efek visual

@@ -282,6 +282,21 @@ window.FX = {
       g.beginPath(); g.arc(4, 24, 16, -0.9, 0.9); g.stroke();
       g.beginPath(); g.arc(44, 24, 16, Math.PI - 0.9, Math.PI + 0.9); g.stroke();
     });
+    // Bola basket
+    make('fx_basket', 64, 64, (g) => {
+      const gr = g.createRadialGradient(24, 22, 4, 32, 32, 30);
+      gr.addColorStop(0, '#ffa04a');
+      gr.addColorStop(0.7, '#e2621a');
+      gr.addColorStop(1, '#9a3a0a');
+      g.fillStyle = gr;
+      g.beginPath(); g.arc(32, 32, 29, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = '#3a1404'; g.lineWidth = 2.5;
+      g.beginPath(); g.arc(32, 32, 29, 0, Math.PI * 2); g.stroke();
+      g.beginPath(); g.moveTo(3, 32); g.lineTo(61, 32); g.stroke();
+      g.beginPath(); g.moveTo(32, 3); g.lineTo(32, 61); g.stroke();
+      g.beginPath(); g.arc(-6, 32, 30, -0.9, 0.9); g.stroke();
+      g.beginPath(); g.arc(70, 32, 30, Math.PI - 0.9, Math.PI + 0.9); g.stroke();
+    });
     // Bola sepak
     make('fx_soccer', 64, 64, (g) => {
       g.fillStyle = '#fff';

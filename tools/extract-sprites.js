@@ -74,15 +74,20 @@ const SHEETS = {
     anchorFix: {},
   },
   tio: {
-    file: 'tio.jpg',
-    colors: [[141, 141, 141], [193, 193, 193]],
-    tol: 12,
-    frames: ['stance', 'dash', 'punch', 'guard', 'jump', 'salto', 'fall', 'crouch', 'flykick', 'sweep', 'stomp', 'salute'],
-    stand: 'salute',
-    portrait: 'stance',
-    matte: { dash: 20, punch: 30, guard: 30, salto: 40, flykick: 30, sweep: 40, stomp: 30 },
+    // sprite baru Mas Tio (operator sekolah), sheet GRID 4x5 tanpa nomor;
+    // baris ke-4 kotak terakhirnya gabungan 2 kolom (pose terbaring)
+    file: 'tio-fix.jpg',
+    grid: { cols: [0, 357, 719, 1082, 1440], rows: [0, 587, 1174, 1761, 2348, 2912], rowCols: { 3: [0, 357, 719, 1440] }, inset: 6, holeBottom: 1 },
+    colors: [[245, 0, 245], [255, 10, 255]],
+    tol: 30,
+    frames: ['walk1', 'walk2', 'walk3', 'walk4', 'jab', 'jab2', 'backfist', 'double', 'kick', 'kick2', 'jumpknee', 'groundpunch',
+      'guard', 'hurt', 'lie', 'aura', 'run', 'dash', 'palm'],
+    stand: 'walk3',
+    portrait: 'aura',
+    face: 'walk3',
     anchorFix: {},
   },
+
   pakjef: {
     file: 'pak-jef.jpg',
     colors: [[129, 129, 129], [186, 186, 186]],
@@ -92,6 +97,21 @@ const SHEETS = {
     portrait: 'flex',
     matte: { run: 20, bigpunch: 30, jab: 20, kick: 30, shoulder: 20, guard: 30, smash: 30, throw: 30 },
     anchorFix: { kick: -40 },
+    // perbaikan: pose terkena pukulan, K.O., menendang & melempar bola
+    // (latar putih + tulisan keterangan; tulisan & bola yang tergambar dihapus)
+    extra: [{
+      file: 'pak-jef-fix.jpg',
+      grid: {
+        cols: [0, 1792], rows: [0, 2400], inset: 2,
+        erase: [[0, 1060, 1792, 1200], [0, 2270, 1792, 2400], [672, 1680, 965, 1890], [1468, 1400, 1785, 1588]],
+      },
+      colors: [[245, 0, 245], [255, 10, 255]],
+      tol: 30,
+      frames: ['hit', 'ko', 'kickball', 'throwball'],
+      stand: 'throwball',
+      standHeight: 324, // disamakan dengan tinggi pose Pak Jef yang lama
+      anchorFix: {},
+    }],
   },
   kingandri: {
     // sheet lama: hanya pose yang masih cocok dipakai ('-' = dilewati)

@@ -119,6 +119,12 @@ class AIController extends Controller {
       return;
     }
 
+    // Mas Tio: meluncur kilat mendekati lawan
+    if (me.def.flashMove && dist > 340 && r < 0.45) {
+      this.press(toward);
+      return;
+    }
+
     if (dist > 380) {
       if (canJ && dist <= (j.range || 400) && r < lv.jutsu) this.press('jurus');
       else if (me.chakra < CFG.MAX_CHAKRA && r < 0.25) this.plan = { hold: { charge: true }, frames: 25 + Phaser.Math.Between(0, 25) };

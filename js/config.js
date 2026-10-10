@@ -14,7 +14,7 @@ window.CFG = (function () {
     TITLE: 'SEIKIJANG FIGHTER',
     SUBTITLE: 'PERTARUNGAN NINJA SEKOLAH',
     BANNER_TEXT: 'SEIKIJANG FIGHTER', // tulisan pada spanduk di arena
-    VERSION: '1.6',
+    VERSION: '1.9',
 
     ROUND_TIME: 99,       // detik per ronde
     ROUNDS_TO_WIN: 2,     // menang 2 ronde = menang pertandingan

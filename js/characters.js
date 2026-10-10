@@ -160,30 +160,35 @@ window.ROSTER = [
   {
     id: 'tio',
     name: 'MAS TIO',
-    title: 'Pendekar Salto Kilat',
+    title: 'Operator Kilat',
     element: 'KECEPATAN KILAT',
-    desc: 'Pesilat lincah dengan tendangan salto. Mampu menerjang lawan secepat kilat hingga terjatuh.',
+    desc: 'Operator sekolah penguasa ilmu bertarung super cepat. Tekan arah sekali untuk meluncur secepat kilat.',
     color: 0xffa53d,
     color2: 0xffd27a,
-    walk: 4.6, backWalk: 3.8, jumpV: 18.8, jumpX: 6,
-    hurtbox: { w: 112, h: 275 },
+    walk: 4.8, backWalk: 4.0, jumpV: 18.8, jumpX: 6,
+    flatPoses: true,
+    // tekan arah depan = meluncur kilat ke depan lawan, arah belakang = mundur kilat ke ujung arena
+    flashMove: true,
+    hurtbox: { w: 106, h: 275 },
+    walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
-      idle: 'stance', walk: 'stance', jump: 'jump', fall: 'jump', hurt: 'fall', fly: 'fall', lie: 'salute', getup: 'crouch',
-      guard: 'guard', charge: 'salute', intro: 'salute', win: 'jump', seal: 'salute',
+      idle: 'walk3', walk: 'walk3', jump: 'jumpknee', fall: 'jumpknee', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
+      guard: 'guard', charge: 'aura', intro: 'aura', win: 'aura', seal: 'aura',
     },
+    // pukulan super cepat beruntun
     moves: {
-      p1: { frame: 'punch', startup: 4, active: 3, recovery: 9, dmg: 40, hitstun: 18, blockstun: 11, push: 5, box: [122, 195, 94, 66], lunge: 3, next: 'p2' },
-      p2: { frame: 'sweep', pre: 'crouch', startup: 5, active: 5, recovery: 11, dmg: 45, hitstun: 20, blockstun: 12, push: 6, box: [120, 45, 170, 95], lunge: 3, next: 'p3' },
-      // Tendangan salto
-      p3: { frame: 'salto', pre: 'crouch', startup: 6, active: 7, recovery: 15, dmg: 70, blockstun: 15, push: 6, box: [70, 190, 150, 210], lunge: 3, hop: -10, kd: true, launch: [4, -16], heavy: true, slash: 0xffd27a },
-      kick: { frame: 'flykick', pre: 'crouch', startup: 8, active: 6, recovery: 14, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [128, 130, 124, 104], lunge: 7, hop: -6, heavy: true },
-      air: { frame: 'stomp', startup: 4, active: 40, recovery: 8, dmg: 80, hitstun: 22, blockstun: 12, push: 6, box: [30, 45, 150, 120], dive: [2, 17], heavy: true },
+      p1: { frame: 'jab', startup: 3, active: 3, recovery: 7, dmg: 32, hitstun: 18, blockstun: 10, push: 4, box: [110, 210, 90, 70], lunge: 3, next: 'p2' },
+      p2: { frame: 'jab2', startup: 3, active: 3, recovery: 7, dmg: 32, hitstun: 18, blockstun: 10, push: 4, box: [112, 210, 90, 70], lunge: 3, next: 'p3' },
+      p3: { frame: 'backfist', startup: 4, active: 3, recovery: 8, dmg: 34, hitstun: 20, blockstun: 11, push: 5, box: [100, 225, 90, 80], lunge: 3, next: 'p4', slash: 0xffd27a },
+      p4: { frame: 'double', startup: 5, active: 4, recovery: 15, dmg: 55, blockstun: 15, push: 9, box: [112, 210, 110, 90], lunge: 5, kd: true, launch: [10, -11], heavy: true },
+      kick: { frame: 'kick2', pre: 'walk3', startup: 7, active: 4, recovery: 15, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 230, 120, 140], lunge: 3, heavy: true, slash: 0xffd27a },
+      air: { frame: 'jumpknee', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [70, 120, 120, 120] },
     },
-    jurus: { type: 'rush', name: 'TERJANGAN KILAT', cost: 25, range: 540, close: true, desc: 'Menerjang lawan dengan kecepatan tinggi hingga terjatuh' },
-    ulti: { type: 'stormsalto', name: 'SALTO BADAI', cost: 100, range: 620, desc: 'Terjangan, tendangan salto ke udara, lalu hantaman ke tanah' },
+    jurus: { type: 'flashpunch', name: 'FLASH PUNCH', cost: 25, range: 1500, desc: 'Berlari secepat kilat lalu meninju; ditangkis pun lawan terpental ke ujung arena' },
+    ulti: { type: 'skyslam', name: 'HANTAMAN LANGIT', cost: 100, range: 1500, desc: 'Muncul di atas kepala lawan lalu menghantam ke bawah, tak bisa ditangkis' },
     quotes: {
-      intro: 'Siap? Jangan sampai berkedip!',
-      win: 'Kecepatan adalah kekuatan!',
+      intro: 'Data sudah saya input. Giliran kamu kalah.',
+      win: 'Server aman, lawan tumbang!',
     },
   },
   {
@@ -197,9 +202,10 @@ window.ROSTER = [
     walk: 3.5, backWalk: 3.0, jumpV: 17.5, jumpX: 4.6,
     power: 1.35, // pukulan & tendangan 35% lebih kuat, dorongan lebih jauh
     walkFx: 'dust',
+    flatPoses: true, // pose K.O. sudah digambar terbaring
     hurtbox: { w: 124, h: 280 },
     frames: {
-      idle: 'stance', walk: 'stance', walkF: 'run', jump: 'jump', fall: 'jump', hurt: 'crouch', fly: 'jump', lie: 'stance',
+      idle: 'stance', walk: 'stance', walkF: 'run', jump: 'jump', fall: 'jump', hurt: 'hit', fly: 'hit', lie: 'ko',
       getup: 'crouch', guard: 'guard', charge: 'flex', intro: 'flex', win: 'flex', seal: 'crouch',
     },
     moves: {
@@ -207,11 +213,12 @@ window.ROSTER = [
       p2: { frame: 'bigpunch', startup: 6, active: 4, recovery: 12, dmg: 50, hitstun: 20, blockstun: 12, push: 7, box: [135, 200, 124, 104], lunge: 2, next: 'p3', slash: 0xffffff },
       // terjangan bahu
       p3: { frame: 'shoulder', pre: 'crouch', startup: 8, active: 6, recovery: 18, dmg: 70, blockstun: 15, push: 9, box: [95, 170, 140, 200], lunge: 7, kd: true, launch: [10, -9], heavy: true },
-      kick: { frame: 'kick', pre: 'stance', startup: 9, active: 4, recovery: 17, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 200, 124, 134], lunge: 2, heavy: true, slash: 0xdff4ff },
+      // tendangan menembakkan bola sepak sejauh 40% arena (kekuatan tendangan biasa)
+      kick: { frame: 'kickball', pre: 'stance', startup: 9, active: 3, recovery: 17, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 90, 124, 134], heavy: true, proj: { ball: true, x: 140, h: 70, speed: 18, reach: 0.4 } },
       air: { frame: 'smash', startup: 4, active: 40, recovery: 9, dmg: 80, hitstun: 22, blockstun: 12, push: 7, box: [40, 45, 160, 120], dive: [2, 16], heavy: true },
     },
-    jurus: { type: 'cannonrock', name: 'LEMPARAN BATU MERIAM', cost: 30, range: 1500, desc: 'Mencabut batu dari tanah lalu melemparnya ke lawan' },
-    ulti: { type: 'megaboulder', name: 'BATU RAKSASA', cost: 100, range: 1500, desc: 'Mengangkat batu raksasa dari tanah lalu melemparkannya' },
+    jurus: { type: 'firebasket', name: 'BOLA BASKET API', cost: 30, range: 1500, desc: 'Melempar bola basket api, lawan yang terkena langsung jatuh' },
+    ulti: { type: 'superkick', name: 'TENDANGAN BOLA PETIR SUPER', cost: 100, range: 1500, desc: 'Tendangan bola berpetir yang mendorong lawan ke ujung arena walau ditangkis' },
     quotes: {
       intro: 'Otot ini bukan pajangan!',
       win: 'Olahraga itu penting, anak-anak!',
@@ -369,8 +376,8 @@ window.ROSTER = [
       kick: { frame: 'bigkick', pre: 'stance', startup: 8, active: 4, recovery: 18, dmg: 95, blockstun: 15, push: 14, box: [135, 160, 130, 130], lunge: 2, kd: true, launch: [24, -12], heavy: true, slash: 0xffd27a },
       air: { frame: 'kick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [115, 170, 140, 130] },
     },
-    jurus: { type: 'ballthrow', name: 'LEMPARAN BOLA', cost: 25, range: 1500, desc: 'Melempar bola dari tangan hingga lawan terjatuh' },
-    ulti: { type: 'thunderkick', name: 'TENDANGAN BOLA PETIR', cost: 100, range: 1500, desc: 'Tendangan bola berlapis petir yang melempar lawan ke ujung arena' },
+    jurus: { type: 'ballthrow', name: 'LEMPARAN BOLA', cost: 25, range: 1500, desc: 'Lemparan bola keras yang menjatuhkan lawan; ditangkis pun lawan terdorong jauh' },
+    ulti: { type: 'thunderkick', name: 'TENDANGAN BOLA PETIR', cost: 100, range: 1500, desc: 'Bola petir yang menghancurkan perisai dan melempar lawan ke ujung arena' },
     quotes: {
       intro: 'Pemanasan dulu? Tidak perlu!',
       win: 'Priiit! Pertandingan selesai!',

@@ -136,7 +136,7 @@ function removeThinLines(fg, w, h) {
  * Siapkan sheet berformat GRID (latar putih polos, garis kotak hitam, label nomor
  * di pojok kiri atas tiap kotak). Latar diganti warna penanda magenta agar bisa
  * diproses removeChecker seperti sheet lain.
- * g = { cols: [tepi x], rows: [tepi y], inset, label: [lebar, tinggi] }
+ * g = { cols: [tepi x], rows: [tepi y], inset, label: [lebar, tinggi], erase: [[x0,y0,x1,y1], ...] }
  */
 function prepGrid(img, g) {
   const { data, w, h } = img;
@@ -147,10 +147,12 @@ function prepGrid(img, g) {
     const [r, gg, b] = px(i);
     return Math.min(r, gg, b) > 215 && Math.max(r, gg, b) - Math.min(r, gg, b) < 30;
   };
-  for (let cx = 0; cx < g.cols.length - 1; cx++) {
-    for (let cy = 0; cy < g.rows.length - 1; cy++) {
-      const X0 = g.cols[cx], Y0 = g.rows[cy];
-      const x0 = X0 + inset, x1 = g.cols[cx + 1] - inset, y0 = Y0 + inset, y1 = g.rows[cy + 1] - inset;
+  for (let cy = 0; cy < g.rows.length - 1; cy++) {
+    // rowCols: baris tertentu boleh punya pembagian kolom sendiri (kotak gabungan)
+    const cols = (g.rowCols && g.rowCols[cy]) || g.cols;
+    for (let cx = 0; cx < cols.length - 1; cx++) {
+      const X0 = cols[cx], Y0 = g.rows[cy];
+      const x0 = X0 + inset, x1 = cols[cx + 1] - inset, y0 = Y0 + inset, y1 = g.rows[cy + 1] - inset;
       const cw = x1 - x0, ch = y1 - y0;
       // area kotak: anggap isi (0) dulu
       const cell = new Uint8Array(cw * ch);
@@ -175,7 +177,7 @@ function prepGrid(img, g) {
         st.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
       }
       // lubang putih bersih yang tertutup (celah lengan-badan) juga latar,
-      // kecuali di bagian bawah kotak (sepatu putih)
+      // kecuali di bagian bawah kotak (sepatu putih; atur lewat holeBottom)
       const hole = new Uint8Array(cw * ch);
       for (let k = 0; k < cw * ch; k++) {
         const [r, gg, b] = px(at(k % cw, (k / cw) | 0));
@@ -186,7 +188,7 @@ function prepGrid(img, g) {
         if (!hole[k]) continue;
         const c = comps[labels[k]];
         const cyc = (c.minY + c.maxY) / 2;
-        if (c.area > 250 && cyc < ch * 0.8) cell[k] = 2;
+        if (c.area > 250 && cyc < ch * (g.holeBottom || 0.8)) cell[k] = 2;
       }
       // tepi abu-abu halus di sekitar latar ikut dibuang (2 lapis)
       for (let it = 0; it < 2; it++) {
@@ -203,6 +205,12 @@ function prepGrid(img, g) {
       for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
         if (cell[y * cw + x] !== 2) mask[at(x, y)] = 0;
       }
+    }
+  }
+  // area yang sengaja dihapus (tulisan keterangan, bola yang tergambar, dll.)
+  for (const [ex0, ey0, ex1, ey1] of g.erase || []) {
+    for (let y = Math.max(0, ey0); y < Math.min(h, ey1); y++) {
+      for (let x = Math.max(0, ex0); x < Math.min(w, ex1); x++) mask[y * w + x] = BG;
     }
   }
   const out = Buffer.from(data);

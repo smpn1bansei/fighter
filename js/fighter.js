@@ -47,6 +47,7 @@ class Fighter {
     this.airUsed = false;
     this.comboTaken = 0;
     this.grabbing = false; // sedang "memegang" lawan dalam jurus (dorongan antar-petarung dimatikan)
+    this.flashCD = 0;
     this.tintOverride = null;
     this.ko = false;
     this.flashAt = -1e9;
@@ -129,6 +130,7 @@ class Fighter {
     const d = this.def;
     this.t++;
     if (this.invuln > 0) this.invuln--;
+    if (this.flashCD > 0) this.flashCD--;
 
     switch (this.state) {
       case 'idle':
@@ -158,6 +160,16 @@ class Fighter {
           this.chargeChakra();
           break;
         }
+        // gerak kilat (Mas Tio): menekan arah sekali langsung meluncur
+        if (d.flashMove && this.flashCD <= 0) {
+          const fp = c.pressed('right') ? 1 : c.pressed('left') ? -1 : 0;
+          if (fp) {
+            c.consume('right');
+            c.consume('left');
+            this.startFlash(fp);
+            break;
+          }
+        }
         const dir = (c.held('right') ? 1 : 0) - (c.held('left') ? 1 : 0);
         if (dir !== 0) {
           const fwd = dir === this.facing;
@@ -180,6 +192,21 @@ class Fighter {
         } else {
           this.vx = 0;
           if (this.state !== 'idle') this.setState('idle');
+        }
+        break;
+      }
+      case 'flash': {
+        const dx = this.flashTarget - this.x, sp = 42;
+        this.vx = 0;
+        this.afterimage(d.color, 0.5, 200);
+        if (this.t % 2 === 0) this.fx.dust(this.x - Math.sign(dx || 1) * 30, this.ground, 1);
+        if (Math.abs(dx) <= sp || this.t > 30) {
+          this.x = this.flashTarget;
+          this.flashCD = 18;
+          this.fx.dust(this.x, this.ground, 4);
+          this.setState('idle');
+        } else {
+          this.x += Math.sign(dx) * sp;
         }
         break;
       }
@@ -270,6 +297,23 @@ class Fighter {
     if (this.t % 20 === 1) this.fx.shock(this.x, this.ground, this.def.color, 1.6);
   }
 
+  // Meluncur secepat kilat: ke depan lawan, atau mundur ke ujung arena sendiri.
+  startFlash(dir) {
+    const fwd = dir === this.facing;
+    const lo = CFG.WALL, hi = CFG.W - CFG.WALL;
+    if (fwd) {
+      const front = this.opp.x - this.facing * (CFG.PUSH_W + 16);
+      this.flashTarget = Phaser.Math.Clamp(front, lo, hi);
+      // sudah di depan lawan: tidak perlu meluncur
+      if ((this.flashTarget - this.x) * this.facing <= 8) return;
+    } else {
+      this.flashTarget = dir > 0 ? hi : lo;
+    }
+    this.setState('flash');
+    this.setPose(fwd ? 'dash' : 'run');
+    Sound.play('dash');
+  }
+
   startMove(key) {
     const m = this.def.moves[key];
     this.move = m;
@@ -294,6 +338,7 @@ class Fighter {
       // serangan jarak jauh (mis. angin sabit King Andri)
       if (m.proj) {
         if (m.proj.fire) new FlameShot(this, m);
+        else if (m.proj.ball) new KickBall(this, m);
         else new LightningBolt(this, m);
         this.hasHit = true;
       }
