@@ -1,7 +1,5 @@
 // =====================================================================
-// JURUS KARAKTER GELOMBANG 10: Fatim (sprite baru, ninja super cepat)
-// (memakai Actor, ADD, rnd, circleRect, rectsOverlap dari jutsu.js, zapAt dari jutsu3.js,
-//  ChestOrb dari jutsu9.js)
+// JURUS FATIM
 // =====================================================================
 
 // ---------------------------------------------------------------------

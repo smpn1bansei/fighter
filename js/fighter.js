@@ -52,6 +52,7 @@ class Fighter {
     this.ko = false;
     this.flashAt = -1e9;
     this.walkPhase = 0;
+    this.clearStars();
     this.landWait = 0;
     this.cancelJutsu();
     this.pose = null;
@@ -552,6 +553,10 @@ class Fighter {
   }
 
   effects() {
+    if (this.state === 'win' && this.t % 4 === 0) {
+      this.fx.auraAt(this.x + Phaser.Math.Between(-70, 70), this.y - Phaser.Math.Between(0, 260), this.def.color);
+      if (this.t % 24 === 0) this.fx.burst(this.fx.sparks, this.x, this.y - 280, 6, 0xffe066);
+    }
     if (this.state === 'charge') {
       for (let i = 0; i < 2; i++) {
         this.fx.auraAt(this.x + Phaser.Math.Between(-60, 60), this.y - Phaser.Math.Between(0, 240), this.def.color);
@@ -572,6 +577,13 @@ class Fighter {
       const b = Math.sin(time / 260 + this.side * 2) * 0.012;
       sy *= 1 + b;
       sx *= 1 - b * 0.5;
+    }
+    if (st === 'win') {
+      // merayakan kemenangan: melompat-lompat kecil
+      const hop = Math.abs(Math.sin(time / 170));
+      oy = -hop * 26;
+      sy = this.S * (1 + (1 - hop) * 0.04);
+      sx = this.S * (1 - (1 - hop) * 0.03);
     }
     if (st === 'walk') {
       const run = this.def.frames.walkF && this.pose === this.def.frames.walkF;
@@ -605,6 +617,19 @@ class Fighter {
     else if (this.baseTint) sp.setTint(this.baseTint);
     else sp.clearTint();
 
+    // bintang pusing berputar di atas petarung yang K.O.
+    if (this.ko && st === 'down') {
+      if (!this.stars) {
+        this.stars = [0, 1, 2].map(() => this.scene.add.image(0, 0, 'fx_spark').setTint(0xffe066)
+          .setBlendMode(Phaser.BlendModes.ADD).setScale(0.32).setDepth(24));
+      }
+      const hx = this.x - this.facing * 60, hy = this.y - 70;
+      this.stars.forEach((s, i) => {
+        const a = time / 260 + (i * Math.PI * 2) / 3;
+        s.setPosition(hx + Math.cos(a) * 46, hy + Math.sin(a) * 14).setAngle(time / 4).setAlpha(Math.sin(a) > 0 ? 1 : 0.55);
+      });
+    } else if (this.stars) this.clearStars();
+
     const h = this.ground - this.y;
     const ss = Math.max(0.35, 1 - h / 420);
     this.shadow.setPosition(this.x, this.ground + 2).setScale(ss * 1.1, ss).setAlpha(ss);
@@ -616,6 +641,11 @@ class Fighter {
       const pulse = st === 'blockstun' ? 1.12 : 1 + Math.sin(time / 90) * 0.03;
       this.shield.setPosition(p.x, p.y).setScale(0.55 * pulse, 1.45 * pulse).setAlpha(st === 'blockstun' ? 0.95 : 0.55);
     }
+  }
+
+  clearStars() {
+    if (this.stars) this.stars.forEach((s) => s.destroy());
+    this.stars = null;
   }
 
   // Bayangan sesaat dari pose sekarang (efek gerak cepat).
@@ -630,6 +660,7 @@ class Fighter {
 
   destroy() {
     this.cancelJutsu();
+    this.clearStars();
     this.sprite.destroy();
     this.shadow.destroy();
     this.shield.destroy();

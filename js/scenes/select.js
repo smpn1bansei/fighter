@@ -5,6 +5,7 @@ class SelectScene extends Phaser.Scene {
 
   init(data) {
     this.leaving = false;
+    this.movesPanel = null;
     this.mode = (data && data.mode) || 'vs';
     this.step = 1;
     this.p1 = null;
@@ -49,6 +50,9 @@ class SelectScene extends Phaser.Scene {
     this.infoJ = UI.text(this, 0, 510, '', 11, '#ffc83d');
     this.infoU = UI.text(this, 0, 538, '', 11, '#ff8a5a');
     this.info.add([ig, this.infoName, this.infoElem, this.infoDesc, this.infoJ, this.infoU]);
+    // tombol DAFTAR JURUS di pojok kanan atas kotak info
+    this.movesBtn = UI.button(this, gw / 2 - 92, 380, 160, 40, 'DAFTAR JURUS', () => this.showMoves(), { size: 10, color: 0x7fd8ff, sound: 'select', noHover: true });
+    this.info.add(this.movesBtn);
 
     // Pilihan tingkat kesulitan (langkah 3)
     this.diffBox = this.add.container(W / 2, 0).setVisible(false);
@@ -83,7 +87,8 @@ class SelectScene extends Phaser.Scene {
       else if (k === 'ArrowUp' || k === 'KeyW') this.moveCursor(0, -1);
       else if (k === 'ArrowDown' || k === 'KeyS') this.moveCursor(0, 1);
       else if (k === 'Enter' || k === 'Space' || k === 'KeyJ' || k === 'KeyZ') this.confirm();
-      else if (k === 'Escape' || k === 'Backspace' || k === 'KeyK' || k === 'KeyX') this.back();
+      else if (k === 'Escape' || k === 'Backspace' || k === 'KeyK' || k === 'KeyX') { if (this.movesPanel) this.hideMoves(); else this.back(); }
+      else if (k === 'KeyM' || k === 'Tab') { if (this.movesPanel) this.hideMoves(); else this.showMoves(); }
     });
 
     UI.soundToggle(this, W - 90, 46);
@@ -164,7 +169,56 @@ class SelectScene extends Phaser.Scene {
     return { c: cont, g, badge, size, char: c };
   }
 
+  // Panel daftar jurus karakter yang sedang dipilih
+  showMoves() {
+    if (this.movesPanel) return;
+    const c = ROSTER[this.step === 3 ? ROSTER.findIndex((r) => r.id === this.p1) : this.cursor];
+    if (!c || c.locked) return;
+    const W = CFG.W, H = CFG.H;
+    const p = this.add.container(0, 0).setDepth(80);
+    const dim = this.add.rectangle(0, 0, W, H, 0x000000, 0.78).setOrigin(0).setInteractive();
+    const pw = Math.min(W - 60, 1080), ph = 560, x0 = W / 2 - pw / 2, y0 = H / 2 - ph / 2;
+    const g = this.add.graphics();
+    g.fillStyle(0x15132a, 0.97).fillRoundedRect(x0, y0, pw, ph, 18);
+    g.lineStyle(4, c.color, 1).strokeRoundedRect(x0, y0, pw, ph, 18);
+    p.add([dim, g]);
+    const face = this.add.image(x0 + 70, y0 + 64, c.id + '_face');
+    face.setScale(90 / Math.max(face.width, face.height));
+    p.add(face);
+    p.add(UI.title(this, x0 + 130, y0 + 50, c.name, 46, UI.hex(c.color)).setOrigin(0, 0.5));
+    p.add(UI.text(this, x0 + 134, y0 + 92, c.title.toUpperCase() + '  -  ' + c.element, 11, '#cfd5ea').setOrigin(0, 0.5));
+    const sk = c.skills || {};
+    const rows = [
+      ['PUKUL', 'J / Z', sk.pukul || '-'],
+      ['TENDANG', 'K / X', sk.tendang || '-'],
+      ['JURUS', 'L / C', c.jurus.name + ' (' + c.jurus.cost + ' cakra): ' + c.jurus.desc],
+      ['ULTI', 'I / B', c.ulti.name + ' (cakra penuh): ' + c.ulti.desc],
+    ];
+    if (sk.khusus) rows.push(['KHUSUS', '', sk.khusus]);
+    rows.forEach((r, i) => {
+      const y = y0 + 150 + i * 70;
+      p.add(UI.text(this, x0 + 40, y, r[0], 14, '#ffc83d').setOrigin(0, 0));
+      if (r[1]) p.add(UI.text(this, x0 + 40, y + 24, r[1], 9, '#8a8fa8').setOrigin(0, 0));
+      p.add(UI.text(this, x0 + 200, y, r[2], 12, '#ffffff', { align: 'left', wordWrap: { width: pw - 240 }, lineSpacing: 8 }).setOrigin(0, 0));
+    });
+    const ok = UI.button(this, W / 2, y0 + ph - 44, 200, 50, 'TUTUP', () => this.hideMoves(), { size: 16 });
+    ok.setFocus(true);
+    p.add(ok);
+    dim.on('pointerup', () => this.hideMoves());
+    this.movesPanel = p;
+    p.setAlpha(0);
+    this.tweens.add({ targets: p, alpha: 1, duration: 140 });
+  }
+
+  hideMoves() {
+    if (!this.movesPanel) return;
+    const p = this.movesPanel;
+    this.movesPanel = null;
+    this.tweens.add({ targets: p, alpha: 0, duration: 120, onComplete: () => p.destroy() });
+  }
+
   moveCursor(dx, dy) {
+    if (this.movesPanel) return;
     if (this.step === 3) {
       if (dx) this.pickDiff((this.diff + dx + 3) % 3);
       return;
@@ -179,6 +233,7 @@ class SelectScene extends Phaser.Scene {
   }
 
   confirm() {
+    if (this.movesPanel) { this.hideMoves(); return; }
     if (this.step === 3) {
       this.startMatch();
       return;

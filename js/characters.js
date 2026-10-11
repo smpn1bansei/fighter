@@ -21,7 +21,7 @@ window.ROSTER = [
     color: 0xffc83d,
     color2: 0x7fd8ff,
     walk: 4.0, backWalk: 3.3, jumpV: 18.5, jumpX: 5,
-    hurtbox: { w: 116, h: 270 },
+    hurtbox: { w: 110, h: 256 },
     frames: {
       idle: 'idle', walk: 'idle', jump: 'jump', fall: 'knee', hurt: 'hurt', fly: 'hurt', lie: 'hurt', getup: 'idle',
       guard: 'palm', charge: 'charge', intro: 'intro', win: 'win', seal: 'charge',
@@ -37,6 +37,8 @@ window.ROSTER = [
     // range = jarak terjauh jurus efektif (dipakai AI), close = cocok dipakai dari dekat
     // tombol atas: menghilang & muncul di belakang lawan (memakai cakra seperti jurus)
     teleport: true,
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Pukulan & telapak cakra, kombo 3x', tendang: 'Melempar lawan ke ujung arena (ditangkis: tanpa damage)', khusus: 'ATAS: menghilang & muncul di belakang lawan (pakai cakra)' },
     jurus: { type: 'rasengan', name: 'RASENGAN CAHAYA', cost: 30, range: 420, close: true, desc: 'Bola cakra yang menembus perisai & melempar lawan ke ujung arena' },
     ulti: { type: 'rasenshuriken', name: 'RASEN-SHURIKEN HOKAGE', cost: 100, range: 1500, desc: 'Shuriken angin raksasa yang tidak bisa ditangkis' },
     quotes: {
@@ -58,6 +60,7 @@ window.ROSTER = [
     ranged: true,
     rangedReach: 0.48,
     hurtbox: { w: 106, h: 275 },
+    titlePose: 'shield', // pose di layar judul
     walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
       idle: 'walk4', walk: 'walk4', jump: 'jump', fall: 'jump', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
@@ -73,6 +76,8 @@ window.ROSTER = [
       kick: { frame: 'kick', pre: 'walk4', startup: 7, active: 4, recovery: 16, dmg: 90, hitstun: 40, blockstun: 30, push: 0, box: [130, 225, 140, 160], lunge: 2, heavy: true, wallBlast: true },
       air: { frame: 'kick2', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [120, 150, 140, 130] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Pukulan api bertubi-tubi sejauh 50% arena', tendang: 'Tendangan angin ke ujung arena (ditangkis: tanpa damage)', khusus: 'ATAS: menghilang & muncul di belakang lawan (pakai cakra)' },
     jurus: { type: 'windlaser', name: 'LASER ANGIN BERPUTAR', cost: 30, range: 1500, desc: 'Laser angin dua tangan yang menghempaskan lawan ke ujung arena' },
     ulti: { type: 'chestorb', name: 'BOLA TEKAD API', cost: 100, range: 1500, desc: 'Bola energi dari dada yang menghapus serangan apa pun & tak bisa ditangkis' },
     quotes: {
@@ -93,6 +98,7 @@ window.ROSTER = [
     ranged: true,
     rangedReach: 0.28,
     hurtbox: { w: 106, h: 272 },
+    titlePose: 'orb', // pose di layar judul
     walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
       idle: 'walk4', walk: 'walk4', jump: 'jump', fall: 'jump', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
@@ -108,6 +114,8 @@ window.ROSTER = [
       kick: { frame: 'kick', pre: 'walk4', startup: 7, active: 4, recovery: 16, dmg: 90, hitstun: 40, blockstun: 30, push: 0, box: [130, 225, 140, 160], lunge: 2, heavy: true, wallBlast: true },
       air: { frame: 'kick2', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [120, 150, 140, 130] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Pukulan angin bertubi-tubi sejauh 30% arena', tendang: 'Tendangan angin ke ujung arena (ditangkis: tanpa damage)' },
     jurus: { type: 'earthquake', name: 'HENTAKAN BUMI', cost: 30, range: 1500, desc: 'Meninju tanah hingga retak sejauh 55% arena; lawan di tanah pasti jatuh' },
     ulti: { type: 'vortexball', name: 'BOLA PUSARAN ANGIN', cost: 100, range: 640, desc: 'Bola energi berpusaran angin sejauh 50% arena' },
     quotes: {
@@ -127,7 +135,7 @@ window.ROSTER = [
     flatPoses: true,
     ranged: true,
     rangedReach: 0.28,
-    hurtbox: { w: 104, h: 272 },
+    hurtbox: { w: 96, h: 235 }, // tubuh 15% lebih pendek
     walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
       idle: 'walk4', walk: 'walk4', jump: 'jump', fall: 'jump', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
@@ -144,6 +152,8 @@ window.ROSTER = [
       kick: { frame: 'kick2', pre: 'walk4', startup: 7, active: 4, recovery: 16, dmg: 90, hitstun: 40, blockstun: 30, push: 0, box: [130, 225, 130, 150], lunge: 3, heavy: true, wallBlast: true, slash: 0xdff6ff },
       air: { frame: 'flykick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [120, 140, 140, 130] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Petir kuning kiri-kanan sejauh 30% arena, menggeser lawan yang menangkis', tendang: 'Menghempaskan lawan ke ujung arena (ditangkis: tanpa damage)' },
     jurus: { type: 'flashupper', name: 'TINJU KILAT ANGIN', cost: 25, range: 1500, desc: 'Melesat secepat kilat lalu meninju dari bawah hingga lawan terlempar ke atas' },
     ulti: { type: 'turbotornado', name: 'BADAI TURBO', cost: 100, range: 1500, desc: 'Putaran angin turbo berpetir yang menghempaskan lawan ke ujung arena' },
     quotes: {
@@ -178,6 +188,8 @@ window.ROSTER = [
       kick: { frame: 'kick2', pre: 'walk4', startup: 8, active: 4, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [125, 200, 130, 140], lunge: 2, heavy: true },
       air: { frame: 'kick3', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [110, 160, 140, 130] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Lemparan shuriken sejauh 45% arena', tendang: 'Tendangan biasa', khusus: 'Tekan arah sekali: meluncur secepat kilat' },
     jurus: { type: 'thunderdash', name: 'TABRAKAN PETIR', cost: 30, range: 700, desc: 'Melesat menabrak lawan lalu menyetrum dengan listrik kuning-biru' },
     ulti: { type: 'thunderorb', name: 'BOLA PETIR', cost: 100, range: 1000, desc: 'Bola petir pelindung didorong ke lawan & menyetrum hingga jatuh' },
     quotes: {
@@ -197,7 +209,8 @@ window.ROSTER = [
     flatPoses: true,
     // tekan arah depan = meluncur kilat ke depan lawan, arah belakang = mundur kilat ke ujung arena
     flashMove: true,
-    hurtbox: { w: 106, h: 275 },
+    hurtbox: { w: 111, h: 289 },
+    titlePose: 'groundpunch', // pose di layar judul
     walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
       idle: 'walk3', walk: 'walk3', jump: 'jumpknee', fall: 'jumpknee', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
@@ -212,6 +225,8 @@ window.ROSTER = [
       kick: { frame: 'kick2', pre: 'walk3', startup: 7, active: 4, recovery: 15, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 230, 120, 140], lunge: 3, heavy: true, slash: 0xffd27a },
       air: { frame: 'jumpknee', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [70, 120, 120, 120] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Pukulan super cepat 4x', tendang: 'Tendangan tinggi', khusus: 'Tekan arah sekali: meluncur secepat kilat' },
     jurus: { type: 'flashpunch', name: 'FLASH PUNCH', cost: 25, range: 1500, desc: 'Berlari secepat kilat lalu meninju; ditangkis pun lawan terpental ke ujung arena' },
     ulti: { type: 'skyslam', name: 'HANTAMAN LANGIT', cost: 100, range: 1500, desc: 'Muncul di atas kepala lawan lalu menghantam ke bawah, tak bisa ditangkis' },
     quotes: {
@@ -245,6 +260,8 @@ window.ROSTER = [
       kick: { frame: 'kickball', pre: 'stance', startup: 9, active: 3, recovery: 17, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 90, 124, 134], heavy: true, proj: { ball: true, x: 140, h: 70, speed: 18, reach: 0.4 } },
       air: { frame: 'smash', startup: 4, active: 40, recovery: 9, dmg: 80, hitstun: 22, blockstun: 12, push: 7, box: [40, 45, 160, 120], dive: [2, 16], heavy: true },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Pukulan 35% lebih kuat, kombo 3x', tendang: 'Tendangan bola sejauh 40% arena', khusus: 'Gerak lebih lambat, tenaga paling besar' },
     jurus: { type: 'firebasket', name: 'BOLA BASKET API', cost: 30, range: 1500, desc: 'Melempar bola basket api, lawan yang terkena langsung jatuh' },
     ulti: { type: 'superkick', name: 'TENDANGAN BOLA PETIR SUPER', cost: 100, range: 1500, desc: 'Tendangan bola berpetir yang mendorong lawan ke ujung arena walau ditangkis' },
     quotes: {
@@ -278,8 +295,10 @@ window.ROSTER = [
       kick: { frame: 'kick', pre: 'stance', startup: 8, active: 3, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 24, box: [130, 175, 120, 120], heavy: true, proj: { h: 175, speed: 21, scale: 1.3, bolt: true } },
       air: { frame: 'kick', startup: 4, active: 3, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 12, box: [100, 120, 90, 90], air: true, proj: { h: 170, speed: 18, vy: 6, bolt: true } },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Petir sejauh setengah layar yang mendorong lawan', tendang: 'Tendangan petir yang mendorong lawan jauh', khusus: 'Cakra penuh hanya 2 detik (OVER POWER)' },
     jurus: { type: 'kamehameha', name: 'KAMEHAMEHA', cost: 30, range: 1500, desc: 'Gelombang energi yang menjangkau tepi layar' },
-    ulti: { type: 'skylaser', name: 'LASER MERAH LANGIT', cost: 100, range: 1500, desc: 'Melompat tinggi lalu menembakkan laser merah ke bawah hingga lawan terlempar' },
+    ulti: { type: 'skylaser', name: 'LASER MERAH LANGIT', cost: 100, range: 1500, desc: 'Menghilang, muncul di atas & menembakkan laser mata, lalu muncul di depan lawan yang terjatuh' },
     quotes: {
       intro: 'Raja tidak perlu mendekat.',
       win: 'Itulah kekuatan seorang raja!',
@@ -295,7 +314,7 @@ window.ROSTER = [
     color2: 0xffd75a,
     walk: 4.3, backWalk: 3.6, jumpV: 18.8, jumpX: 5.4,
     flatPoses: true,
-    hurtbox: { w: 104, h: 272 },
+    hurtbox: { w: 97, h: 253 },
     frames: {
       idle: 'stance', walk: 'stance', jump: 'stance', fall: 'stance', hurt: 'hurt', fly: 'fall', lie: 'lie', getup: 'hurt',
       guard: 'guard', charge: 'drawbow', intro: 'aimbow', win: 'drawbow', seal: 'drawbow',
@@ -308,6 +327,8 @@ window.ROSTER = [
       kick: { frame: 'kick', pre: 'stance', startup: 8, active: 4, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [125, 150, 130, 130], lunge: 2, heavy: true },
       air: { frame: 'kick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [100, 120, 140, 130] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Pukulan berapi sejauh 25% arena', tendang: 'Tendangan tinggi menjatuhkan lawan' },
     jurus: { type: 'arrow', name: 'PANAH CAHAYA', cost: 25, range: 1500, desc: 'Mengeluarkan busur lalu menembakkan panah' },
     ulti: { type: 'thunderarrow', name: 'PANAH PETIR', cost: 100, range: 1500, desc: 'Panah berpetir yang menyeret lawan jauh ke belakang' },
     quotes: {
@@ -324,7 +345,7 @@ window.ROSTER = [
     color2: 0xffa8cc,
     walk: 4.2, backWalk: 3.5, jumpV: 18.5, jumpX: 5.2,
     flatPoses: true,
-    hurtbox: { w: 100, h: 272 },
+    hurtbox: { w: 90, h: 245 },
     walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
       idle: 'walk4', walk: 'walk4', jump: 'roseup', fall: 'roseup', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
@@ -338,6 +359,8 @@ window.ROSTER = [
       kick: { frame: 'kick', pre: 'walk4', startup: 8, active: 4, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [125, 170, 130, 120], lunge: 2, heavy: true, slash: 0xffa8cc },
       air: { frame: 'kick2', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [110, 150, 140, 140] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Pukulan mawar dari bawah ke atas', tendang: 'Tendangan kaki' },
     jurus: { type: 'roseblade', name: 'ANGIN PISAU MAWAR', cost: 25, range: 1500, desc: 'Kibasan mawar melepas angin pisau merah yang mementalkan lawan' },
     ulti: { type: 'poisonrose', name: 'MAWAR BERACUN', cost: 100, range: 1500, desc: 'Melempar mawar yang meledakkan racun hingga lawan roboh' },
     quotes: {
@@ -355,7 +378,7 @@ window.ROSTER = [
     color2: 0xdff4ff,
     walk: 4.3, backWalk: 3.6, jumpV: 18.5, jumpX: 5.3,
     flatPoses: true,
-    hurtbox: { w: 102, h: 272 },
+    hurtbox: { w: 92, h: 245 },
     walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
       idle: 'walk1', walk: 'walk1', jump: 'walk2', fall: 'walk2', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
@@ -371,6 +394,8 @@ window.ROSTER = [
       kick: { frame: 'skirtkick', pre: 'walk1', startup: 8, active: 5, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 190, 140, 150], lunge: 2, heavy: true },
       air: { frame: 'skirtkick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [110, 160, 140, 140] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Kibasan kipas mendorong lawan 50% arena (ditangkis: tanpa damage)', tendang: 'Tendangan dengan rok' },
     jurus: { type: 'fangust', name: 'KIBASAN KIPAS', cost: 25, range: 1500, desc: 'Satu kibasan kipas melepas angin yang menjatuhkan lawan' },
     ulti: { type: 'twinfan', name: 'BADAI DUA KIPAS', cost: 100, range: 1500, desc: 'Badai angin dua kipas yang melempar lawan sampai tepi arena' },
     quotes: {
@@ -388,7 +413,7 @@ window.ROSTER = [
     color2: 0x7fd8ff,
     walk: 4.3, backWalk: 3.6, jumpV: 18.5, jumpX: 5.2,
     flatPoses: true,
-    hurtbox: { w: 110, h: 275 },
+    hurtbox: { w: 105, h: 262 },
     walkCycle: ['walk1', 'walk2', 'walk3', 'walk4'],
     frames: {
       idle: 'stance', walk: 'stance', jump: 'kick2', fall: 'kick2', hurt: 'hurt', fly: 'hurt', lie: 'lie', getup: 'hurt',
@@ -405,6 +430,8 @@ window.ROSTER = [
       kick: { frame: 'bigkick', pre: 'stance', startup: 8, active: 4, recovery: 18, dmg: 95, blockstun: 15, push: 14, box: [135, 160, 130, 130], lunge: 2, kd: true, launch: [24, -12], heavy: true, slash: 0xffd27a },
       air: { frame: 'kick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [115, 170, 140, 130] },
     },
+    // ringkasan untuk DAFTAR JURUS di layar pilih karakter
+    skills: { pukul: 'Kombo 5 pukulan kiri-kanan super cepat', tendang: 'Sekali tendang lawan terpental jauh' },
     jurus: { type: 'ballthrow', name: 'LEMPARAN BOLA', cost: 25, range: 1500, desc: 'Lemparan bola keras yang menjatuhkan lawan; ditangkis pun lawan terdorong jauh' },
     ulti: { type: 'thunderkick', name: 'TENDANGAN BOLA PETIR', cost: 100, range: 1500, desc: 'Bola petir yang menghancurkan perisai dan melempar lawan ke ujung arena' },
     quotes: {

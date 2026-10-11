@@ -24,6 +24,7 @@ const SHEETS = {
     tol: 12,
     frames: ['intro', 'idle', 'palm', 'hurt', 'punch', 'palm2', 'knee', 'kick', 'charge', 'jump', 'smash', 'win'],
     stand: 'intro',
+    standHeight: 323, // 5% lebih kecil dari ukuran standar (340)
     portrait: 'intro',
     matte: { charge: 40, palm: 30, palm2: 30, kick: 30, smash: 20 },
     anchorFix: {},
@@ -74,6 +75,7 @@ const SHEETS = {
       'guard', 'hurt', 'lie', 'aura', 'flykick', 'dash', 'palm'],
     stand: 'walk4',
     portrait: 'aura',
+    standHeight: 289, // 15% lebih pendek dari ukuran standar (340)
     face: 'walk4',
     anchorFix: {},
   },
@@ -105,6 +107,7 @@ const SHEETS = {
     frames: ['walk1', 'walk2', 'walk3', 'walk4', 'jab', 'jab2', 'backfist', 'double', 'kick', 'kick2', 'jumpknee', 'groundpunch',
       'guard', 'hurt', 'lie', 'aura', 'run', 'dash', 'palm'],
     stand: 'walk3',
+    standHeight: 357, // 5% lebih tinggi dari ukuran standar (340)
     portrait: 'aura',
     face: 'walk3',
     anchorFix: {},
@@ -165,6 +168,7 @@ const SHEETS = {
     tol: 12,
     frames: ['stance', 'drawbow', 'aimbow', 'shoot', 'punch', 'punch2', 'kick', 'highkick', 'guard', 'hurt', 'fall', 'lie'],
     stand: 'stance',
+    standHeight: 316, // 7% lebih kecil dari ukuran standar (340)
     portrait: 'aimbow',
     face: 'stance', // ikon wajah diambil dari pose ini (di pose busur, busur menutupi kepala)
     matte: { drawbow: 40, aimbow: 40, shoot: 40, punch: 20, punch2: 20, kick: 20, highkick: 30, guard: 30, lie: 20 },
@@ -176,6 +180,7 @@ const SHEETS = {
     tol: 12,
     frames: ['walk1', 'walk2', 'walk3', 'walk4', 'roseup', 'throw', 'kick', 'kick2', 'hurt', 'lie', 'meditate', 'aura'],
     stand: 'walk4',
+    standHeight: 306, // 10% lebih kecil dari ukuran standar (340)
     portrait: 'roseup',
     face: 'walk4',
     matte: { roseup: 40, throw: 40, kick: 30, kick2: 30, hurt: 20, lie: 20, meditate: 60, aura: 90 },
@@ -187,6 +192,7 @@ const SHEETS = {
     tol: 12,
     frames: ['walk1', 'walk2', 'walk3', 'walk4', 'fan1', 'fan2', 'skirtkick', 'kick2', 'hurt', 'lie', 'meditate', 'aura'],
     stand: 'walk1',
+    standHeight: 306, // 10% lebih kecil dari ukuran standar (340)
     portrait: 'fan1',
     face: 'walk1',
     matte: { fan1: 40, fan2: 40, skirtkick: 40, kick2: 40, meditate: 60, aura: 90 },
@@ -202,7 +208,7 @@ const SHEETS = {
       'guard', 'hurt', 'lie', 'stance', 'charge', 'soccer', 'ballready', 'throw'],
     stand: 'stance',
     portrait: 'charge',
-    standHeight: 306, // 10% lebih kecil dari ukuran standar
+    standHeight: 291, // 15% lebih kecil (10% lalu 5%) dari ukuran standar (340)
     face: 'stance',
     anchorFix: {},
   },

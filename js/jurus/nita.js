@@ -1,6 +1,5 @@
 // =====================================================================
-// JURUS KARAKTER GELOMBANG 4: Mbak Nita
-// (memakai Actor, ADD, rnd, circleRect, fadeOut dari jutsu.js dan zapAt dari jutsu3.js)
+// JURUS MBAK NITA
 // =====================================================================
 
 // ---------------------------------------------------------------------

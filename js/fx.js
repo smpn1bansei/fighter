@@ -116,34 +116,6 @@ window.FX = {
         g.fill();
       }
     });
-    make('fx_seal', 256, 256, (g) => {
-      g.translate(128, 128);
-      g.strokeStyle = '#fff';
-      g.fillStyle = '#fff';
-      g.shadowColor = '#fff';
-      g.shadowBlur = 6;
-      const circle = (r, w) => { g.lineWidth = w; g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.stroke(); };
-      circle(120, 6);
-      circle(102, 3);
-      circle(58, 4);
-      for (let i = 0; i < 12; i++) {
-        g.save();
-        g.rotate((i * Math.PI) / 6);
-        g.fillRect(-5, -116, 10, 10);
-        g.lineWidth = 3;
-        g.beginPath();
-        g.moveTo(-8, -96); g.lineTo(0, -64); g.lineTo(8, -96);
-        g.stroke();
-        g.restore();
-      }
-      g.lineWidth = 5;
-      g.beginPath();
-      for (let t = 0; t <= 1.001; t += 0.02) {
-        const a = t * Math.PI * 4, r = 4 + t * 42;
-        g.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-      }
-      g.stroke();
-    });
     make('fx_crack', 240, 48, (g) => {
       g.strokeStyle = 'rgba(45,28,12,0.95)';
       g.lineCap = 'round';
@@ -213,32 +185,6 @@ window.FX = {
       gr.addColorStop(1, 'rgba(255,255,255,0)');
       g.fillStyle = gr;
       g.fillRect(0, 0, 256, 64);
-    });
-    // Batu bulat (dilempar Pak Jef)
-    make('fx_boulder', 96, 96, (g) => {
-      g.beginPath();
-      const pts = 14;
-      for (let i = 0; i < pts; i++) {
-        const a = (i / pts) * Math.PI * 2;
-        const r = 40 + Math.sin(i * 2.7) * 4 + Math.cos(i * 1.3) * 3;
-        g.lineTo(48 + Math.cos(a) * r, 48 + Math.sin(a) * r);
-      }
-      g.closePath();
-      const gr = g.createRadialGradient(36, 34, 4, 48, 48, 46);
-      gr.addColorStop(0, '#a99a86');
-      gr.addColorStop(0.55, '#7a6650');
-      gr.addColorStop(1, '#3e3226');
-      g.fillStyle = gr;
-      g.fill();
-      g.lineWidth = 4;
-      g.strokeStyle = '#211a12';
-      g.stroke();
-      g.strokeStyle = 'rgba(33,26,18,0.7)';
-      g.lineWidth = 2.5;
-      g.beginPath(); g.moveTo(30, 52); g.lineTo(44, 60); g.lineTo(50, 74); g.stroke();
-      g.beginPath(); g.moveTo(58, 28); g.lineTo(66, 40); g.stroke();
-      g.fillStyle = 'rgba(255,255,255,0.18)';
-      g.beginPath(); g.ellipse(36, 32, 12, 7, -0.5, 0, Math.PI * 2); g.fill();
     });
     // Petir horizontal (3 bentuk berbeda agar bisa berkedip)
     for (let v = 0; v < 3; v++) {

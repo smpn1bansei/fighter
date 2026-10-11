@@ -541,8 +541,29 @@ class FightScene extends Phaser.Scene {
     Sound.music(null);
     Sound.play(won ? 'heal' : 'back');
     const c = this.panel(won ? 'KAMU MENANG!' : 'KAMU KALAH...', won ? '#ffd75a' : '#ff6a6a');
+    const loser = won ? this.p2 : this.p1;
+    // pemenang: cahaya di belakang & melompat-lompat gembira
+    const glow = this.add.image(W * 0.2, H - 260, 'fx_glow').setTint(winner.def.color).setBlendMode(Phaser.BlendModes.ADD).setScale(5).setAlpha(0.45);
+    this.tweens.add({ targets: glow, scale: 5.8, alpha: 0.25, duration: 800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     const por = this.add.image(W * 0.2, H + 20, winner.def.id + '_portrait').setOrigin(0.5, 1).setScale(0.9);
     if (winner.baseTint) por.setTint(winner.baseTint);
+    this.tweens.add({ targets: por, y: H - 4, scaleY: 0.93, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    // yang kalah: terbaring keabu-abuan dengan bintang pusing berputar
+    const lf = loser.def.frames.lie;
+    const lie = this.add.image(W * 0.82, H - 40, loser.def.id, lf).setOrigin(0.5, 1).setScale(1.05).setTint(0x8a8a9a).setFlipX(true);
+    // karakter tanpa pose terbaring: pose diputar agar tampak rebah
+    if (!loser.def.flatPoses) lie.setOrigin(0.5, 0.5).setAngle(90).setY(H - 40 - lie.displayWidth / 2);
+    const stars = [0, 1, 2].map(() => this.add.image(0, 0, 'fx_spark').setTint(0xffe066).setScale(0.35));
+    const starsEv = this.time.addEvent({ delay: 16, loop: true, callback: () => {
+      const tm = this.time.now;
+      stars.forEach((s, i) => {
+        const a = tm / 260 + (i * Math.PI * 2) / 3;
+        const top = lie.getBounds();
+        s.setPosition(top.x + top.width * 0.82 + Math.cos(a) * 46, top.y - 18 + Math.sin(a) * 14).setAngle(tm / 4);
+      });
+    } });
+    this.events.once('shutdown', () => starsEv.remove());
+    c.add([glow, lie, ...stars]);
     const quote = UI.text(this, W / 2, 240, '"' + winner.def.quotes.win + '"', 14, '#ffffff', { wordWrap: { width: W * 0.5 } });
     const stats = UI.text(this, W / 2, 292, 'KOMBO TERBANYAK: ' + this.maxCombo + ' HIT', 12, '#7fd8ff');
     c.add([por, quote, stats]);

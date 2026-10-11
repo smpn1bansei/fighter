@@ -1,47 +1,6 @@
 // =====================================================================
-// JURUS KARAKTER GELOMBANG 8: Mrs. Dina (ASN, elemen angin + petir)
-// (memakai Actor, ADD, rnd, rectsOverlap, fadeOut dari jutsu.js dan zapAt dari jutsu3.js)
+// JURUS MRS. DINA
 // =====================================================================
-
-// ---------------------------------------------------------------------
-// Dorongan sampai ujung arena (tendangan Mrs. Dina).
-// blocked = lawan menangkis: tetap terdorong, tetapi TIDAK terkena damage.
-// ---------------------------------------------------------------------
-class WallShove extends Actor {
-  constructor(att, vic, blocked, frac) {
-    super(att.scene, att);
-    this.vic = vic;
-    this.blocked = blocked;
-    // frac: dorong sejauh pecahan lebar arena (0 = sampai ujung arena)
-    this.left = frac ? CFG.W * frac : Infinity;
-    this.dir = Math.sign(vic.x - att.x) || att.facing;
-    this.x = vic.x;
-    this.y = vic.y;
-  }
-  step() {
-    const sc = this.scene, f = this.owner, vic = this.vic;
-    if (vic.ko) return false;
-    const d = Math.min(26, this.left);
-    this.left -= d;
-    vic.x = Phaser.Math.Clamp(vic.x + this.dir * d, CFG.WALL, CFG.W - CFG.WALL);
-    vic.vx = 0;
-    vic.hitstun = vic.t + 10;
-    this.x = vic.x;
-    if (this.t % 2 === 0) sc.fx.dust(vic.x, vic.ground, 2);
-    if (this.t % 3 === 0) sc.fx.auraAt(vic.x - this.dir * 60, vic.y - rnd(60, 240), 0xdff6ff);
-    const wall = vic.x <= CFG.WALL || vic.x >= CFG.W - CFG.WALL;
-    if (this.left !== Infinity && (this.left <= 0 || wall)) return false; // dorongan angin biasa
-    if (wall || this.t > 60) {
-      if (!this.blocked) {
-        sc.applyHit(f, vic, { dmg: 10, kd: true, launch: [3, -9], heavy: true, force: true, hitstop: 8, srcX: vic.x - this.dir * 60, x: vic.x, y: vic.y - 150, noGain: true });
-      }
-      sc.shake(220, 0.012);
-      sc.fx.shock(vic.x, vic.ground, 0x9fe8ff, 2.4);
-      return false;
-    }
-    return true;
-  }
-}
 
 // ---------------------------------------------------------------------
 // MRS. DINA — Tinju Kilat Angin: melesat secepat kilat lalu meninju

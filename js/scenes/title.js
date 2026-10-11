@@ -13,13 +13,21 @@ class TitleScene extends Phaser.Scene {
     const swirl = this.add.image(W / 2, 190, 'fx_swirl').setTint(0xff7a1a).setAlpha(0.18).setScale(4.2);
     this.tweens.add({ targets: swirl, angle: 360, duration: 24000, repeat: -1 });
 
-    // Karakter bergiliran tampil (3 sekaligus) + siluet "karakter berikutnya"
+    // Karakter bergiliran tampil, 4 sekaligus (2 kiri, 2 kanan)
     const chars = ROSTER.filter((c) => !c.locked);
+    const PER = 4;
     const spots = [
-      { x: W * 0.13, s: 0.88, d: 2 },
-      { x: W * 0.29, s: 0.74, tint: 0xb8b8c8, d: 1 },
-      { x: W * 0.87, s: 0.88, d: 2, flip: true },
+      { x: W * 0.12, s: 0.88, d: 2 },
+      { x: W * 0.28, s: 0.74, tint: 0xb8b8c8, d: 1 },
+      { x: W * 0.72, s: 0.74, tint: 0xb8b8c8, d: 1, flip: true },
+      { x: W * 0.88, s: 0.88, d: 2, flip: true },
     ];
+    // titlePose: pose khusus layar judul (diambil dari atlas, diperbesar setara potret)
+    const PORTRAIT_K = 560 / 340;
+    const dress = (img, c) => {
+      if (c.titlePose) img.setTexture(c.id, c.titlePose).setScale(img.spot.s * PORTRAIT_K);
+      else img.setTexture(c.id + '_portrait').setScale(img.spot.s);
+    };
     const heroes = spots.map((sp) => {
       const img = this.add.image(sp.x, H + 400, chars[0].id + '_portrait').setOrigin(0.5, 1).setDepth(sp.d).setFlipX(!!sp.flip);
       if (sp.tint) img.setTint(sp.tint);
@@ -27,36 +35,22 @@ class TitleScene extends Phaser.Scene {
       return img;
     });
     let group = 0;
-    const groups = Math.ceil(chars.length / 3);
+    const groups = Math.ceil(chars.length / PER);
     const show = (first) => {
       heroes.forEach((img, i) => {
-        const c = chars[(group * 3 + i) % chars.length];
+        const c = chars[(group * PER + i) % chars.length];
         const enter = () => {
-          img.setTexture(c.id + '_portrait').setScale(img.spot.s);
+          dress(img, c);
           img.y = H + 400;
-          this.tweens.add({ targets: img, y: H + 8, duration: 650, delay: (first ? 150 : 0) + i * 120, ease: 'Back.easeOut' });
+          this.tweens.add({ targets: img, y: H + 8, duration: 650, delay: (first ? 150 : 0) + i * 110, ease: 'Back.easeOut' });
         };
         if (first) enter();
-        else this.tweens.add({ targets: img, y: H + 420, duration: 280, delay: i * 80, ease: 'Cubic.easeIn', onComplete: enter });
+        else this.tweens.add({ targets: img, y: H + 420, duration: 280, delay: i * 70, ease: 'Cubic.easeIn', onComplete: enter });
       });
       group = (group + 1) % groups;
     };
     show(true);
     if (groups > 1) this.time.addEvent({ delay: 4500, loop: true, callback: () => show(false) });
-    // Siluet "karakter berikutnya": tanda tanya di dalam lingkaran bercahaya,
-    // diletakkan di antara tombol & karakter kanan agar tidak menumpuk gambar lain.
-    const mx = W * 0.71, my = H - 230;
-    const mys = this.add.container(mx, my).setDepth(1).setAlpha(0);
-    // semua karakter sudah tersedia: tanda tanya tidak ditampilkan
-    if (!ROSTER.some((c) => c.locked)) mys.setVisible(false);
-    const halo = this.add.image(0, 0, 'fx_glow').setTint(0xffc83d).setBlendMode(Phaser.BlendModes.ADD).setScale(2.2).setAlpha(0.35);
-    const ring = this.add.image(0, 0, 'fx_ring').setTint(0xffc83d).setScale(1.05).setAlpha(0.7);
-    const q = UI.title(this, 0, 4, '?', 120, '#ffd75a');
-    const soon = UI.text(this, 0, 104, 'SEGERA HADIR', 11, '#ffd75a');
-    mys.add([halo, ring, q, soon]);
-    this.tweens.add({ targets: mys, alpha: 1, delay: 900, duration: 400 });
-    this.tweens.add({ targets: ring, angle: 360, duration: 6000, repeat: -1 });
-    this.tweens.add({ targets: q, scale: 1.12, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     // Judul
     const t1 = UI.title(this, W / 2, 128, 'SEIKIJANG', 132, '#ffd75a').setDepth(5);
@@ -87,11 +81,20 @@ class TitleScene extends Phaser.Scene {
 
     UI.soundToggle(this, W - 90, 40);
     UI.fullscreenToggle(this, W - 246, 40);
+    // tombol KREDIT (pojok kiri atas)
+    const cr = this.add.container(80, 40).setDepth(150);
+    const crg = this.add.graphics();
+    crg.fillStyle(0x000000, 0.5).fillRoundedRect(-62, -20, 124, 40, 10);
+    crg.lineStyle(2, 0xffc83d, 1).strokeRoundedRect(-62, -20, 124, 40, 10);
+    cr.add([crg, UI.text(this, 0, 0, 'KREDIT', 12, '#ffc83d')]);
+    cr.setSize(124, 40).setInteractive({ useHandCursor: true });
+    cr.on('pointerup', () => this.showCredits());
     UI.text(this, W - 16, H - 16, 'v' + CFG.VERSION, 10, '#9aa3c0').setOrigin(1, 1).setDepth(6);
     const hint = this.sys.game.device.input.touch ? 'Pilih mode untuk bermain layar penuh' : 'Gunakan panah & Enter untuk memilih';
     UI.text(this, W / 2, H - 26, hint, 11, '#cfd5ea').setDepth(6);
 
     this.input.keyboard.on('keydown-ESC', () => this.hideHelp());
+    this.input.keyboard.on('keydown-C', () => this.showCredits());
   }
 
   gradient(t, colors) {
@@ -152,6 +155,32 @@ class TitleScene extends Phaser.Scene {
     c.add(ok);
     this.help = c;
     // ditunda agar tombol Enter yang membuka panel ini tidak langsung menutupnya
+    this.time.delayedCall(150, () => this.input.keyboard.once('keydown-ENTER', () => this.hideHelp()));
+    c.setAlpha(0);
+    this.tweens.add({ targets: c, alpha: 1, duration: 150 });
+  }
+
+  // Layar kredit
+  showCredits() {
+    if (this.help) return;
+    const W = CFG.W, H = CFG.H;
+    Sound.play('select');
+    this.menu.active = false;
+    const c = this.add.container(0, 0).setDepth(50);
+    const dim = this.add.rectangle(0, 0, W, H, 0x000000, 0.8).setOrigin(0).setInteractive();
+    const pw = Math.min(W - 80, 900), ph = 380;
+    const g = this.add.graphics();
+    g.fillStyle(0x15132a, 0.97).fillRoundedRect(W / 2 - pw / 2, H / 2 - ph / 2, pw, ph, 18);
+    g.lineStyle(4, 0xffc83d, 1).strokeRoundedRect(W / 2 - pw / 2, H / 2 - ph / 2, pw, ph, 18);
+    c.add([dim, g]);
+    c.add(UI.title(this, W / 2, H / 2 - ph / 2 + 50, 'KREDIT', 52, '#ffc83d'));
+    c.add(UI.text(this, W / 2, H / 2 - 30, 'Game Hiburan bagi keluarga SMPN 1 Bansei', 18, '#ffffff'));
+    c.add(UI.text(this, W / 2, H / 2 + 26, 'Development by Andri F. \u00a9 2026', 18, '#7fd8ff'));
+    const ok = UI.button(this, W / 2, H / 2 + ph / 2 - 50, 200, 54, 'TUTUP', () => this.hideHelp(), { size: 18 });
+    ok.setFocus(true);
+    c.add(ok);
+    dim.on('pointerup', () => this.hideHelp());
+    this.help = c;
     this.time.delayedCall(150, () => this.input.keyboard.once('keydown-ENTER', () => this.hideHelp()));
     c.setAlpha(0);
     this.tweens.add({ targets: c, alpha: 1, duration: 150 });

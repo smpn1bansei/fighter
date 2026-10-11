@@ -1,6 +1,5 @@
 // =====================================================================
-// JURUS KARAKTER GELOMBANG 7: Mas Tio (operator sekolah, super cepat)
-// (memakai ADD, rnd, rectsOverlap, fadeOut dari jutsu.js dan shatterShield dari jutsu6.js)
+// JURUS MAS TIO
 // =====================================================================
 
 // ---------------------------------------------------------------------

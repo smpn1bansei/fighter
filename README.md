@@ -14,7 +14,7 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 | **Fatim**: Ninja Senjata Kilat | Tabrakan Petir: melesat menabrak lawan lalu menyetrum (ditangkis: setengah damage) | Bola Petir: bola petir sejauh 70% arena masuk ke tubuh lawan (ditangkis: setengah damage) |
 | **Mas Tio**: Operator Kilat | Flash Punch: lari kilat lalu meninju, ditangkis pun lawan terpental ke ujung arena | Hantaman Langit: muncul di atas kepala lawan & menghantam ke bawah, tak bisa ditangkis, tanah retak |
 | **Pak Jef**: Otot Baja Sekolah | Bola Basket Api: lawan yang terkena langsung jatuh | Tendangan Bola Petir Super: lawan terdorong ke ujung arena walau menangkis |
-| **King Andri**: Raja Petir *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Laser Merah Langit: melompat tinggi lalu menembakkan laser merah ke bawah, lawan terlempar |
+| **King Andri**: Raja Petir *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Laser Merah Langit: menghilang, muncul di atas & menembakkan laser mata, lalu muncul di depan lawan yang terjatuh |
 | **Mbak Nita**: Pemanah Petir | Panah Cahaya: mengeluarkan busur lalu menembakkan panah | Panah Petir: panah berpetir yang menyeret lawan jauh ke belakang |
 | **Suci Flower**: Mawar Berduri | Angin Pisau Mawar: kibasan mawar melepas angin pisau merah yang mementalkan lawan | Mawar Beracun: mawar dilempar, meledak menjadi racun, lawan roboh |
 | **Septi**: Penari Kipas Angin | Kibasan Kipas: satu kipas melepas angin yang menjatuhkan lawan | Badai Dua Kipas: badai angin yang melempar lawan sampai tepi arena |
@@ -30,6 +30,11 @@ King Andri, Suci Flower, Septi, dan Almusbar berjalan dengan langkah kaki bergan
 Pukulan & tendangan King Andri melepaskan petir sejauh setengah layar yang mendorong lawan, dan cakranya penuh dalam 2 detik.
 
 Semua 12 slot karakter sudah terisi.
+
+## Layar judul
+
+Tombol **KREDIT** (pojok kiri atas) menampilkan informasi pembuat game.
+Di layar pilih karakter, tombol **DAFTAR JURUS** (atau tombol M) menampilkan semua jurus karakter.
 
 ## Mode permainan
 
@@ -81,7 +86,7 @@ Game akan terbuka layar penuh dan mendatar seperti aplikasi.
 
 ## Memperbarui game yang sudah online
 
-Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=2.3` → `?v=2.4`) dan `VERSION` di `js/config.js`
+Setelah mengunggah versi baru, naikkan angka `?v=` di `index.html` (misalnya `?v=2.5` → `?v=2.6`) dan `VERSION` di `js/config.js`
 agar HP pemain langsung memuat versi terbaru, bukan versi lama yang tersimpan di browser.
 GitHub Pages butuh sekitar 1–10 menit untuk menampilkan perubahan.
 
@@ -109,7 +114,9 @@ Nama, deskripsi, kutipan, dan kekuatan karakter ada di `js/characters.js`.
    Sheet boleh JPG atau PNG dengan latar kotak-kotak gelap maupun terang (lihat contoh `kingandri` & `nita`),
    atau sheet GRID berlatar putih dengan garis kotak & nomor (lihat contoh `almusbar`, opsi `grid`).
    Hasilnya `assets/sprites/<id>.webp`, `<id>.json`, `<id>-portrait.webp`, `<id>-face.webp`.
-4. Di `js/characters.js`, ganti salah satu slot `locked` dengan data karakter baru (salin data karakter yang ada lalu sesuaikan pose, jangkauan serangan, dan jurusnya). Jurus baru ditulis di `js/jutsu.js`.
+4. Di `js/characters.js`, ganti salah satu slot `locked` dengan data karakter baru (salin data karakter yang ada lalu sesuaikan pose, jangkauan serangan, dan jurusnya). Jurus baru ditulis di `js/jurus/_dasar.js     alat bantu jurus, kelas Actor, efek bersama
+js/jurus/_proyektil.js proyektil yang dipakai beberapa karakter
+js/jurus/<karakter>.js jurus tiap karakter (nur, siti, ranti, dina, fatim, tio, pakjef, kingandri, nita, suci, septi, almusbar)
 
 ## Struktur folder
 
@@ -120,16 +127,9 @@ lib/phaser.min.js     mesin game Phaser 3.80.1
 js/config.js          pengaturan umum
 js/characters.js      data 12 slot karakter
 js/fighter.js         gerak, serangan, & status petarung
-js/jutsu.js           jurus-jurus ninja (Nur, Sit, Ranti) + dasar proyektil
-js/jutsu2.js          jurus Mrs. Dina, Fatim, Mas Tio
-js/jutsu3.js          jurus Pak Jef, King Andri
-js/jutsu4.js          jurus Mbak Nita
-js/jutsu5.js          jurus Suci Flower, Septi
-js/jutsu6.js          jurus Almusbar + api pukulan Mbak Nita
-js/jutsu7.js          jurus Mas Tio
-js/jutsu8.js          jurus Mrs. Dina
-js/jutsu9.js          jurus Siti Hokage & Ranti
-js/jutsu10.js         jurus Fatim
+js/jurus/_dasar.js     alat bantu jurus, kelas Actor, efek bersama
+js/jurus/_proyektil.js proyektil yang dipakai beberapa karakter
+js/jurus/<karakter>.js jurus tiap karakter (nur, siti, ranti, dina, fatim, tio, pakjef, kingandri, nita, suci, septi, almusbar)
 js/ai.js              kecerdasan komputer
 js/input.js           keyboard & tombol layar sentuh
 js/fx.js              efek visual
