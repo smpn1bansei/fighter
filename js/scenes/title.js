@@ -3,6 +3,8 @@ class TitleScene extends Phaser.Scene {
   constructor() { super('Title'); }
 
   create() {
+    Net.close();
+    Net.setWidth(CFG.NATIVE_W);
     const W = CFG.W, H = CFG.H;
     this.leaving = false;
     this.help = null;
@@ -63,20 +65,21 @@ class TitleScene extends Phaser.Scene {
     });
     UI.text(this, W / 2, 312, CFG.SUBTITLE, 16, '#ffffff').setDepth(5);
 
-    const start = UI.button(this, W / 2, 400, 320, 68, 'VS BATTLE', () => this.go('vs'), { size: 24, color: 0xff6a2a });
-    const arcade = UI.button(this, W / 2, 484, 320, 62, 'ARCADE', () => this.go('arcade'), { size: 22, color: 0xb06cff });
-    const help = UI.button(this, W / 2, 562, 320, 52, 'CARA MAIN', () => this.showHelp(), { size: 16, color: 0x4aa8ff });
-    [start, arcade, help].forEach((b) => b.setDepth(6));
-    this.menu = UI.menu(this, [start, arcade, help]);
+    const start = UI.button(this, W / 2, 384, 320, 62, 'VS BATTLE', () => this.go('vs'), { size: 24, color: 0xff6a2a });
+    const arcade = UI.button(this, W / 2, 456, 320, 56, 'ARCADE', () => this.go('arcade'), { size: 20, color: 0xb06cff });
+    const online = UI.button(this, W / 2, 524, 320, 56, 'VS ONLINE', () => this.go('online'), { size: 20, color: 0x4cd964 });
+    const help = UI.button(this, W / 2, 588, 320, 46, 'CARA MAIN', () => this.showHelp(), { size: 15, color: 0x4aa8ff });
+    [start, arcade, online, help].forEach((b) => b.setDepth(6));
+    this.menu = UI.menu(this, [start, arcade, online, help]);
     // abaikan tombol yang masih tertekan dari layar sebelumnya
     this.menu.active = false;
     this.time.delayedCall(350, () => { if (!this.help) this.menu.active = true; });
-    this.modeHint = UI.text(this, W / 2, 618, '', 10, '#cfd5ea').setDepth(6);
-    const hints = ['Lawan 1 karakter pilihanmu', 'Kalahkan semua karakter satu per satu!', 'Daftar tombol & tips'];
+    this.modeHint = UI.text(this, W / 2, 634, '', 10, '#cfd5ea').setDepth(6);
+    const hints = ['Lawan 1 karakter pilihanmu', 'Kalahkan semua karakter satu per satu!', 'Lawan temanmu dari HP lain', 'Daftar tombol & tips'];
     const upd = () => this.modeHint.setText(hints[this.menu.index] || '');
     upd();
     this.input.keyboard.on('keydown', upd);
-    [start, arcade, help].forEach((b) => b.on('pointerover', upd));
+    [start, arcade, online, help].forEach((b) => b.on('pointerover', upd));
     this.tweens.add({ targets: start, scale: 1.05, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     UI.soundToggle(this, W - 90, 40);
@@ -110,7 +113,7 @@ class TitleScene extends Phaser.Scene {
     // Di HP: masuk layar penuh & kunci posisi mendatar bila didukung browser
     if (this.sys.game.device.input.touch) UI.goFullscreen(this);
     this.cameras.main.fadeOut(250, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Select', { mode }));
+    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(mode === 'online' ? 'Online' : 'Select', { mode }));
   }
 
   showHelp() {

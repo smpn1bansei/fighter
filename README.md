@@ -8,19 +8,24 @@ Bisa dimainkan di **HP** (tombol layar sentuh) maupun **komputer** (keyboard), l
 | Karakter | Jurus (butuh cakra) | Jurus Pamungkas (cakra penuh) |
 |---|---|---|
 | **Nur Hokage**: Hokage Cahaya Emas | Rasengan Cahaya: melesat maju membawa bola cakra berputar | Rasen-Shuriken Hokage: shuriken angin raksasa yang mengurung lawan |
-| **Siti Hokage**: Pemimpin Tekad Api | Laser Angin Berputar: dua tangan, lawan terhempas ke ujung arena (ditangkis: setengah damage) | Bola Tekad Api: bola energi dari dada, menghapus serangan lawan & tak bisa ditangkis |
-| **Ranti**: Pengurus Administrasi Ninja | Hentakan Bumi: tanah retak sejauh 55% arena, lawan di tanah pasti jatuh | Bola Pusaran Angin: sejauh 50% arena (ditangkis: setengah damage) |
-| **Mrs. Dina**: ASN Angin Petir | Tinju Kilat Angin: melesat kilat lalu meninju dari bawah, lawan terlempar ke atas | Badai Turbo: angin turbo berpetir menghempaskan lawan ke ujung arena (ditangkis: setengah damage) |
-| **Fatim**: Ninja Senjata Kilat | Tabrakan Petir: melesat menabrak lawan lalu menyetrum (ditangkis: setengah damage) | Bola Petir: bola petir sejauh 70% arena masuk ke tubuh lawan (ditangkis: setengah damage) |
-| **Mas Tio**: Operator Kilat | Flash Punch: lari kilat lalu meninju, ditangkis pun lawan terpental ke ujung arena | Hantaman Langit: muncul di atas kepala lawan & menghantam ke bawah, tak bisa ditangkis, tanah retak |
+| **Siti Hokage**: Pemimpin Tekad Api | Laser Angin Berputar: dua tangan, lawan terhempas ke ujung arena | Bola Tekad Api: bola energi dari dada, menghapus serangan lawan |
+| **Ranti**: Pengurus Administrasi Ninja | Hentakan Bumi: tanah retak sejauh 55% arena, tak bisa ditangkis | Bola Pusaran Angin: sejauh 50% arena |
+| **Mrs. Dina**: ASN Angin Petir | Tinju Kilat Angin: melesat kilat lalu meninju dari bawah, lawan terlempar ke atas | Badai Turbo: angin turbo berpetir menghempaskan lawan ke ujung arena |
+| **Fatim**: Ninja Senjata Kilat | Tabrakan Petir: melesat menabrak lawan lalu menyetrum | Bola Petir: bola petir sejauh 70% arena masuk ke tubuh lawan |
+| **Mas Tio**: Operator Kilat | Flash Punch: lari kilat lalu meninju | Hantaman Langit: muncul di atas kepala lawan & menghantam ke bawah, tanah retak |
 | **Pak Jef**: Otot Baja Sekolah | Bola Basket Api: lawan yang terkena langsung jatuh | Tendangan Bola Petir Super: lawan terdorong ke ujung arena walau menangkis |
 | **King Andri**: Raja Petir *(over power)* | Kamehameha: gelombang energi sampai tepi layar | Laser Merah Langit: menghilang, muncul di atas & menembakkan laser mata, lalu muncul di depan lawan yang terjatuh |
 | **Mbak Nita**: Pemanah Petir | Panah Cahaya: mengeluarkan busur lalu menembakkan panah | Panah Petir: panah berpetir yang menyeret lawan jauh ke belakang |
 | **Suci Flower**: Mawar Berduri | Angin Pisau Mawar: kibasan mawar melepas angin pisau merah yang mementalkan lawan | Mawar Beracun: mawar dilempar, meledak menjadi racun, lawan roboh |
 | **Septi**: Penari Kipas Angin | Kibasan Kipas: satu kipas melepas angin yang menjatuhkan lawan | Badai Dua Kipas: badai angin yang melempar lawan sampai tepi arena |
-| **Almusbar**: Pelatih Bola Petir | Lemparan Bola: bola dari tangan yang menjatuhkan lawan | Tendangan Bola Petir: menghancurkan perisai lawan dan melempar lawan ke ujung arena |
+| **Almusbar**: Pelatih Bola Petir | Lemparan Bola: bola dari tangan yang menjatuhkan lawan | Tendangan Bola Petir: melempar lawan ke ujung arena |
+
+**Perisai (tahan):** pukulan & tendangan yang ditangkis tidak memberi damage.
+Jurus yang ditangkis tetap memberi 20% damage (kecuali Hentakan Bumi Ranti yang tak bisa ditangkis).
+Ulti yang ditangkis tetap memberi 50% damage (Nur Hokage, Siti Hokage, King Andri, Almusbar) atau 20% (karakter lain).
 
 Nur Hokage & Siti Hokage: tekan arah ATAS untuk menghilang & muncul di belakang lawan (memakai cakra seperti jurus).
+Lawan baru sadar dan berbalik badan sekitar 2,5 detik kemudian (atau saat terkena serangan).
 Ciri khas tambahan: pukulan Mrs. Dina berupa petir kuning sejauh 30% arena dan tendangannya mendorong lawan ke ujung arena (ditangkis: tanpa damage),
 Fatim melempar shuriken sejauh 45% arena dan bisa meluncur kilat seperti Mas Tio, Mas Tio bisa meluncur kilat: tekan arah depan sekali untuk melesat ke depan lawan, arah belakang untuk mundur ke ujung arena.
 Almusbar punya kombo 5 pukulan kiri-kanan (tekan PUKUL berulang) dan tendangan yang mementalkan lawan jauh.
@@ -41,6 +46,16 @@ Di layar pilih karakter, tombol **DAFTAR JURUS** (atau tombol M) menampilkan sem
 - **VS BATTLE**: pilih karaktermu dan satu lawan (komputer).
 - **ARCADE**: pilih satu karakter, lalu kalahkan semua karakter lain satu per satu (urutan acak, King Andri selalu jadi bos terakhir).
   Kalah di tengah jalan? Pilih **COBA LAGI** untuk mengulang lawan yang sama.
+- **VS ONLINE**: dua pemain dari dua HP.
+  1. Pemain pertama menekan **BUAT ROOM** dan mendapat **kode room** 4 angka.
+  2. Pemain kedua menekan **GABUNG ROOM** lalu memasukkan kode itu.
+  3. Masing-masing memilih karakter di HP sendiri, lalu bertarung. Pembuat room selalu di kiri.
+
+  Kedua HP butuh internet saat menyambung (memakai server perkenalan gratis PeerJS).
+  Setelah tersambung, data dikirim langsung antar-HP (WebRTC), jadi paling lancar bila kedua HP memakai
+  **Wi-Fi yang sama**, atau HP kedua memakai **hotspot** HP pertama.
+  Beberapa Wi-Fi sekolah/kantor memblokir sambungan antar-perangkat; bila gagal, pakai hotspot.
+  Bila layar kedua HP berbeda rasio, arena disamakan dan HP yang layarnya lebih lebar mendapat sedikit tepi hitam.
 
 ## Cara main
 
@@ -132,10 +147,11 @@ js/jurus/_proyektil.js proyektil yang dipakai beberapa karakter
 js/jurus/<karakter>.js jurus tiap karakter (nur, siti, ranti, dina, fatim, tio, pakjef, kingandri, nita, suci, septi, almusbar)
 js/ai.js              kecerdasan komputer
 js/input.js           keyboard & tombol layar sentuh
+js/net.js             main online 2 HP (PeerJS / WebRTC, lockstep)
 js/fx.js              efek visual
 js/sound.js           efek suara & musik (dibuat dengan kode)
 js/ui.js              tombol & teks menu
-js/scenes/            layar: memuat, judul, pilih karakter, VS, arena
+js/scenes/            layar: memuat, judul, online, pilih karakter, VS, arena
 assets/               gambar karakter, latar, font, ikon
 asset-custom/         gambar asli (sumber)
 tools/                alat bantu pemroses gambar (tidak dimuat oleh game)

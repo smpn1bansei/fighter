@@ -119,6 +119,8 @@ class Fighter {
   }
 
   faceOpponent() {
+    // baru saja ditinggal teleport: belum sadar lawan ada di belakang
+    if (this.faceLock > this.t) return;
     const dx = this.opp.x - this.x;
     if (Math.abs(dx) > 4) this.facing = dx > 0 ? 1 : -1;
   }
@@ -314,6 +316,8 @@ class Fighter {
     this.x = nx;
     this.vx = 0;
     this.faceOpponent();
+    // lawan baru sadar & berbalik setelah +-2,5 detik
+    opp.faceLock = opp.t + 150;
     this.fx.image('fx_ring', this.x, this.y - 150, { tint: this.def.color, from: 0.2, to: 1.8, ms: 260, scaleY: 1.6 });
     this.fx.burst(this.fx.sparks, this.x, this.y - 150, 10, this.def.color);
     this.invuln = 8;
@@ -419,6 +423,8 @@ class Fighter {
     const j = this.def[which];
     this.chakra -= j.cost;
     this.actionId = (this.actionId || 0) + 1;
+    this.jutsuKind = which;
+    this.jutsuSeq = (this.jutsuSeq || 0) + 1;
     this.move = null;
     this.queued = null;
     this.vx = 0;
@@ -446,13 +452,7 @@ class Fighter {
     if (this.ko || (!hit.force && !this.hurtbox())) return 'miss';
     const srcX = hit.srcX !== undefined ? hit.srcX : att.x;
     const dir = Math.sign(this.x - srcX) || -this.facing;
-    const fromFront = dir !== this.facing || Math.abs(this.x - srcX) < 8;
-    const backKey = this.facing === 1 ? 'left' : 'right';
-    const blocking = !hit.force && this.onGround && fromFront && !hit.unblockable && (
-      this.state === 'guard' || this.state === 'blockstun' ||
-      ((this.state === 'idle' || this.state === 'walk') && this.ctrl.held(backKey) && !this.ctrl.held(backKey === 'left' ? 'right' : 'left'))
-    );
-    if (blocking) {
+    if (this.canBlock(att, hit)) {
       const chip = Math.round(hit.dmg * (hit.chip || 0) * att.dmgMult);
       this.hp = Math.max(1, this.hp - chip);
       this.setState('blockstun');
@@ -462,6 +462,7 @@ class Fighter {
       return 'block';
     }
     this.comboTaken++;
+    this.faceLock = 0; // terkena serangan: langsung sadar
     // Kombo panjang mengurangi damage pukulan biasa (jurus tidak dikurangi).
     const scale = hit.noGain ? 1 : Math.max(0.4, 1 - 0.1 * Math.max(0, this.comboTaken - 2));
     const dmg = Math.max(1, Math.round(hit.dmg * scale * att.dmgMult));
@@ -485,6 +486,17 @@ class Fighter {
       this.vx = dir * (hit.push || 5);
     }
     return 'hit';
+  }
+
+  // Apakah serangan ini bisa ditangkis sekarang (sedang menangkis & serangan dari depan)?
+  canBlock(att, hit) {
+    if (this.ko || hit.force || hit.unblockable || !this.onGround) return false;
+    const srcX = hit.srcX !== undefined ? hit.srcX : att.x;
+    const dir = Math.sign(this.x - srcX) || -this.facing;
+    if (!(dir !== this.facing || Math.abs(this.x - srcX) < 8)) return false;
+    const backKey = this.facing === 1 ? 'left' : 'right';
+    return this.state === 'guard' || this.state === 'blockstun' ||
+      ((this.state === 'idle' || this.state === 'walk') && this.ctrl.held(backKey) && !this.ctrl.held(backKey === 'left' ? 'right' : 'left'));
   }
 
   launch(dir, l) {

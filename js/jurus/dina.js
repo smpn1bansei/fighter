@@ -27,7 +27,7 @@ JUTSU.flashupper = function (f) {
         if (rectsOverlap(f.boxRect([90, 160, 150, 260]), vic.hurtbox())) {
           f.setPose('uppercut');
           const p = f.at(90, 230);
-          sc.applyHit(f, vic, { dmg: 130, kd: true, launch: [3, -25], heavy: true, hitstop: 12, chip: 0.2, blockstun: 18, push: 10, srcX: f.x, x: p.x, y: p.y, noGain: true });
+          sc.applyHit(f, vic, { dmg: 120, kd: true, launch: [3, -25], heavy: true, hitstop: 12, chip: 0.2, blockstun: 18, push: 10, srcX: f.x, x: p.x, y: p.y, noGain: true });
           zapAt(sc, p.x, p.y, 0xffe066);
           fx.image('fx_slash', p.x, p.y - 40, { tint: 0xdff6ff, from: 1, to: 2.2, ms: 280, angle: -70 });
           sc.shake(280, 0.014);
@@ -125,8 +125,7 @@ class TurboTornado extends Actor {
     if (rectsOverlap(this.rect(), vic.hurtbox())) {
       // tidak bisa ditahan perisai; yang menangkis hanya menerima setengah damage
       this.guarded = vic.state === 'guard' || vic.state === 'blockstun';
-      if (this.guarded) sc.fx.popup(vic.x, vic.y - 330, 'SETENGAH DAMAGE', '#bff4ff', 26);
-      sc.applyHit(f, vic, { dmg: this.guarded ? 15 : 30, hitstun: 40, heavy: true, unblockable: true, hitstop: 8, push: 0, srcX: this.x, x: vic.x, y: vic.y - 160, noGain: true });
+      sc.applyHit(f, vic, { dmg: 30, hitstun: 40, heavy: true, hitstop: 8, push: 0, srcX: this.x, x: vic.x, y: vic.y - 160, noGain: true });
       this.phase = 'carry';
       this.pt = 0;
       this.vx = Math.sign(this.vx) * 15;

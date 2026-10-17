@@ -10,11 +10,12 @@ window.CFG = (function () {
 
   return {
     W,
+    NATIVE_W: W, // lebar asli layar HP ini (W bisa disamakan saat main online)
     H,
     TITLE: 'SEIKIJANG FIGHTER',
     SUBTITLE: 'PERTARUNGAN NINJA SEKOLAH',
     BANNER_TEXT: 'SEIKIJANG FIGHTER', // tulisan pada spanduk di arena
-    VERSION: '2.5',
+    VERSION: '2.7',
 
     ROUND_TIME: 99,       // detik per ronde
     ROUNDS_TO_WIN: 2,     // menang 2 ronde = menang pertandingan

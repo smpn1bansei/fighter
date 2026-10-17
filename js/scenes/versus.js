@@ -39,9 +39,12 @@ class VersusScene extends Phaser.Scene {
 
     const na = UI.title(this, W * 0.24, H - 92, a.name, 64, UI.hex(a.color)).setAlpha(0);
     const nb = UI.title(this, W * 0.76, H - 92, b.name, 64, UI.hex(b.color)).setAlpha(0);
-    const la = UI.text(this, W * 0.24, H - 40, 'KAMU', 14, '#ffffff').setAlpha(0);
+    const on = this.match.online;
+    if (on) Net.watch(this);
+    const la = UI.text(this, W * 0.24, H - 40, on && this.match.side === 1 ? 'TEMAN' : 'KAMU', 14, '#ffffff').setAlpha(0);
     const arc = this.match.arcade;
-    const lb = UI.text(this, W * 0.76, H - 40, 'CPU - ' + diff.name, 14, '#ffffff').setAlpha(0);
+    const lb = UI.text(this, W * 0.76, H - 40, on ? (this.match.side === 1 ? 'KAMU' : 'TEMAN') : 'CPU - ' + diff.name, 14, '#ffffff').setAlpha(0);
+    if (on) UI.title(this, W / 2, 46, 'VS ONLINE', 40, '#4cd964').setDepth(5);
     if (arc) {
       const last = arc.index === arc.order.length - 1;
       const st = UI.title(this, W / 2, 46, last ? 'ARCADE - PERTARUNGAN TERAKHIR!' : 'ARCADE - LAWAN ' + (arc.index + 1) + ' / ' + arc.order.length, 40, last ? '#ff6a6a' : '#d9b8ff');

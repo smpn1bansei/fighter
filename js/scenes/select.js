@@ -12,6 +12,8 @@ class SelectScene extends Phaser.Scene {
     this.cpu = null;
     this.cursor = 0;
     this.diff = Store.get('difficulty', 1);
+    this.friend = null; // pilihan teman (mode online)
+    this.friendW = 0;
     if (data && data.p1) {
       this.p1 = data.p1;
       this.cursor = ROSTER.findIndex((c) => c.id === data.p1);
@@ -94,7 +96,45 @@ class SelectScene extends Phaser.Scene {
     UI.soundToggle(this, W - 90, 46);
     UI.fullscreenToggle(this, W - 246, 46);
     if (this.p1) this.step = 2;
+    if (this.mode === 'online') this.setupOnline();
     this.refresh();
+  }
+
+  // ---- mode online: masing-masing memilih karakter di HP sendiri
+  setupOnline() {
+    Net.watch(this);
+    this.p1 = null;
+    this.step = 1;
+    Net.on('pick', (d) => {
+      this.friend = d.id;
+      this.friendW = d.w;
+      if (d.id) Sound.play('select');
+      this.refresh();
+      this.tryStart();
+    });
+    Net.on('go', (d) => this.startOnline(d));
+    this.events.once('shutdown', () => { Net.off('pick'); Net.off('go'); });
+  }
+
+  // Tuan rumah memulai pertandingan setelah keduanya memilih
+  tryStart() {
+    if (!Net.isHost || !this.p1 || !this.friend || this.leaving) return;
+    Net.mid++;
+    const d = { t: 'go', p1: this.p1, p2: this.friend, w: Math.min(CFG.NATIVE_W, this.friendW || CFG.NATIVE_W), mid: Net.mid };
+    Net.send(d);
+    this.startOnline(d);
+  }
+
+  startOnline(d) {
+    if (this.leaving) return;
+    this.leaving = true;
+    Net.mid = d.mid;
+    Sound.play('confirm');
+    this.cameras.main.fadeOut(250, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      Net.setWidth(d.w);
+      this.scene.start('Versus', { online: true, p1: d.p1, cpu: d.p2, diff: 1, side: Net.isHost ? 0 : 1, mid: d.mid });
+    });
   }
 
   makePanel(side) {
@@ -105,7 +145,7 @@ class SelectScene extends Phaser.Scene {
     const color = side === 0 ? 0x4aa8ff : 0xff4d4d;
     g.fillStyle(color, 0.12).fillRoundedRect(-148, 120, 296, 496, 16);
     g.lineStyle(3, color, 0.7).strokeRoundedRect(-148, 120, 296, 496, 16);
-    const label = UI.text(this, 0, 142, side === 0 ? 'KAMU' : 'KOMPUTER', 14, UI.hex(color));
+    const label = UI.text(this, 0, 142, side === 0 ? 'KAMU' : this.mode === 'online' ? 'TEMAN' : 'KOMPUTER', 14, UI.hex(color));
     const img = this.add.image(0, 548, 'bg').setOrigin(0.5, 1).setVisible(false);
     const q = UI.title(this, 0, 360, '?', 120, '#3a3760');
     const name = UI.title(this, 0, 572, '', 34, '#ffffff');
@@ -246,6 +286,15 @@ class SelectScene extends Phaser.Scene {
       return;
     }
     Sound.play('confirm');
+    if (this.mode === 'online') {
+      if (this.step !== 1) return;
+      this.p1 = c.id;
+      this.step = 3;
+      Net.send({ t: 'pick', id: c.id, w: CFG.NATIVE_W });
+      this.refresh();
+      this.tryStart();
+      return;
+    }
     if (this.step === 1) {
       this.p1 = c.id;
       if (this.mode === 'arcade') {
@@ -265,11 +314,21 @@ class SelectScene extends Phaser.Scene {
   }
 
   back() {
+    if (this.leaving) return;
     if (this.step === 1) {
+      Net.close();
       this.scene.start('Title');
       return;
     }
     Sound.play('back');
+    if (this.mode === 'online') {
+      Net.send({ t: 'pick', id: null });
+      this.cursor = ROSTER.findIndex((c) => c.id === this.p1);
+      this.p1 = null;
+      this.step = 1;
+      this.refresh();
+      return;
+    }
     if (this.step === 3 && this.mode === 'arcade') {
       this.cursor = ROSTER.findIndex((c) => c.id === this.p1);
       this.p1 = null;
@@ -312,6 +371,7 @@ class SelectScene extends Phaser.Scene {
   refresh() {
     const cur = ROSTER[this.cursor];
     const arc = this.mode === 'arcade';
+    if (this.mode === 'online') { this.refreshOnline(cur); return; }
     const headers = ['', arc ? 'ARCADE: PILIH KARAKTER' : 'PILIH KARAKTERMU', 'PILIH LAWANMU', arc ? 'SIAP MENANTANG SEMUA?' : 'SIAP BERTARUNG?'];
     const nOpp = ROSTER.filter((c) => !c.locked).length - 1;
     const subs = ['', arc ? 'Pilih jagoanmu untuk melawan ' + nOpp + ' karakter berturut-turut' : 'Sentuh kotak karakter, lalu tekan PILIH',
@@ -376,6 +436,47 @@ class SelectScene extends Phaser.Scene {
       this.diffBtns.forEach((b, i) => b.setFocus(i === this.diff));
       this.diffDesc.setText(CFG.DIFFICULTY[this.diff].desc);
     }
+    this.refreshButtons();
+  }
+
+  refreshOnline(cur) {
+    const fr = this.friend ? getChar(this.friend) : null;
+    this.header.setText(this.step === 1 ? 'VS ONLINE: PILIH KARAKTERMU' : 'MENUNGGU TEMAN...');
+    this.subheader.setText(this.step === 1 ? 'Sentuh kotak karakter, lalu tekan PILIH'
+      : fr ? 'Pertandingan segera dimulai!' : 'Temanmu sedang memilih karakter di HP-nya');
+    this.setPanel(this.panels[0], this.step === 1 ? cur : getChar(this.p1), this.step >= 3);
+    this.setPanel(this.panels[1], fr, !!fr);
+    if (!fr) { this.panels[1].name.setText('...'); this.panels[1].title.setText('SEDANG MEMILIH'); }
+    this.slots.forEach((s, i) => {
+      const g = s.g, half = s.size / 2;
+      const isCur = i === this.cursor && this.step === 1;
+      const isMe = s.char.id === this.p1, isFr = s.char.id === this.friend;
+      g.clear();
+      g.fillStyle(s.char.locked ? 0x16152a : 0x24223f, 1).fillRoundedRect(-half, -half, s.size, s.size, 10);
+      let col = 0x3a3760, w = 2;
+      if (isMe) { col = 0x4aa8ff; w = 4; }
+      if (isFr) { col = 0xff4d4d; w = 4; }
+      if (isCur) { col = 0x4aa8ff; w = 5; }
+      g.lineStyle(w, col, 1).strokeRoundedRect(-half, -half, s.size, s.size, 10);
+      s.badge.setText(isMe && isFr ? 'KAMU/TEMAN' : isMe ? 'KAMU' : isFr ? 'TEMAN' : '');
+      s.badge.setColor(isMe ? '#4aa8ff' : '#ff4d4d');
+      s.c.setScale(isCur ? 1.08 : 1);
+    });
+    this.info.setVisible(true);
+    this.diffBox.setVisible(false);
+    if (!cur.locked) {
+      this.infoName.setText(cur.name).setColor(UI.hex(cur.color));
+      this.infoElem.setText('ELEMEN: ' + cur.element);
+      this.infoDesc.setText(cur.desc);
+      this.infoJ.setText('JURUS: ' + cur.jurus.name);
+      this.infoU.setText('PAMUNGKAS: ' + cur.ulti.name);
+    }
+    this.pickBtn.setVisible(this.step === 1);
+    this.pickBtn.x = 168;
+    this.startBtn.setVisible(false);
+  }
+
+  refreshButtons() {
     // tombol PILIH berada di bawah panel pemain yang sedang dipilih
     this.pickBtn.setVisible(this.step < 3);
     this.pickBtn.x = this.step === 1 ? 168 : CFG.W - 168;

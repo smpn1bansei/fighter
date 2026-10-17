@@ -88,7 +88,7 @@ class FireBasket extends Actor {
     sc.fx.flameAt(this.x - Math.sign(this.vx) * 24 + rnd(-8, 8), this.y + rnd(-16, 16), this.t % 2 ? 0xff5a1a : 0xffb030);
     if (this.clash()) return false;
     if (rectsOverlap(this.rect(), vic.hurtbox())) {
-      sc.applyHit(f, vic, { dmg: 115, kd: true, launch: [9, -10], heavy: true, hitstop: 9, chip: 0.25, blockstun: 18, push: 12, srcX: this.x, x: this.x, y: this.y, noGain: true });
+      sc.applyHit(f, vic, { dmg: 140, kd: true, launch: [9, -10], heavy: true, hitstop: 9, chip: 0.25, blockstun: 18, push: 12, srcX: this.x, x: this.x, y: this.y, noGain: true });
       sc.shake(200, 0.01);
       this.explode();
       return false;

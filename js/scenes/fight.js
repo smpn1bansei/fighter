@@ -14,6 +14,8 @@ class FightScene extends Phaser.Scene {
     this.pausePanel = null;
     this.pauseMenu = null;
     this.resultMenu = null;
+    this.wantAgain = false;
+    this.friendAgain = false;
   }
 
   create() {
@@ -41,12 +43,26 @@ class FightScene extends Phaser.Scene {
 
     const d1 = getChar(this.match.p1), d2 = getChar(this.match.cpu);
     const diff = CFG.DIFFICULTY[this.match.diff];
-    this.touch = new TouchPad(this, d1.color);
+    // online: tuan rumah = pemain kiri (p1), teman yang bergabung = pemain kanan (p2)
+    this.online = !!this.match.online;
+    this.side = this.online ? this.match.side : 0;
+    this.touch = new TouchPad(this, (this.side === 0 ? d1 : d2).color);
     const pc = new PlayerController(this, this.touch);
-    const ai = new AIController(this, this.match.diff);
-    this.p1 = new Fighter(this, d1, 0, W * 0.3, pc, {});
-    this.p2 = new Fighter(this, d2, 1, W * 0.7, ai, { cpu: true, dmgMult: diff.dmg, tint: d1.id === d2.id ? 0xc9b6ff : null });
-    ai.bind(this.p2);
+    const tint2 = d1.id === d2.id ? 0xc9b6ff : null;
+    if (this.online) {
+      this.pc = pc;
+      this.p1 = new Fighter(this, d1, 0, W * 0.3, new NetController(), {});
+      this.p2 = new Fighter(this, d2, 1, W * 0.7, new NetController(), { tint: tint2 });
+    } else {
+      const ai = new AIController(this, this.match.diff);
+      this.p1 = new Fighter(this, d1, 0, W * 0.3, pc, {});
+      this.p2 = new Fighter(this, d2, 1, W * 0.7, ai, { cpu: true, dmgMult: diff.dmg, tint: tint2 });
+      ai.bind(this.p2);
+    }
+    this.me = this.side === 0 ? this.p1 : this.p2;
+    // penjadwal berbasis langkah logika (sama persis di kedua HP saat online)
+    this.lf = 0;
+    this.sched = [];
 
     this.wins = [0, 0];
     this.round = 1;
@@ -59,7 +75,7 @@ class FightScene extends Phaser.Scene {
     this.buildHud();
 
     this.events.on('nochakra', (f) => {
-      if (f !== this.p1 || this.noChakraCD > 0) return;
+      if (f !== this.me || this.noChakraCD > 0) return;
       this.noChakraCD = 40;
       Sound.play('locked');
       this.fx.popup(f.x, f.y - 320, 'CAKRA KURANG!', '#9fb2d8', 26);
@@ -74,12 +90,105 @@ class FightScene extends Phaser.Scene {
     this.input.on('pointerdown', (p) => {
       if (!this.paused && this.touch.hitPause(p.x, p.y)) this.togglePause();
     });
-    const autoPause = () => { if (!this.paused && this.phase !== 'over') this.togglePause(); };
+    const autoPause = () => { if (!this.online && !this.paused && this.phase !== 'over') this.togglePause(); };
     this.game.events.on('hidden', autoPause);
     this.events.once('shutdown', () => this.game.events.off('hidden', autoPause));
 
+    if (this.online) this.setupNet();
     Sound.music('fight');
     this.startRound(true);
+  }
+
+  // Jalankan fn setelah ms (dihitung dalam langkah logika, bukan waktu nyata).
+  after(ms, fn) {
+    this.sched.push({ at: this.lf + Math.round(ms / CFG.STEP_MS), fn });
+  }
+
+  // ------------------------------------------------------------------
+  // Main online (lockstep): tiap HP hanya mengirim tombol yang ditekan per langkah.
+  // Kedua HP menjalankan langkah logika yang sama dengan masukan yang sama, sehingga
+  // hasilnya sama. Masukan sendiri ditunda DELAY langkah agar masukan teman sempat tiba.
+  // ------------------------------------------------------------------
+  setupNet() {
+    this.DELAY = 4;
+    this.nf = 0;
+    this.lq = {};
+    this.rq = {};
+    this.snaps = {};
+    this.stall = 0;
+    this.mid = this.match.mid;
+    for (let f = 0; f < this.DELAY; f++) { this.lq[f] = 0; this.rq[f] = 0; }
+    this.netWait = UI.text(this, CFG.W / 2, CFG.H * 0.6, 'MENUNGGU TEMAN...', 18, '#ffffff').setDepth(120).setVisible(false);
+    Net.watch(this);
+    Net.on('i', (d) => { if (d.mid === this.mid) this.rq[d.f] = d.m; });
+    Net.on('s', (d) => { if (d.mid === this.mid) this.snaps[d.f] = d.d; });
+    Net.on('again', (d) => {
+      if (d.mid !== this.mid) return;
+      this.friendAgain = true;
+      if (!this.wantAgain) UI.toast(this, 'Temanmu ingin TANDING ULANG!', '#ffc83d');
+      this.checkAgain();
+    });
+    Net.on('reselect', () => {
+      if (this.leaving) return;
+      UI.toast(this, 'Temanmu memilih GANTI KARAKTER', '#ffc83d');
+      this.time.delayedCall(900, () => this.leave('Select', { mode: 'online' }));
+    });
+    this.events.once('shutdown', () => ['i', 's', 'again', 'reselect'].forEach((t) => Net.off(t)));
+  }
+
+  // Langkah berikutnya boleh dijalankan bila masukan teman untuk langkah itu sudah tiba.
+  netReady() {
+    if (this.rq[this.nf] === undefined) return false;
+    const prev = this.nf - 1;
+    if (!Net.isHost && prev > 0 && prev % 60 === 0 && !this.snaps[prev]) return false;
+    return true;
+  }
+
+  netStep() {
+    const f = this.nf, prev = f - 1;
+    // HP teman menyamakan keadaan dengan tuan rumah tiap 1 detik (jaga-jaga selisih kecil)
+    if (!Net.isHost && prev > 0 && prev % 60 === 0) {
+      this.applySnap(this.snaps[prev]);
+      delete this.snaps[prev];
+    }
+    this.pc.poll();
+    const m = this.paused || this.phase === 'over' ? 0 : encodeInput(this.pc);
+    this.lq[f + this.DELAY] = m;
+    Net.send({ t: 'i', mid: this.mid, f: f + this.DELAY, m });
+    const other = this.me === this.p1 ? this.p2 : this.p1;
+    this.me.ctrl.feed(this.lq[f]);
+    other.ctrl.feed(this.rq[f]);
+    delete this.lq[f];
+    delete this.rq[f];
+    this.logic();
+    if (Net.isHost && f > 0 && f % 60 === 0) Net.send({ t: 's', mid: this.mid, f, d: this.snapData() });
+    this.nf++;
+  }
+
+  snapData() {
+    const d = [];
+    [this.p1, this.p2].forEach((p) => d.push(p.x, p.y, p.vx, p.vy, p.hp, p.chakra, p.facing));
+    d.push(this.timer, this.timerFrames);
+    return d;
+  }
+
+  applySnap(d) {
+    if (!d) return;
+    const keys = ['x', 'y', 'vx', 'vy', 'hp', 'chakra', 'facing'];
+    [this.p1, this.p2].forEach((p, i) => keys.forEach((k, j) => {
+      const v = d[i * 7 + j];
+      if (!Number.isFinite(v)) return;
+      if (p[k] !== v) Net.resyncs = (Net.resyncs || 0) + 1; // selisih (seharusnya 0)
+      p[k] = v;
+    }));
+    this.timer = d[14];
+    this.timerFrames = d[15];
+  }
+
+  checkAgain() {
+    if (!this.wantAgain || !this.friendAgain || this.leaving) return;
+    Net.mid++;
+    this.leave('Versus', Object.assign({}, this.match, { mid: Net.mid }));
   }
 
   // ------------------------------------------------------------------
@@ -113,11 +222,11 @@ class FightScene extends Phaser.Scene {
     }
     const final = this.wins[0] === CFG.ROUNDS_TO_WIN - 1 && this.wins[1] === CFG.ROUNDS_TO_WIN - 1;
     const delay = first ? 1700 : 500;
-    this.time.delayedCall(delay, () => {
+    this.after(delay, () => {
       Sound.play('round');
       this.announce(final ? 'RONDE FINAL' : 'RONDE ' + this.round, '#ffffff', 96, 1000);
     });
-    this.time.delayedCall(delay + 1300, () => {
+    this.after(delay + 1300, () => {
       Sound.play('fight');
       this.announce('MULAI!', '#ffc83d', 130, 600);
       this.p1.setState('idle');
@@ -134,9 +243,9 @@ class FightScene extends Phaser.Scene {
     Sound.play('ko');
     this.flash(300, 255, 255, 255);
     this.timeScale = 0.3;
-    this.time.delayedCall(900, () => { this.timeScale = 1; });
+    this.after(270, () => { this.timeScale = 1; });
     this.announce('K.O.!', '#ff4d4d', 170, 1400);
-    this.time.delayedCall(2600, () => this.endRound(att.side));
+    this.after(1970, () => this.endRound(att.side));
   }
 
   timeUp() {
@@ -145,7 +254,7 @@ class FightScene extends Phaser.Scene {
     Sound.play('round');
     this.announce('WAKTU HABIS!', '#ffc83d', 90, 1300);
     const w = this.p1.hp > this.p2.hp ? 0 : this.p2.hp > this.p1.hp ? 1 : -1;
-    this.time.delayedCall(1900, () => this.endRound(w));
+    this.after(1900, () => this.endRound(w));
   }
 
   endRound(w) {
@@ -163,7 +272,7 @@ class FightScene extends Phaser.Scene {
     } else {
       this.announce('SERI!', '#ffffff', 110, 1400);
     }
-    this.time.delayedCall(2300, () => {
+    this.after(2300, () => {
       if (w >= 0 && this.wins[w] >= CFG.ROUNDS_TO_WIN) this.matchEnd(w);
       else {
         if (w >= 0) this.round++;
@@ -176,7 +285,20 @@ class FightScene extends Phaser.Scene {
   // Loop utama: logika tetap 60 langkah/detik apa pun kecepatan layar HP
   // ------------------------------------------------------------------
   update(time, delta) {
-    if (!this.paused) {
+    if (this.online) {
+      this.acc += Math.min(delta, 100) * this.timeScale;
+      // tertinggal dari teman: kejar dengan satu langkah tambahan
+      if (this.rq[this.nf + this.DELAY + 3] !== undefined) this.acc += CFG.STEP_MS;
+      let n = 0;
+      while (this.acc >= CFG.STEP_MS && n < 6) {
+        if (!this.netReady()) { this.acc = CFG.STEP_MS; break; }
+        this.acc -= CFG.STEP_MS;
+        this.netStep();
+        n++;
+      }
+      this.stall = n > 0 ? 0 : this.stall + delta;
+      this.netWait.setVisible(this.stall > 500 && !this.leaving && !this.netLost);
+    } else if (!this.paused) {
       this.acc += Math.min(delta, 100) * this.timeScale;
       let n = 0;
       while (this.acc >= CFG.STEP_MS && n < 6) {
@@ -192,6 +314,12 @@ class FightScene extends Phaser.Scene {
   }
 
   logic() {
+    this.lf++;
+    if (this.sched.length && this.sched.some((s) => s.at <= this.lf)) {
+      const due = this.sched.filter((s) => s.at <= this.lf);
+      this.sched = this.sched.filter((s) => s.at > this.lf);
+      due.forEach((s) => s.fn());
+    }
     if (this.noChakraCD > 0) this.noChakraCD--;
     if (this.chakraWarn > 0) this.chakraWarn--;
     if (this.freeze) return;
@@ -214,7 +342,7 @@ class FightScene extends Phaser.Scene {
         if (this.timer <= 0) this.timeUp();
       }
     }
-    this.touch.setAvailability(this.p1.chakra, this.p1.def.jurus.cost, this.p1.def.ulti.cost);
+    this.touch.setAvailability(this.me.chakra, this.me.def.jurus.cost, this.me.def.ulti.cost);
   }
 
   // Petarung tidak boleh saling tembus saat berdiri berdekatan.
@@ -265,6 +393,27 @@ class FightScene extends Phaser.Scene {
     // hit.guard: 'full' = tembus tangkisan (damage penuh), 'half' = tembus tangkisan (setengah damage)
     // hit.half : pengali damage tambahan (serangan lanjutan dari jurus yang tadinya ditangkis)
     this.lastGuarded = false;
+    // Jurus & ulti: bisa ditangkis, tetapi lawan tetap terkena sebagian damage total jurus
+    // (def.jurus/ulti.dmg x chip). Setelah ditangkis, sisa hit jurus yang sama tidak memberi damage.
+    const jk = hit.noGain && !hit.normal && att.jutsuKind;
+    const jd = jk && att.def[jk];
+    if (jd && !jd.unblockable) {
+      if (att.jutsuBlocked === att.jutsuSeq) { this.lastGuarded = true; return 'block'; }
+      const clean = Object.assign({}, hit, { guard: null, unblockable: false });
+      if (vic.hurtbox() && vic.canBlock(att, clean)) {
+        att.jutsuBlocked = att.jutsuSeq;
+        this.lastGuarded = true;
+        const res = vic.receive(att, { dmg: jd.dmg, chip: jd.chip, blockstun: 22, push: 8, srcX: hit.srcX });
+        const cx = hit.x !== undefined ? hit.x : vic.x;
+        const cy = hit.y !== undefined ? hit.y : vic.y - 180;
+        this.fx.block(cx, cy, vic.def.color2);
+        this.fx.popup(vic.x, vic.y - 380, 'DITAHAN: KENA ' + Math.round(jd.chip * 100) + '%', '#bff4ff', 26);
+        Sound.play('block');
+        this.hitstop = Math.max(this.hitstop, 6);
+        return res;
+      }
+      hit = clean;
+    }
     const guarding = vic.onGround && (vic.state === 'guard' || vic.state === 'blockstun');
     if (hit.guard && guarding && vic.hurtbox()) {
       hit = Object.assign({}, hit, { unblockable: true });
@@ -363,13 +512,11 @@ class FightScene extends Phaser.Scene {
     txt.x += fromLeft ? 120 : -120;
     this.tweens.add({ targets: txt, x: fromLeft ? W * 0.62 : W * 0.38, duration: 380, delay: 260, ease: 'Cubic.easeOut' });
     lines.forEach((l) => this.tweens.add({ targets: l, x: fromLeft ? l.x + 900 : l.x - 900, duration: 1300, ease: 'Linear' }));
+    this.after(1450, () => { this.freeze = false; });
     this.time.delayedCall(1250, () => {
       this.tweens.add({
         targets: c, alpha: 0, duration: 200,
-        onComplete: () => {
-          c.destroy();
-          this.freeze = false;
-        },
+        onComplete: () => c.destroy(),
       });
       this.tweens.add({ targets: this.dim, alpha: 0.45, duration: 200 });
       this.time.delayedCall(2300, () => this.tweens.add({ targets: this.dim, alpha: 0, duration: 400 }));
@@ -377,7 +524,7 @@ class FightScene extends Phaser.Scene {
   }
 
   showCombo(att, n) {
-    if (att === this.p1) this.maxCombo = Math.max(this.maxCombo, n);
+    if (att === this.me) this.maxCombo = Math.max(this.maxCombo, n);
     const W = CFG.W;
     const x = att.side === 0 ? 210 : W - 210;
     if (!this.comboText) this.comboText = [null, null];
@@ -455,7 +602,7 @@ class FightScene extends Phaser.Scene {
       const full = f.chakra >= CFG.MAX_CHAKRA;
       para(cx0 - 3, cy - 3, cw + 6, ch + 6, sk * 0.6, 0x000000, 0.7);
       para(cx0, cy, cw, ch, sk * 0.6, 0x0c2238, 1);
-      const warn = i === 0 && this.chakraWarn > 0 && Math.floor(this.chakraWarn / 4) % 2 === 0;
+      const warn = i === this.side && this.chakraWarn > 0 && Math.floor(this.chakraWarn / 4) % 2 === 0;
       const ccol = warn ? 0xff4d4d : full ? (Math.sin(time / 90) > 0 ? 0xffd75a : 0xfff3b0) : 0x3fd0ff;
       const cww = cw * ck;
       if (i === 0) para(cx0, cy, cww, ch, sk * 0.6, ccol, 1);
@@ -499,6 +646,7 @@ class FightScene extends Phaser.Scene {
 
   togglePause() {
     if (this.phase === 'over' || this.leaving) return;
+    if (this.online) { this.toggleOnlineMenu(); return; }
     if (this.paused) {
       this.paused = false;
       this.time.paused = false;
@@ -531,17 +679,44 @@ class FightScene extends Phaser.Scene {
     this.pauseMenu = UI.menu(this, btns);
   }
 
+  // Menu saat online: pertarungan tidak berhenti (temanmu tetap bermain).
+  toggleOnlineMenu() {
+    if (this.paused) {
+      this.paused = false;
+      this.touch.setEnabled(true);
+      if (this.pauseMenu) this.pauseMenu.destroy();
+      if (this.pausePanel) this.pausePanel.destroy();
+      this.pausePanel = null;
+      return;
+    }
+    this.paused = true;
+    this.touch.setEnabled(false);
+    Sound.play('select');
+    const W = CFG.W;
+    const c = this.panel('MENU', '#ffffff');
+    c.add(UI.text(this, W / 2, 222, 'Pertarungan online tetap berjalan', 12, '#cfd5ea'));
+    const btns = [
+      UI.button(this, W / 2, 320, 340, 64, 'LANJUTKAN', () => this.toggleOnlineMenu(), { size: 18 }),
+      UI.button(this, W / 2, 400, 340, 64, 'KELUAR', () => { Net.close(); this.leave('Title'); }, { size: 16, color: 0xff6a6a }),
+    ];
+    btns.forEach((b) => c.add(b));
+    c.add(UI.soundToggle(this, W / 2, 490));
+    this.pausePanel = c;
+    this.pauseMenu = UI.menu(this, btns);
+  }
+
   matchEnd(w) {
     this.phase = 'over';
     this.inputLocked = true;
     this.touch.setEnabled(false);
     const W = CFG.W, H = CFG.H;
-    const won = w === 0;
-    const winner = won ? this.p1 : this.p2;
+    if (this.paused && this.online) this.toggleOnlineMenu();
+    const won = w === this.side;
+    const winner = w === 0 ? this.p1 : this.p2;
     Sound.music(null);
     Sound.play(won ? 'heal' : 'back');
     const c = this.panel(won ? 'KAMU MENANG!' : 'KAMU KALAH...', won ? '#ffd75a' : '#ff6a6a');
-    const loser = won ? this.p2 : this.p1;
+    const loser = winner === this.p1 ? this.p2 : this.p1;
     // pemenang: cahaya di belakang & melompat-lompat gembira
     const glow = this.add.image(W * 0.2, H - 260, 'fx_glow').setTint(winner.def.color).setBlendMode(Phaser.BlendModes.ADD).setScale(5).setAlpha(0.45);
     this.tweens.add({ targets: glow, scale: 5.8, alpha: 0.25, duration: 800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
@@ -570,7 +745,20 @@ class FightScene extends Phaser.Scene {
     const title = c.titleText;
     const arc = this.match.arcade;
     let btns;
-    if (arc) {
+    if (this.online) {
+      const again = () => {
+        if (this.wantAgain) return;
+        this.wantAgain = true;
+        Net.send({ t: 'again', mid: this.mid });
+        stats.setText(this.friendAgain ? 'Memulai ulang...' : 'Menunggu temanmu menekan TANDING ULANG...');
+        this.checkAgain();
+      };
+      btns = [
+        UI.button(this, W / 2, 380, 360, 66, 'TANDING ULANG', again, { size: 18, color: 0xff6a2a }),
+        UI.button(this, W / 2, 462, 360, 62, 'GANTI KARAKTER', () => { Net.send({ t: 'reselect' }); this.leave('Select', { mode: 'online' }); }, { size: 16 }),
+        UI.button(this, W / 2, 540, 360, 62, 'KELUAR', () => { Net.close(); this.leave('Title'); }, { size: 16 }),
+      ];
+    } else if (arc) {
       const done = arc.index + 1;
       const total = arc.order.length;
       if (won && done >= total) {

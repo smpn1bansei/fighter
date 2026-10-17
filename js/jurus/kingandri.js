@@ -40,7 +40,7 @@ JUTSU.kamehameha = function (f) {
         if (t >= 31 && t <= 61 && (t - 31) % 5 === 0 && rectsOverlap(beamRect(f, hand, len * grow, 72), f.opp.hurtbox())) {
           const last = t === 61;
           sc.applyHit(f, f.opp, last
-            ? { dmg: 60, kd: true, launch: [10, -9], heavy: true, hitstop: 10, chip: 0.2, blockstun: 16, push: 10, srcX: hand.x, x: f.opp.x, y: hand.y, noGain: true }
+            ? { dmg: 64, kd: true, launch: [10, -9], heavy: true, hitstop: 10, chip: 0.2, blockstun: 16, push: 10, srcX: hand.x, x: f.opp.x, y: hand.y, noGain: true }
             : { dmg: 16, hitstun: 22, blockstun: 12, push: 3, chip: 0.2, hitstop: 2, srcX: hand.x, x: f.opp.x - f.facing * 20, y: hand.y, noGain: true });
         }
         if (t >= 78) { beam.destroy(); beam = null; }

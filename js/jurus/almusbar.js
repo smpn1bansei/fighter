@@ -102,7 +102,7 @@ JUTSU.thunderkick = function (f) {
       if (t === 35) {
         f.setPose('soccer');
         const p = f.at(150, 70);
-        new ThunderBall(f, p.x, p.y, { shatter: true });
+        new ThunderBall(f, p.x, p.y, {});
         fx.shock(p.x, f.ground, 0x7fd8ff, 2.4);
         Sound.play('heavy');
         Sound.play('shuriken');

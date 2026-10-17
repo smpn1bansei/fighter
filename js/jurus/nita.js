@@ -72,7 +72,7 @@ class ArrowShot extends Actor {
     if (rectsOverlap(this.rect(), vic.hurtbox())) {
       if (!this.thunder) {
         // lawan jatuh walau menangkis (setengah damage)
-        sc.applyHit(f, vic, { dmg: 110, kd: true, launch: [9, -11], heavy: true, guard: 'half', srcX: this.x, x: this.x, y: this.y, hitstop: 7, noGain: true });
+        sc.applyHit(f, vic, { dmg: 120, kd: true, launch: [9, -11], heavy: true, guard: 'half', srcX: this.x, x: this.x, y: this.y, hitstop: 7, noGain: true });
         this.explode();
         return false;
       }

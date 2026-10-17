@@ -74,7 +74,7 @@ JUTSU.thunderdash = function (f) {
         if (rectsOverlap(f.boxRect([90, 150, 150, 260]), f.opp.hurtbox())) {
           vic = f.opp;
           f.setPose('zap');
-          sc.applyHit(f, vic, { dmg: 40, hitstun: 50, heavy: true, guard: 'half', hitstop: 8, push: 0, srcX: f.x, x: vic.x, y: vic.y - 160, noGain: true });
+          sc.applyHit(f, vic, { dmg: 30, hitstun: 50, heavy: true, guard: 'half', hitstop: 8, push: 0, srcX: f.x, x: vic.x, y: vic.y - 160, noGain: true });
           this.half = sc.lastGuarded ? 0.5 : 0;
           Sound.play('explosion');
           phase = 'shock';
@@ -93,7 +93,7 @@ JUTSU.thunderdash = function (f) {
         if (pt % 6 === 0) Sound.play('shuriken');
         if (pt >= 30 || vic.ko) {
           vic.tintOverride = null;
-          sc.applyHit(f, vic, { dmg: 100, kd: true, launch: [6, -10], heavy: true, force: true, half: this.half, hitstop: 12, srcX: f.x, x: vic.x, y: vic.y - 150, noGain: true });
+          sc.applyHit(f, vic, { dmg: 90, kd: true, launch: [6, -10], heavy: true, force: true, half: this.half, hitstop: 12, srcX: f.x, x: vic.x, y: vic.y - 150, noGain: true });
           sc.shake(320, 0.016);
           phase = 'end';
           pt = 0;

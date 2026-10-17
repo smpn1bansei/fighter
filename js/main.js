@@ -43,7 +43,7 @@
       render: { antialias: true, powerPreference: 'high-performance' },
       disableContextMenu: true,
       banner: false,
-      scene: [BootScene, TitleScene, SelectScene, VersusScene, FightScene],
+      scene: [BootScene, TitleScene, OnlineScene, SelectScene, VersusScene, FightScene],
     });
   };
   // Tunggu font pixel siap agar teks tidak tampil dengan font cadangan.

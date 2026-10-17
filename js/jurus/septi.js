@@ -19,7 +19,7 @@ JUTSU.fangust = function (f) {
         const p = f.at(150, 170);
         new ColorBlade(f, p.x, p.y, {
           tint: 0xffffff, tint2: 0x9fe8ff, s: 1.35, speed: 13,
-          hit: { dmg: 100, kd: true, launch: [9, -13], heavy: true, hitstop: 8, chip: 0.2, blockstun: 16, push: 12 },
+          hit: { dmg: 120, kd: true, launch: [9, -13], heavy: true, hitstop: 8, chip: 0.2, blockstun: 16, push: 12 },
         });
         Sound.play('wind');
         Sound.play('whoosh');

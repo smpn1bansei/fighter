@@ -112,7 +112,7 @@ JUTSU.roseblade = function (f) {
         fx.slash(p.x, p.y - 40, f.facing, 0xff3d6a);
         new ColorBlade(f, p.x, p.y, {
           tint: 0xff2a4a, tint2: 0xffa8cc, s: 1.25, speed: 14, petals: true,
-          hit: { dmg: 105, kd: true, launch: [15, -11], heavy: true, hitstop: 8, chip: 0.2, blockstun: 16, push: 12 },
+          hit: { dmg: 120, kd: true, launch: [15, -11], heavy: true, hitstop: 8, chip: 0.2, blockstun: 16, push: 12 },
         });
         Sound.play('whoosh');
         Sound.play('wind');

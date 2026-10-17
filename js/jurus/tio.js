@@ -29,12 +29,8 @@ JUTSU.flashpunch = function (f) {
           dir = f.facing;
           const p = f.at(130, 205);
           // lawan menangkis: tetap terpental, tapi damage hanya setengah
-          half = vic.state === 'guard' || vic.state === 'blockstun' ? 0.5 : 1;
-          if (half < 1) {
-            shatterShield(sc, vic, f.x);
-            fx.popup(vic.x, vic.y - 380, 'SETENGAH DAMAGE', '#bff4ff', 26);
-          }
-          sc.applyHit(f, vic, { dmg: Math.round(90 * half), hitstun: 60, heavy: true, unblockable: true, hitstop: 10, push: 0, srcX: f.x, x: p.x, y: p.y, noGain: true });
+          half = 1;
+          sc.applyHit(f, vic, { dmg: 90, hitstun: 60, heavy: true, hitstop: 10, push: 0, srcX: f.x, x: p.x, y: p.y, noGain: true });
           fx.image('fx_ring', p.x, p.y, { tint: 0xffffff, from: 0.4, to: 2.4, ms: 300 });
           sc.shake(300, 0.016);
           Sound.play('explosion');
@@ -124,9 +120,8 @@ JUTSU.skyslam = function (f) {
           f.setPose('groundpunch');
           clear();
           const x = f.x + f.facing * 60;
-          if (vic.state === 'guard' || vic.state === 'blockstun') shatterShield(sc, vic, f.x);
           if (Math.abs(vic.x - f.x) < 200) {
-            sc.applyHit(f, vic, { dmg: 280, kd: true, launch: [6, -10], heavy: true, unblockable: true, force: true, hitstop: 18, srcX: f.x, x: vic.x, y: vic.y - 200, noGain: true });
+            sc.applyHit(f, vic, { dmg: 280, kd: true, launch: [6, -10], heavy: true, hitstop: 18, srcX: f.x, x: vic.x, y: vic.y - 200, noGain: true });
           }
           Sound.play('explosion');
           Sound.play('rock');

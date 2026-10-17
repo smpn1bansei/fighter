@@ -39,8 +39,8 @@ window.ROSTER = [
     teleport: true,
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Pukulan & telapak cakra, kombo 3x', tendang: 'Melempar lawan ke ujung arena (ditangkis: tanpa damage)', khusus: 'ATAS: menghilang & muncul di belakang lawan (pakai cakra)' },
-    jurus: { type: 'rasengan', name: 'RASENGAN CAHAYA', cost: 30, range: 420, close: true, desc: 'Bola cakra yang menembus perisai & melempar lawan ke ujung arena' },
-    ulti: { type: 'rasenshuriken', name: 'RASEN-SHURIKEN HOKAGE', cost: 100, range: 1500, desc: 'Shuriken angin raksasa yang tidak bisa ditangkis' },
+    jurus: { type: 'rasengan', dmg: 160, chip: 0.2, name: 'RASENGAN CAHAYA', cost: 30, range: 420, close: true, desc: 'Bola cakra yang melempar lawan ke ujung arena' },
+    ulti: { type: 'rasenshuriken', dmg: 280, chip: 0.5, name: 'RASEN-SHURIKEN HOKAGE', cost: 100, range: 1500, desc: 'Shuriken angin raksasa (ditangkis: tetap kena 50%)' },
     quotes: {
       intro: 'Siap belajar? Eh... siap bertarung!',
       win: 'Jangan lupa kerjakan PR-nya, ya!',
@@ -78,8 +78,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Pukulan api bertubi-tubi sejauh 50% arena', tendang: 'Tendangan angin ke ujung arena (ditangkis: tanpa damage)', khusus: 'ATAS: menghilang & muncul di belakang lawan (pakai cakra)' },
-    jurus: { type: 'windlaser', name: 'LASER ANGIN BERPUTAR', cost: 30, range: 1500, desc: 'Laser angin dua tangan yang menghempaskan lawan ke ujung arena' },
-    ulti: { type: 'chestorb', name: 'BOLA TEKAD API', cost: 100, range: 1500, desc: 'Bola energi dari dada yang menghapus serangan apa pun & tak bisa ditangkis' },
+    jurus: { type: 'windlaser', dmg: 130, chip: 0.2, name: 'LASER ANGIN BERPUTAR', cost: 30, range: 1500, desc: 'Laser angin dua tangan yang menghempaskan lawan ke ujung arena' },
+    ulti: { type: 'chestorb', dmg: 270, chip: 0.5, name: 'BOLA TEKAD API', cost: 100, range: 1500, desc: 'Bola energi dari dada yang menghapus serangan apa pun (ditangkis: tetap kena 50%)' },
     quotes: {
       intro: 'Tekad api tak pernah padam.',
       win: 'Seorang pemimpin melindungi semuanya.',
@@ -116,8 +116,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Pukulan angin bertubi-tubi sejauh 30% arena', tendang: 'Tendangan angin ke ujung arena (ditangkis: tanpa damage)' },
-    jurus: { type: 'earthquake', name: 'HENTAKAN BUMI', cost: 30, range: 1500, desc: 'Meninju tanah hingga retak sejauh 55% arena; lawan di tanah pasti jatuh' },
-    ulti: { type: 'vortexball', name: 'BOLA PUSARAN ANGIN', cost: 100, range: 640, desc: 'Bola energi berpusaran angin sejauh 50% arena' },
+    jurus: { type: 'earthquake', dmg: 75, unblockable: true, name: 'HENTAKAN BUMI', cost: 30, range: 1500, desc: 'Meninju tanah hingga retak sejauh 55% arena; tak bisa ditangkis, lawan di tanah pasti jatuh' },
+    ulti: { type: 'vortexball', dmg: 240, chip: 0.2, name: 'BOLA PUSARAN ANGIN', cost: 100, range: 640, desc: 'Bola energi berpusaran angin sejauh 50% arena' },
     quotes: {
       intro: 'Berkasmu sudah saya proses. Sekarang giliranmu.',
       win: 'Arsip pertarungan: menang!',
@@ -154,8 +154,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Petir kuning kiri-kanan sejauh 30% arena, menggeser lawan yang menangkis', tendang: 'Menghempaskan lawan ke ujung arena (ditangkis: tanpa damage)' },
-    jurus: { type: 'flashupper', name: 'TINJU KILAT ANGIN', cost: 25, range: 1500, desc: 'Melesat secepat kilat lalu meninju dari bawah hingga lawan terlempar ke atas' },
-    ulti: { type: 'turbotornado', name: 'BADAI TURBO', cost: 100, range: 1500, desc: 'Putaran angin turbo berpetir yang menghempaskan lawan ke ujung arena' },
+    jurus: { type: 'flashupper', dmg: 120, chip: 0.2, name: 'TINJU KILAT ANGIN', cost: 25, range: 1500, desc: 'Melesat secepat kilat lalu meninju dari bawah hingga lawan terlempar ke atas' },
+    ulti: { type: 'turbotornado', dmg: 240, chip: 0.2, name: 'BADAI TURBO', cost: 100, range: 1500, desc: 'Putaran angin turbo berpetir yang menghempaskan lawan ke ujung arena' },
     quotes: {
       intro: 'Surat tugas: mengalahkanmu.',
       win: 'Laporan selesai, tepat waktu!',
@@ -190,8 +190,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Lemparan shuriken sejauh 45% arena', tendang: 'Tendangan biasa', khusus: 'Tekan arah sekali: meluncur secepat kilat' },
-    jurus: { type: 'thunderdash', name: 'TABRAKAN PETIR', cost: 30, range: 700, desc: 'Melesat menabrak lawan lalu menyetrum dengan listrik kuning-biru' },
-    ulti: { type: 'thunderorb', name: 'BOLA PETIR', cost: 100, range: 1000, desc: 'Bola petir pelindung didorong ke lawan & menyetrum hingga jatuh' },
+    jurus: { type: 'thunderdash', dmg: 120, chip: 0.2, name: 'TABRAKAN PETIR', cost: 30, range: 700, desc: 'Melesat menabrak lawan lalu menyetrum dengan listrik kuning-biru' },
+    ulti: { type: 'thunderorb', dmg: 250, chip: 0.2, name: 'BOLA PETIR', cost: 100, range: 1000, desc: 'Bola petir pelindung didorong ke lawan & menyetrum hingga jatuh' },
     quotes: {
       intro: 'Bayanganku lebih cepat dari matamu.',
       win: 'Kau bahkan tak melihat shuriken itu datang.',
@@ -227,8 +227,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Pukulan super cepat 4x', tendang: 'Tendangan tinggi', khusus: 'Tekan arah sekali: meluncur secepat kilat' },
-    jurus: { type: 'flashpunch', name: 'FLASH PUNCH', cost: 25, range: 1500, desc: 'Berlari secepat kilat lalu meninju; ditangkis pun lawan terpental ke ujung arena' },
-    ulti: { type: 'skyslam', name: 'HANTAMAN LANGIT', cost: 100, range: 1500, desc: 'Muncul di atas kepala lawan lalu menghantam ke bawah, tak bisa ditangkis' },
+    jurus: { type: 'flashpunch', dmg: 150, chip: 0.2, name: 'FLASH PUNCH', cost: 25, range: 1500, desc: 'Berlari secepat kilat lalu meninju hingga lawan terpental' },
+    ulti: { type: 'skyslam', dmg: 280, chip: 0.2, name: 'HANTAMAN LANGIT', cost: 100, range: 1500, desc: 'Muncul di atas kepala lawan lalu menghantam ke bawah' },
     quotes: {
       intro: 'Data sudah saya input. Giliran kamu kalah.',
       win: 'Server aman, lawan tumbang!',
@@ -262,8 +262,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Pukulan 35% lebih kuat, kombo 3x', tendang: 'Tendangan bola sejauh 40% arena', khusus: 'Gerak lebih lambat, tenaga paling besar' },
-    jurus: { type: 'firebasket', name: 'BOLA BASKET API', cost: 30, range: 1500, desc: 'Melempar bola basket api, lawan yang terkena langsung jatuh' },
-    ulti: { type: 'superkick', name: 'TENDANGAN BOLA PETIR SUPER', cost: 100, range: 1500, desc: 'Tendangan bola berpetir yang mendorong lawan ke ujung arena walau ditangkis' },
+    jurus: { type: 'firebasket', dmg: 140, chip: 0.2, name: 'BOLA BASKET API', cost: 30, range: 1500, desc: 'Melempar bola basket api, lawan yang terkena langsung jatuh' },
+    ulti: { type: 'superkick', dmg: 250, chip: 0.2, name: 'TENDANGAN BOLA PETIR SUPER', cost: 100, range: 1500, desc: 'Tendangan bola berpetir yang mendorong lawan ke ujung arena walau ditangkis' },
     quotes: {
       intro: 'Otot ini bukan pajangan!',
       win: 'Olahraga itu penting, anak-anak!',
@@ -297,8 +297,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Petir sejauh setengah layar yang mendorong lawan', tendang: 'Tendangan petir yang mendorong lawan jauh', khusus: 'Cakra penuh hanya 2 detik (OVER POWER)' },
-    jurus: { type: 'kamehameha', name: 'KAMEHAMEHA', cost: 30, range: 1500, desc: 'Gelombang energi yang menjangkau tepi layar' },
-    ulti: { type: 'skylaser', name: 'LASER MERAH LANGIT', cost: 100, range: 1500, desc: 'Menghilang, muncul di atas & menembakkan laser mata, lalu muncul di depan lawan yang terjatuh' },
+    jurus: { type: 'kamehameha', dmg: 160, chip: 0.2, name: 'KAMEHAMEHA', cost: 30, range: 1500, desc: 'Gelombang energi yang menjangkau tepi layar' },
+    ulti: { type: 'skylaser', dmg: 360, chip: 0.5, name: 'LASER MERAH LANGIT', cost: 100, range: 1500, desc: 'Menghilang, muncul di atas & menembakkan laser mata (ditangkis: tetap kena 50%)' },
     quotes: {
       intro: 'Raja tidak perlu mendekat.',
       win: 'Itulah kekuatan seorang raja!',
@@ -329,8 +329,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Pukulan berapi sejauh 25% arena', tendang: 'Tendangan tinggi menjatuhkan lawan' },
-    jurus: { type: 'arrow', name: 'PANAH CAHAYA', cost: 25, range: 1500, desc: 'Mengeluarkan busur lalu menembakkan panah' },
-    ulti: { type: 'thunderarrow', name: 'PANAH PETIR', cost: 100, range: 1500, desc: 'Panah berpetir yang menyeret lawan jauh ke belakang' },
+    jurus: { type: 'arrow', dmg: 120, chip: 0.2, name: 'PANAH CAHAYA', cost: 25, range: 1500, desc: 'Mengeluarkan busur lalu menembakkan panah' },
+    ulti: { type: 'thunderarrow', dmg: 250, chip: 0.2, name: 'PANAH PETIR', cost: 100, range: 1500, desc: 'Panah berpetir yang menyeret lawan jauh ke belakang' },
     quotes: {
       intro: 'Satu anak panah, satu sasaran.',
       win: 'Tepat sasaran, seperti biasa!',
@@ -361,8 +361,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Pukulan mawar dari bawah ke atas', tendang: 'Tendangan kaki' },
-    jurus: { type: 'roseblade', name: 'ANGIN PISAU MAWAR', cost: 25, range: 1500, desc: 'Kibasan mawar melepas angin pisau merah yang mementalkan lawan' },
-    ulti: { type: 'poisonrose', name: 'MAWAR BERACUN', cost: 100, range: 1500, desc: 'Melempar mawar yang meledakkan racun hingga lawan roboh' },
+    jurus: { type: 'roseblade', dmg: 120, chip: 0.2, name: 'ANGIN PISAU MAWAR', cost: 25, range: 1500, desc: 'Kibasan mawar melepas angin pisau merah yang mementalkan lawan' },
+    ulti: { type: 'poisonrose', dmg: 270, chip: 0.2, name: 'MAWAR BERACUN', cost: 100, range: 1500, desc: 'Melempar mawar yang meledakkan racun hingga lawan roboh' },
     quotes: {
       intro: 'Indah, tapi berduri.',
       win: 'Setiap mawar punya durinya sendiri.',
@@ -391,13 +391,13 @@ window.ROSTER = [
       p2: { frame: 'fan2', startup: 5, active: 4, recovery: 11, dmg: 45, hitstun: 20, blockstun: 12, push: 7, box: [125, 180, 140, 150], lunge: 2, next: 'p3' },
       p3: { frame: 'kick2', pre: 'walk1', startup: 7, active: 5, recovery: 17, dmg: 70, blockstun: 15, push: 8, box: [120, 230, 120, 150], lunge: 3, kd: true, launch: [8, -13], heavy: true },
       // tendangan dengan rok
-      kick: { frame: 'skirtkick', pre: 'walk1', startup: 8, active: 5, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 11, box: [120, 190, 140, 150], lunge: 2, heavy: true },
+      kick: { frame: 'skirtkick', pre: 'walk1', startup: 8, active: 5, recovery: 16, dmg: 85, hitstun: 22, blockstun: 14, push: 3, box: [120, 190, 140, 150], lunge: 2 },
       air: { frame: 'skirtkick', startup: 4, active: 40, recovery: 6, dmg: 75, hitstun: 22, blockstun: 12, push: 7, box: [110, 160, 140, 140] },
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Kibasan kipas mendorong lawan 50% arena (ditangkis: tanpa damage)', tendang: 'Tendangan dengan rok' },
-    jurus: { type: 'fangust', name: 'KIBASAN KIPAS', cost: 25, range: 1500, desc: 'Satu kibasan kipas melepas angin yang menjatuhkan lawan' },
-    ulti: { type: 'twinfan', name: 'BADAI DUA KIPAS', cost: 100, range: 1500, desc: 'Badai angin dua kipas yang melempar lawan sampai tepi arena' },
+    jurus: { type: 'fangust', dmg: 120, chip: 0.2, name: 'KIBASAN KIPAS', cost: 25, range: 1500, desc: 'Satu kibasan kipas melepas angin yang menjatuhkan lawan' },
+    ulti: { type: 'twinfan', dmg: 250, chip: 0.2, name: 'BADAI DUA KIPAS', cost: 100, range: 1500, desc: 'Badai angin dua kipas yang melempar lawan sampai tepi arena' },
     quotes: {
       intro: 'Biarkan anginku menari.',
       win: 'Angin selalu menang dengan tenang.',
@@ -432,8 +432,8 @@ window.ROSTER = [
     },
     // ringkasan untuk DAFTAR JURUS di layar pilih karakter
     skills: { pukul: 'Kombo 5 pukulan kiri-kanan super cepat', tendang: 'Sekali tendang lawan terpental jauh' },
-    jurus: { type: 'ballthrow', name: 'LEMPARAN BOLA', cost: 25, range: 1500, desc: 'Lemparan bola keras yang menjatuhkan lawan; ditangkis pun lawan terdorong jauh' },
-    ulti: { type: 'thunderkick', name: 'TENDANGAN BOLA PETIR', cost: 100, range: 1500, desc: 'Bola petir yang menghancurkan perisai dan melempar lawan ke ujung arena' },
+    jurus: { type: 'ballthrow', dmg: 140, chip: 0.2, name: 'LEMPARAN BOLA', cost: 25, range: 1500, desc: 'Lemparan bola keras yang menjatuhkan lawan; ditangkis pun lawan terdorong jauh' },
+    ulti: { type: 'thunderkick', dmg: 250, chip: 0.5, name: 'TENDANGAN BOLA PETIR', cost: 100, range: 1500, desc: 'Bola petir yang melempar lawan ke ujung arena (ditangkis: tetap kena 50%)' },
     quotes: {
       intro: 'Pemanasan dulu? Tidak perlu!',
       win: 'Priiit! Pertandingan selesai!',

@@ -119,6 +119,7 @@ class WallShove extends Actor {
     super(att.scene, att);
     this.vic = vic;
     this.blocked = blocked;
+    this.jutsu = att.state === 'jutsu';
     // frac: dorong sejauh pecahan lebar arena (0 = sampai ujung arena)
     this.left = frac ? CFG.W * frac : Infinity;
     this.dir = Math.sign(vic.x - att.x) || att.facing;
@@ -140,7 +141,7 @@ class WallShove extends Actor {
     if (this.left !== Infinity && (this.left <= 0 || wall)) return false; // dorongan angin biasa
     if (wall || this.t > 60) {
       if (!this.blocked) {
-        sc.applyHit(f, vic, { dmg: 10, kd: true, launch: [3, -9], heavy: true, force: true, hitstop: 8, srcX: vic.x - this.dir * 60, x: vic.x, y: vic.y - 150, noGain: true });
+        sc.applyHit(f, vic, { dmg: 10, kd: true, launch: [3, -9], heavy: true, force: true, normal: !this.jutsu, hitstop: 8, srcX: vic.x - this.dir * 60, x: vic.x, y: vic.y - 150, noGain: true });
       }
       sc.shake(220, 0.012);
       sc.fx.shock(vic.x, vic.ground, 0x9fe8ff, 2.4);
